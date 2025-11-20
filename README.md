@@ -1,81 +1,83 @@
-Weather-HMM-Co-Repo
+# Weather-HMM-Co-Repo
 
-Collaborative repository for the CSE 250A Final Project: Hidden Markov Models for Weather Pattern Analysis
+Collaborative repository for the CSE 250A Final Project: Hidden Markov Models for Weather Pattern Analysis.
 
-⸻
+---
 
-Repository Structure and Interface Design
+## Repository Structure and Module Interfaces
 
-This repository follows a modular, team-collaborative structure. Each module exposes a clear interface, allowing the Data, HMM, Baseline, and Evaluation groups to develop independently while maintaining full compatibility.
+This repository follows a modular design. Each team works independently but adheres to a unified interface.
 
-⸻
+---
 
-1. Data Module (data team)
+## 1. Data Module (data team)
 
-Responsibility:
-Process raw weather data from the Kaggle Global Weather Repository and produce a single cleaned CSV file for downstream modules.
+**Responsibility:**  
+Process the raw Kaggle Global Weather Repository data and output a single cleaned CSV file.
 
-Output format:
-The processed CSV should contain:
-	•	site_id — weather station / region ID
-	•	date — chronological date
-	•	processed meteorological features (e.g., temperature, humidity, precipitation, condition encoding, etc.)
-	•	any other optional metadata fields
+**Output CSV Requirements:**  
+Each row must contain:
+- `site_id`
+- `date` (chronologically ordered within each site)
+- processed meteorological features (temperature, humidity, precipitation, condition-encoded values, etc.)
+- optional metadata fields
 
-Rows must be grouped by site and sorted by date within each site.
+**Important:**  
+The data team outputs **only the CSV file**. No Python objects, no pickles, no NumPy arrays.
 
-No Python object output — only the CSV file is produced by this module.
+Rows must be grouped by site and sorted by date.
 
-⸻
+---
 
-2. HMM Module (HMM team)
+## 2. HMM Module (HMM team)
 
-The HMM team will implement:
-	•	data loading
-	•	model training (Baum–Welch)
-	•	inference (Forward–Backward, Viterbi)
-	•	generation of result files
+**Responsibility:**  
+Train HMMs on the processed CSV and produce model outputs.
 
-load_data() specification (HMM team version)
+### load_data() specification (HMM team version)
+Given the CSV from the data module, `load_data()` must:
+1. Read the CSV  
+2. Convert it into a two-level dictionary:
+   `data[site_id][t] = feature_vector`
+- `site_id`: region/station identifier  
+- `t`: integer index representing time order within that site  
+- `feature_vector`: numerical feature array derived from the CSV (continuous + encoded categorical fields)
 
-Given the CSV from the data module, load_data() should:
-	1.	Read the CSV
-	2.	Convert it into a two-level dictionary:
-  data[site_id][t] = feature_vector
-  	•	site_id: string or integer
-	•	t: integer time index within that site
-	•	feature_vector: processed numeric feature array
+Each site is treated as a separate observation sequence.
 
-This structure ensures each site is treated as an independent observation sequence for the HMM.
+### Output  
+The HMM module writes its results to a unified `results.csv` file.
 
-No dependency on the data preprocessing code—the HMM team independently loads and structures the CSV.
+---
 
-Output from HMM module
+## 3. Baseline Module (baseline team)
 
-Write model outputs in a unified results.csv format.
+**Responsibility:**  
+Implement alternative (non-HMM) unsupervised baselines, such as:
+- Gaussian Mixture Models  
+- k-means  
+- simple temporal baselines  
 
-⸻
+The baseline team:
+- implements its own `load_data()` reading the same CSV  
+- outputs predictions or state sequences to the same unified `results.csv` format
 
-3. Baseline Module (baseline team)
+This ensures fair comparison with the HMM model.
 
-The Baseline team (e.g., GMM, k-means, naive temporal baseline) follows the same interface as the HMM team:
-	•	They write their own load_data() reading the same CSV
-	•	They output their predictions, cluster assignments, or state sequences into a unified results.csv format
+---
 
-This ensures fair comparison between HMM and alternative models.
+## 4. Evaluation Module (evaluation team)
 
-⸻
+**Responsibility:**  
+Evaluation depends **only on** `results.csv`, independent of model internals.
 
-4. Evaluation Module (evaluation team)
+Tasks may include:
+- computing temporal metrics  
+- assessing sequence consistency  
+- comparing across sites  
+- analyzing correlations with ENSO phases  
+- visualizing hidden state sequences  
 
-The evaluation module:
-	•	only reads results.csv
-	•	does not depend on internal representations of HMM/Baseline
-	•	computes metrics such as:
-	•	likelihood-based scores
-	•	temporal consistency
-	•	cross-site synchronization
-	•	ENSO-related correlations
-	•	visualization of hidden-state sequences
+The evaluation module does not access or assume anything about how HMM or baseline models were implemented.
 
-The evaluation module remains completely independent, making the pipeline modular and reproducible.
+---
