@@ -1,4 +1,5 @@
 import pandas as pd
+from pathlib import Path
 
 # ================================
 # 可调参数
@@ -7,7 +8,11 @@ TARGET_COUNTRIES = {"JA", "KS", "AS", "US", "MX", "PE"}  # 日本、韩国、澳
 MIN_TOTAL_YEARS = 50          # 站点总长度至少多少年
 WINDOW_START = 1950           # 要求覆盖的时间窗口起点
 WINDOW_END = 2000             # 要求覆盖的时间窗口终点
-CSV_PATH = "isd-history.csv"  # 你的 CSV 路径
+
+# 使用相对路径：相对于当前脚本所在目录
+SCRIPT_DIR = Path(__file__).parent
+CSV_PATH = SCRIPT_DIR / "isd-history.csv"
+
 TOP_K = 4                    # 每个国家最多取多少个站点
 
 # 必须存在的列名（完全按你给的表头来）
@@ -84,5 +89,7 @@ else:
 
         print(out)
 
-        out.to_csv("stations_1960_2000_covered_top_each_country.csv", index=False)
-        print("\nSaved to stations_1960_2000_covered_top_each_country.csv")
+        # 输出到同一目录
+        output_path = SCRIPT_DIR / "stations_1960_2000_covered_top_each_country.csv"
+        out.to_csv(output_path, index=False)
+        print(f"\n✅ 已保存到: {output_path}")
