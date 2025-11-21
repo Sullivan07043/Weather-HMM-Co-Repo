@@ -1,0 +1,41 @@
+# macOS 系统文件
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Python 缓存
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# 虚拟环境
+venv/
+env/
+ENV/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 数据文件（可选，根据需要调整）
+*.csv
+*.pkl
+*.h5
+!data/stations_1960_2000_covered_top_each_country.csv
+
+# 输出文件
+data/processed/
+*.log
+
+# 临时文件
+*.tmp
+*.bak
+
