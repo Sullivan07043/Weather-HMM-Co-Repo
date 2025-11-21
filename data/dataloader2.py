@@ -404,18 +404,104 @@ class GSODDataLoader:
 
         print(f"   清洗完成，保留 {len(df_cleaned)} 行，{len(df_cleaned.columns)} 列特征")
 
-        # 先进行时间聚合（如果需要）
+        # 1. 先填充缺失值（在时间聚合之前，保证插值效果）
+        df_cleaned = self.fill_missing_values(df_cleaned)
+        
+        # 2. 进行时间聚合（如果需要）
         if self.time_aggregation == 'monthly':
             df_cleaned = self.aggregate_to_monthly(df_cleaned)
         elif self.time_aggregation == 'quarterly':
             df_cleaned = self.aggregate_to_quarterly(df_cleaned)
         # 如果是 'daily'，则不做聚合
         
-        # 再进行归一化和离散化（如果启用）
+        # 3. 进行归一化和离散化（如果启用）
         if self.discretize:
             df_cleaned = self.normalize_and_discretize(df_cleaned)
 
         return df_cleaned
+
+    def fill_missing_values(self, df):
+        """
+        填充缺失值（按站点进行时间序列插值）
+        
+        策略：
+        1. 对每个站点的连续特征，使用线性插值
+        2. 如果开头/结尾仍有NaN，使用前向/后向填充
+        3. 如果整列都是NaN，使用全局均值
+        4. 二进制特征用0填充（表示事件未发生）
+        """
+        print("\n填充缺失值...")
+        
+        df_filled = df.copy()
+        
+        # 统计原始缺失情况
+        original_na_counts = {}
+        for feature in self.continuous_features:
+            if feature in df_filled.columns:
+                original_na_counts[feature] = df_filled[feature].isna().sum()
+        
+        # 按站点分组处理连续特征
+        print("   对连续特征进行时间序列插值...")
+        for site_id in tqdm(df_filled['site_id'].unique(), desc="   处理站点", leave=False):
+            site_mask = df_filled['site_id'] == site_id
+            
+            for feature in self.continuous_features:
+                if feature not in df_filled.columns:
+                    continue
+                
+                # 获取该站点该特征的数据
+                site_feature_data = df_filled.loc[site_mask, feature]
+                
+                if site_feature_data.isna().all():
+                    # 如果该站点该特征全是NaN，跳过（后面用全局均值填充）
+                    continue
+                
+                # 1. 线性插值（基于时间顺序）
+                interpolated = site_feature_data.interpolate(method='linear', limit_direction='both')
+                
+                # 2. 前向填充（处理开头的NaN）
+                interpolated = interpolated.fillna(method='ffill')
+                
+                # 3. 后向填充（处理结尾的NaN）
+                interpolated = interpolated.fillna(method='bfill')
+                
+                # 更新数据
+                df_filled.loc[site_mask, feature] = interpolated
+        
+        # 4. 如果仍有NaN（整个站点都缺失或某些特殊情况），使用全局均值
+        for feature in self.continuous_features:
+            if feature in df_filled.columns:
+                remaining_na = df_filled[feature].isna().sum()
+                if remaining_na > 0:
+                    global_mean = df_filled[feature].mean()
+                    if pd.notna(global_mean):
+                        df_filled[feature] = df_filled[feature].fillna(global_mean)
+                        print(f"   ⚠️  {feature}: 用全局均值 {global_mean:.2f} 填充 {remaining_na} 个剩余NaN")
+                    else:
+                        # 如果全局均值都是NaN（整列都缺失），填充为0
+                        df_filled[feature] = df_filled[feature].fillna(0)
+                        print(f"   ⚠️  {feature}: 全部缺失，用0填充")
+        
+        # 5. 二进制特征（天气事件）：NaN填充为0（表示未发生）
+        binary_features = ['fog', 'rain', 'snow', 'hail', 'thunder', 'tornado']
+        for feature in binary_features:
+            if feature in df_filled.columns:
+                na_count = df_filled[feature].isna().sum()
+                if na_count > 0:
+                    df_filled[feature] = df_filled[feature].fillna(0)
+        
+        # 汇总填充结果
+        print(f"\n   缺失值填充结果：")
+        for feature in self.continuous_features:
+            if feature in df_filled.columns and feature in original_na_counts:
+                original_na = original_na_counts[feature]
+                remaining_na = df_filled[feature].isna().sum()
+                if original_na > 0:
+                    print(f"      {feature:25s}: {original_na:6d} → {remaining_na:6d} NaN")
+        
+        print(f"   ✅ 缺失值填充完成")
+        
+        return df_filled
 
     def normalize_and_discretize(self, df):
         """
