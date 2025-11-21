@@ -438,36 +438,78 @@ class GSODDataLoader:
             print(f"   - 离散化组数: {self.n_bins}")
             print(f"   - 原始值列（*_raw）: {len(raw_cols)} 个")
     
-    def process_multiple_years(self, years, max_stations_per_year=None):
+    def process_multiple_years(self, years, max_stations_per_year=None, batch_size=5):
         """
-        处理多个年份的数据
+        处理多个年份的数据（分批处理以避免内存溢出）
         
         Args:
             years: 年份列表
             max_stations_per_year: 每年最大处理站点数
+            batch_size: 每批处理的年份数（默认5年一批）
             
         Returns:
             DataFrame: 合并后的数据
         """
-        all_years_data = []
+        # 将年份分批
+        year_batches = [years[i:i+batch_size] for i in range(0, len(years), batch_size)]
         
-        for year in years:
-            df = self.process_year_data(year, max_stations=max_stations_per_year)
-            if df is not None:
-                all_years_data.append(df)
+        print(f"\n📦 将 {len(years)} 个年份分为 {len(year_batches)} 批处理")
+        print(f"   每批处理 {batch_size} 年，避免内存溢出")
         
-        if not all_years_data:
+        all_batches_data = []
+        
+        for batch_idx, year_batch in enumerate(year_batches, 1):
+            print(f"\n{'='*80}")
+            print(f"📦 处理第 {batch_idx}/{len(year_batches)} 批: {year_batch[0]}-{year_batch[-1]}")
+            print(f"{'='*80}")
+            
+            batch_data = []
+            for year in year_batch:
+                df = self.process_year_data(year, max_stations=max_stations_per_year)
+                if df is not None:
+                    batch_data.append(df)
+                    
+                    # 显示当前内存使用
+                    import psutil
+                    process = psutil.Process()
+                    memory_mb = process.memory_info().rss / 1024 / 1024
+                    print(f"   💾 当前内存使用: {memory_mb:.1f} MB")
+            
+            if batch_data:
+                # 合并当前批次
+                print(f"\n🔗 合并批次 {batch_idx} 的数据...")
+                batch_combined = pd.concat(batch_data, ignore_index=True)
+                
+                # 立即清洗和转换（减少内存占用）
+                batch_cleaned = self.clean_and_transform(batch_combined)
+                
+                # 保存批次数据
+                batch_filename = f'weather_data_batch_{batch_idx}_{year_batch[0]}_{year_batch[-1]}.csv'
+                self.save_processed_data(batch_cleaned, batch_filename)
+                
+                all_batches_data.append(batch_cleaned)
+                
+                # 清理内存
+                del batch_data, batch_combined
+                import gc
+                gc.collect()
+                print(f"   🧹 已清理批次 {batch_idx} 的临时数据")
+            
+        if not all_batches_data:
             print("❌ 没有成功处理任何年份的数据")
             return None
         
-        # 合并所有年份
-        print(f"\n🔗 合并 {len(all_years_data)} 个年份的数据...")
-        combined_df = pd.concat(all_years_data, ignore_index=True)
+        # 合并所有批次
+        print(f"\n{'='*80}")
+        print(f"🔗 合并所有 {len(all_batches_data)} 个批次的数据...")
+        final_df = pd.concat(all_batches_data, ignore_index=True)
         
-        # 清洗和转换
-        cleaned_df = self.clean_and_transform(combined_df)
+        # 最终排序
+        final_df = final_df.sort_values(['site_id', 'date']).reset_index(drop=True)
         
-        return cleaned_df
+        print(f"✅ 所有批次合并完成")
+        
+        return final_df
     
     def generate_summary_statistics(self, df):
         """
