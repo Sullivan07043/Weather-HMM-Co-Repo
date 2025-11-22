@@ -76,11 +76,11 @@ segments.to_csv("my_segments.csv", index=False)
 
 The output CSV (`pelt_segments_enso24.csv`) contains:
 - `site_id`: Weather station identifier
-- `segment_id`: Sequential segment number for each site
-- `start_idx`: Starting index in the time series
+- `segment_id`: Sequential segment number for EACH site.
+- `start_idx`: Starting index in the time series (months)
 - `end_idx`: Ending index (inclusive)
-- `start_date`: First date of segment
-- `end_date`: Last date of segment
+- `start_date`: First date of this segment
+- `end_date`: Last date of this segment
 - `length`: Number of time points in segment
 
 ## Parameters
