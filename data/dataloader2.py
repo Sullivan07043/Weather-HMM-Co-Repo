@@ -25,7 +25,7 @@ class GSODDataLoader:
         n_bins=5,
         discretize=True,
         station_list_csv=None,   # 新增：只处理这些站点
-        time_aggregation='daily',   # 新增：时间聚合方式 ('daily', 'monthly', 'quarterly')
+        time_aggregation='daily',   # 新增：时间聚合方式 ('daily', 'monthly', 'quarterly', 'yearly')
     ):
         """
         初始化数据加载器
@@ -41,6 +41,7 @@ class GSODDataLoader:
                 - 'daily': 保持每日数据（默认）
                 - 'monthly': 聚合为月平均
                 - 'quarterly': 聚合为季度平均
+                - 'yearly': 聚合为年平均
         """
         if data_root is None:
             # 自动检测数据路径
@@ -69,8 +70,8 @@ class GSODDataLoader:
         self.discretize = discretize
         
         # 时间聚合参数
-        if time_aggregation not in ['daily', 'monthly', 'quarterly']:
-            raise ValueError("time_aggregation 必须是 'daily', 'monthly' 或 'quarterly'")
+        if time_aggregation not in ['daily', 'monthly', 'quarterly', 'yearly']:
+            raise ValueError("time_aggregation 必须是 'daily', 'monthly', 'quarterly' 或 'yearly'")
         self.time_aggregation = time_aggregation
 
         # 数据格式定义（基于 GSOD 文档）
@@ -412,6 +413,8 @@ class GSODDataLoader:
             df_cleaned = self.aggregate_to_monthly(df_cleaned)
         elif self.time_aggregation == 'quarterly':
             df_cleaned = self.aggregate_to_quarterly(df_cleaned)
+        elif self.time_aggregation == 'yearly':
+            df_cleaned = self.aggregate_to_yearly(df_cleaned)
         # 如果是 'daily'，则不做聚合
         
         # 3. 进行归一化和离散化（如果启用）
@@ -697,6 +700,41 @@ class GSODDataLoader:
         
         return df_monthly
 
+    def aggregate_to_yearly(self, df):
+        """将每日数据聚合为年平均数据"""
+        print("\n聚合为年平均数据...")
+
+        df['year'] = df['date'].dt.year
+
+        agg_dict = {}
+        for feature in self.continuous_features:
+            if feature in df.columns:
+                agg_dict[feature] = 'mean'
+                if f'{feature}_raw' in df.columns:
+                    agg_dict[f'{feature}_raw'] = 'mean'
+
+        binary_features = ['fog', 'rain', 'snow', 'hail', 'thunder', 'tornado']
+        for feature in binary_features:
+            if feature in df.columns:
+                agg_dict[feature] = 'mean'
+
+        agg_dict['date'] = 'first'
+
+        print("   按站点和年份分组聚合...")
+        df_yearly = df.groupby(['site_id', 'year'], as_index=False).agg(agg_dict)
+
+        df_yearly['date'] = pd.to_datetime(df_yearly['year'].astype(str) + '-01-01')
+
+        df_yearly = df_yearly.drop(columns=['year'])
+        df_yearly = df_yearly.sort_values(['site_id', 'date']).reset_index(drop=True)
+
+        print(f"   聚合完成:")
+        print(f"      原始每日数据: {len(df):,} 行")
+        print(f"      年平均数据: {len(df_yearly):,} 行")
+        print(f"      平均每站点年数: {len(df_yearly) / df_yearly['site_id'].nunique():.1f}")
+
+        return df_yearly
+
     def save_processed_data(self, df, filename='processed_weather_data.csv'):
         output_path = self.output_dir / filename
         df.to_csv(output_path, index=False)
@@ -705,7 +743,8 @@ class GSODDataLoader:
         time_granularity_map = {
             'daily': '每日观测',
             'monthly': '月平均',
-            'quarterly': '季度平均'
+            'quarterly': '季度平均',
+            'yearly': '年平均'
         }
         
         print(f"\n✅ 数据已保存到: {output_path}")
@@ -773,20 +812,23 @@ def main():
     print("1. 每日观测（Daily）- 保持原始每日数据")
     print("2. 月平均（Monthly）- 将每日数据聚合为月平均（数据量约减少 1/30）")
     print("3. 季度平均（Quarterly）- 将每日数据聚合为季度平均（数据量约减少 1/90）")
+    print("4. 年平均（Yearly）- 将每日数据聚合为年平均（数据量约减少 1/365）")
     
-    time_choice = input("\n请选择 (1/2/3) [默认: 1]: ").strip() or "1"
+    time_choice = input("\n请选择 (1/2/3/4) [默认: 1]: ").strip() or "1"
     
     time_aggregation_map = {
         "1": "daily",
         "2": "monthly",
-        "3": "quarterly"
+        "3": "quarterly",
+        "4": "yearly"
     }
     time_aggregation = time_aggregation_map.get(time_choice, "daily")
     
     time_display = {
         "daily": "每日观测",
         "monthly": "月平均聚合",
-        "quarterly": "季度平均聚合"
+        "quarterly": "季度平均聚合",
+        "yearly": "年平均聚合"
     }
     print(f"✓ 已选择: {time_display[time_aggregation]}")
 
