@@ -641,7 +641,7 @@ if __name__ == "__main__":
     ]
 
     # Path to preprocessed monthly data with discretized features
-    csv_path = "data/processed/weather_1901_2019_monthly_bins10.csv"
+    csv_path = "data/processed/weather_1901_2019_yearly_bins10.csv"
 
     data_dict, lengths_dict, feature_cols, n_categories = load_data(
         csv_path,
