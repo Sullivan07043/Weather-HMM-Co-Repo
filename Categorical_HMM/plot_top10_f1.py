@@ -18,17 +18,7 @@ df_results = df_results.sort_values('f1_score', ascending=False)
 # Get top 10
 top10 = df_results.head(10).copy()
 
-# Load station metadata to get names
-df_stations = pd.read_csv('data/stations_1960_2000_covered_top_each_country.csv')
-
-# Update station names
-for idx, row in top10.iterrows():
-    station_info = df_stations[df_stations['USAF'] == row['site_id']]
-    if len(station_info) > 0:
-        top10.at[idx, 'station_name'] = station_info.iloc[0]['Name']
-        top10.at[idx, 'country'] = station_info.iloc[0]['Country']
-        top10.at[idx, 'lat'] = station_info.iloc[0]['Lat']
-        top10.at[idx, 'lon'] = station_info.iloc[0]['Lon']
+# Station info is already in the CSV from evaluate_enso_f1.py
 
 # Create figure with 2 subplots
 fig = plt.figure(figsize=(16, 10))
@@ -126,8 +116,8 @@ plt.suptitle('ENSO Detection: Top 10 Stations by F1-Score\nBased on Official ONI
              fontsize=16, fontweight='bold', y=0.98)
 
 plt.tight_layout(rect=[0, 0, 1, 0.96])
-plt.savefig('top10_f1_enso_sites.png', dpi=300, bbox_inches='tight')
-print("✓ Saved: top10_f1_enso_sites.png")
+plt.savefig('top10_f1_performance_comparison.png', dpi=300, bbox_inches='tight')
+print("✓ Saved: top10_f1_performance_comparison.png")
 
 # ============================================================================
 # Create detailed table visualization
