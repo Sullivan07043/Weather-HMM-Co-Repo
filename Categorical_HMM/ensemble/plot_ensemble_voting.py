@@ -1,0 +1,184 @@
+"""
+Generate visualizations for ensemble voting results
+"""
+import pandas as pd
+import numpy as np
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend
+import matplotlib.pyplot as plt
+
+# Load results
+df = pd.read_csv('ensemble_voting_results.csv')
+
+print("Generating visualizations...")
+
+# Create figure with subplots
+fig, axes = plt.subplots(3, 1, figsize=(14, 12))
+
+# ============================================================================
+# Plot 1: Time Series Comparison
+# ============================================================================
+ax = axes[0]
+
+years = df['Year'].values
+ground_truth = df['Ground_Truth'].values
+prediction = df['Ensemble_50pct'].values
+
+# Plot bars
+width = 0.35
+x = np.arange(len(years))
+
+bars1 = ax.bar(x - width/2, ground_truth, width, label='Ground Truth', 
+               alpha=0.7, color='red', edgecolor='black', linewidth=0.5)
+
+# Use 30% threshold as default
+prediction_30 = df['Ensemble_30pct'].values if 'Ensemble_30pct' in df.columns else df['Ensemble_50pct'].values
+bars2 = ax.bar(x + width/2, prediction_30, width, label='Ensemble Prediction (30%)', 
+               alpha=0.7, color='blue', edgecolor='black', linewidth=0.5)
+
+ax.set_xlabel('Year', fontsize=12, fontweight='bold')
+ax.set_ylabel('ENSO Anomaly (0=Normal, 1=Anomaly)', fontsize=11, fontweight='bold')
+ax.set_title('Ensemble ENSO Prediction vs Ground Truth (1950-1990)', 
+             fontsize=13, fontweight='bold', pad=10)
+ax.set_xticks(x[::5])  # Show every 5th year
+ax.set_xticklabels(years[::5], rotation=45)
+ax.legend(loc='upper left', framealpha=0.9)
+ax.grid(True, alpha=0.3, axis='y', linestyle='--')
+
+# ============================================================================
+# Plot 2: Anomaly Voting Ratio Time Series
+# ============================================================================
+ax = axes[1]
+
+ax.plot(years, df['Anomaly_Ratio'], color='purple', linewidth=2, 
+        label='Station Anomaly Ratio', alpha=0.8, marker='o', markersize=4)
+ax.axhline(y=0.2, color='green', linestyle=':', linewidth=1.5, 
+          label='20% Threshold', alpha=0.6)
+ax.axhline(y=0.3, color='orange', linestyle='--', linewidth=2, 
+          label='30% Threshold (Default)', alpha=0.8)
+ax.axhline(y=0.4, color='blue', linestyle=':', linewidth=1.5, 
+          label='40% Threshold', alpha=0.6)
+ax.axhline(y=0.5, color='red', linestyle=':', linewidth=1.5, 
+          label='50% Threshold', alpha=0.6)
+
+# Shade ground truth anomaly periods
+for idx, row in df.iterrows():
+    if row['Ground_Truth'] == 1:
+        ax.axvspan(row['Year']-0.5, row['Year']+0.5, alpha=0.1, color='red')
+
+ax.set_xlabel('Year', fontsize=12, fontweight='bold')
+ax.set_ylabel('Fraction of Stations Predicting Anomaly', fontsize=11, fontweight='bold')
+ax.set_title('Station Voting Ratio Over Time', fontsize=13, fontweight='bold', pad=10)
+ax.set_ylim(0, 1)
+ax.set_xlim(years[0]-1, years[-1]+1)
+ax.grid(True, alpha=0.3, linestyle='--')
+ax.legend(loc='best', framealpha=0.9)
+
+# ============================================================================
+# Plot 3: Performance Metrics
+# ============================================================================
+ax = axes[2]
+
+# Calculate metrics using 30% threshold
+prediction_30 = df['Ensemble_30pct'].values if 'Ensemble_30pct' in df.columns else df['Ensemble_50pct'].values
+
+tn = np.sum((df['Ground_Truth'] == 0) & (prediction_30 == 0))
+fp = np.sum((df['Ground_Truth'] == 0) & (prediction_30 == 1))
+fn = np.sum((df['Ground_Truth'] == 1) & (prediction_30 == 0))
+tp = np.sum((df['Ground_Truth'] == 1) & (prediction_30 == 1))
+
+accuracy = (tp + tn) / len(df)
+precision = tp / (tp + fp) if (tp + fp) > 0 else 0
+recall = tp / (tp + fn) if (tp + fn) > 0 else 0
+f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0
+
+metrics = ['Accuracy', 'Precision', 'Recall', 'F1-Score']
+values = [accuracy, precision, recall, f1]
+colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728']
+
+bars = ax.barh(metrics, values, color=colors, alpha=0.8, edgecolor='black', linewidth=1.5)
+
+# Add value labels
+for i, (bar, val) in enumerate(zip(bars, values)):
+    ax.text(val + 0.02, i, f'{val:.3f}', va='center', fontsize=11, fontweight='bold')
+
+# Add confusion matrix text
+cm_text = f'Confusion Matrix:\nTN={tn}, FP={fp}\nFN={fn}, TP={tp}'
+ax.text(0.65, 0.15, cm_text, transform=ax.transAxes, fontsize=10,
+        bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
+
+ax.set_xlabel('Score', fontsize=12, fontweight='bold')
+ax.set_title('Ensemble Performance Metrics (30% Threshold)', 
+             fontsize=13, fontweight='bold', pad=10)
+ax.set_xlim(0, 1.1)
+ax.grid(True, alpha=0.3, axis='x', linestyle='--')
+
+plt.suptitle('Ensemble ENSO Detection: Majority Voting Across All Stations', 
+             fontsize=15, fontweight='bold', y=0.995)
+
+plt.tight_layout()
+plt.savefig('ensemble_voting_enso_analysis.png', dpi=300, bbox_inches='tight')
+print("✓ Saved: ensemble_voting_enso_analysis.png")
+
+# ============================================================================
+# Create detailed comparison table visualization
+# ============================================================================
+fig2, ax = plt.subplots(figsize=(12, 14))
+ax.axis('tight')
+ax.axis('off')
+
+# Prepare table data
+table_data = []
+table_data.append(['Year', 'ENSO Type', 'Truth', 'Vote %', 'Prediction', 'Match'])
+
+for idx, row in df.iterrows():
+    year = int(row['Year'])
+    enso_type = row['ENSO_Type'].replace('_', ' ')
+    truth = 'Anomaly' if row['Ground_Truth'] == 1 else 'Normal'
+    vote_pct = f"{row['Anomaly_Ratio']*100:.1f}%"
+    # Use 30% threshold
+    prediction_col = 'Ensemble_30pct' if 'Ensemble_30pct' in row else 'Ensemble_50pct'
+    prediction = 'Anomaly' if row[prediction_col] == 1 else 'Normal'
+    match_col = 'Match_30pct' if 'Match_30pct' in row else 'Match_50pct'
+    match = '✓' if row[match_col] == 1 else '✗'
+    
+    table_data.append([year, enso_type, truth, vote_pct, prediction, match])
+
+# Create table
+table = ax.table(cellText=table_data, cellLoc='center', loc='center',
+                colWidths=[0.15, 0.20, 0.17, 0.15, 0.18, 0.15])
+
+table.auto_set_font_size(False)
+table.set_fontsize(9)
+table.scale(1, 1.8)
+
+# Style header row
+for i in range(6):
+    cell = table[(0, i)]
+    cell.set_facecolor('#4472C4')
+    cell.set_text_props(weight='bold', color='white', fontsize=10)
+
+# Style data rows
+for i in range(1, len(table_data)):
+    for j in range(6):
+        cell = table[(i, j)]
+        if i % 2 == 0:
+            cell.set_facecolor('#E7E6E6')
+        else:
+            cell.set_facecolor('#FFFFFF')
+        
+        # Highlight mismatches in red
+        if j == 5 and table_data[i][5] == '✗':
+            cell.set_text_props(color='red', weight='bold', fontsize=10)
+        # Highlight matches in green
+        elif j == 5 and table_data[i][5] == '✓':
+            cell.set_text_props(color='green', weight='bold', fontsize=10)
+
+plt.title('Year-by-Year Ensemble Prediction vs Ground Truth (1950-1990)', 
+          fontsize=14, fontweight='bold', pad=20)
+
+plt.savefig('ensemble_voting_detailed_comparison.png', dpi=300, bbox_inches='tight')
+print("✓ Saved: ensemble_voting_detailed_comparison.png")
+
+print("\nVisualization complete!")
+
