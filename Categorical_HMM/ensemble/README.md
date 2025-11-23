@@ -20,12 +20,13 @@ For each year from 1950 to 1990:
 
 ### Threshold Selection
 
-We evaluated four different voting thresholds:
+We evaluated five different voting thresholds:
 
 | Threshold | Description | Use Case |
 |-----------|-------------|----------|
 | **20%** | Most sensitive | High-risk scenarios (disaster prevention) |
-| **30%** | Balanced (default) | Scientific research and analysis |
+| **25%** | High sensitivity (recommended) | Balanced early warning systems |
+| **30%** | Balanced | Scientific research and analysis |
 | **40%** | Conservative | Moderate-risk scenarios |
 | **50%** | Most strict | High-confidence requirements |
 
@@ -54,7 +55,31 @@ Actual: Anomaly          0                  28
 - ✅ **68.3% precision** - 2 out of 3 anomaly predictions are correct
 - ⚠️ **13 false positives** - Some normal years classified as anomalies
 
-### Balanced Performance: 30% Threshold (Default)
+### Balanced Performance: 25% Threshold (Recommended)
+
+| Metric | Value |
+|--------|-------|
+| **Accuracy** | 0.6829 |
+| **Precision** | 0.7143 |
+| **Recall** | 0.8929 |
+| **F1-Score** | 0.7937 |
+
+**Confusion Matrix (25% threshold):**
+
+```
+                Predicted: Normal    Predicted: Anomaly
+Actual: Normal           3                  10
+Actual: Anomaly          3                  25
+```
+
+**Key Findings:**
+- ✅ High recall (89.3%) - Catches most ENSO events
+- ✅ Good precision (71.4%) - Reduces false positives compared to 20%
+- ✅ Excellent F1-score (0.79) - Better balance than 20% threshold
+- ✅ Only 3 false negatives - Misses very few events
+- ⚠️ 10 false positives - Some normal years classified as anomalies
+
+### Balanced Performance: 30% Threshold
 
 | Metric | Value |
 |--------|-------|
@@ -84,7 +109,7 @@ Actual: Anomaly         10                  18
 1. **`ensemble_voting_enso.py`** (18KB)
    - Main analysis script
    - Performs majority voting across all stations
-   - Evaluates performance at multiple thresholds (20%, 30%, 40%, 50%)
+   - Evaluates performance at multiple thresholds (20%, 25%, 30%, 40%, 50%)
    - Generates CSV results and console reports
 
 2. **`plot_ensemble_voting.py`** (7.1KB)
@@ -103,20 +128,20 @@ Actual: Anomaly         10                  18
      - `Total_Stations`: Number of stations with predictions
      - `Anomaly_Votes`: Count of stations predicting anomaly
      - `Anomaly_Ratio`: Fraction of stations predicting anomaly
-     - `Ensemble_20pct`, `Ensemble_30pct`, `Ensemble_40pct`, `Ensemble_50pct`: Predictions at each threshold
-     - `Match_20pct`, `Match_30pct`, `Match_40pct`, `Match_50pct`: Binary match indicators
+     - `Ensemble_20pct`, `Ensemble_25pct`, `Ensemble_30pct`, `Ensemble_40pct`, `Ensemble_50pct`: Predictions at each threshold
+     - `Match_20pct`, `Match_25pct`, `Match_30pct`, `Match_40pct`, `Match_50pct`: Binary match indicators
 
 ### Visualizations
 
 4. **`ensemble_voting_enso_analysis.png`** (513KB)
    - Three-panel comprehensive analysis figure
    - **Panel 1**: Time series comparison (Ground truth vs. Ensemble prediction)
-   - **Panel 2**: Station voting ratio over time with threshold lines
-   - **Panel 3**: Performance metrics bar chart (30% threshold)
+   - **Panel 2**: Station voting ratio over time with threshold lines (20%, 25%, 30%, 40%, 50%)
+   - **Panel 3**: Performance metrics bar chart (25% threshold default)
 
 5. **`ensemble_voting_detailed_comparison.png`** (576KB)
    - Year-by-year detailed comparison table (1950-1990)
-   - Shows ENSO type, ground truth, voting percentage, prediction, and match status
+   - Shows ENSO type, ground truth, voting percentage, prediction (25% threshold), and match status
    - Color-coded: ✓ (green) for correct, ✗ (red) for misclassified
 
 ## Usage
@@ -154,6 +179,12 @@ Threshold: 20% (anomaly votes > 20%)
   Recall:    1.0000
   F1-Score:  0.8116
 
+Threshold: 25% (anomaly votes > 25%)
+  Accuracy:  0.6829
+  Precision: 0.7143
+  Recall:    0.8929
+  F1-Score:  0.7937
+
 Threshold: 30% (anomaly votes > 30%)
   Accuracy:  0.5854
   Precision: 0.7200
@@ -173,8 +204,9 @@ Best Threshold: 20% (F1-Score: 0.8116)
 
 The ensemble system is highly sensitive to the voting threshold:
 
-- **Lower thresholds (20-30%)**: Favor recall (detecting more ENSO events)
-- **Higher thresholds (40-50%)**: Favor precision (fewer false positives)
+- **Lower thresholds (20-25%)**: Favor recall (detecting more ENSO events), best F1-scores
+- **Medium thresholds (30%)**: Balance between precision and recall
+- **Higher thresholds (40-50%)**: Favor precision (fewer false positives) but miss many events
 
 ### 2. Station Consensus Patterns
 
@@ -208,14 +240,21 @@ The ensemble method successfully leverages the "wisdom of crowds" to outperform 
 ### For Disaster Risk Management
 **Use 20% threshold**
 - Priority: Don't miss any ENSO event
-- Acceptable: Some false alarms
-- Perfect recall ensures all potential risks are flagged
+- Perfect recall (100%) ensures all potential risks are flagged
+- Acceptable: Some false alarms (13 out of 41 years)
+
+### For Early Warning Systems (Recommended)
+**Use 25% threshold**
+- Priority: Balance high detection with acceptable precision
+- 89.3% recall catches almost all ENSO events
+- 71.4% precision reduces false alarms significantly
+- Best overall F1-score (0.79) after 20% threshold
 
 ### For Climate Research
 **Use 30% threshold**
 - Priority: Balance between detection and precision
-- Acceptable: Missing some minor ENSO events
 - Good for statistical analysis and pattern recognition
+- Acceptable: Missing some minor ENSO events
 
 ### For Economic Forecasting
 **Use 40-50% threshold**
@@ -272,6 +311,12 @@ The ensemble method successfully leverages the "wisdom of crowds" to outperform 
 For questions or suggestions about the ensemble voting system, please open an issue on the GitHub repository.
 
 ## Version History
+
+- **v1.1** (2024-11-22): Added 25% threshold
+  - Added 25% threshold evaluation for better balance
+  - 25% threshold achieves F1=0.7937 with 89.3% recall and 71.4% precision
+  - Updated visualizations to include all 5 thresholds
+  - Recommended 25% as default for early warning systems
 
 - **v1.0** (2024-11-22): Initial release
   - Implemented majority voting ensemble

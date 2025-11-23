@@ -60,16 +60,16 @@ print("Loading data...")
 print("="*80)
 
 # Load HMM predictions for all stations
-df_states = pd.read_csv('enso_factorized_categorical_hmm_states.csv')
+df_states = pd.read_csv('../enso_factorized_categorical_hmm_states.csv')
 print(f"Loaded HMM states: {len(df_states)} records")
 
 # Load ground truth ENSO data
-df_truth = pd.read_csv('enso_oni_data_1950_1990.csv')
+df_truth = pd.read_csv('../enso_oni_data_1950_1990.csv')
 print(f"Loaded ground truth: {len(df_truth)} years (1950-1990)")
 
 # Load station metadata to get station names
 try:
-    df_stations = pd.read_csv('data/stations_1960_2000_covered_top_each_country.csv')
+    df_stations = pd.read_csv('../data/stations_1960_2000_covered_top_each_country.csv')
     # Create station ID from USAF and WBAN
     df_stations['station_id'] = df_stations['USAF'].astype(str) + '-' + df_stations['WBAN'].astype(str)
     station_dict = dict(zip(df_stations['station_id'], df_stations['Name']))
@@ -103,10 +103,11 @@ voting_results['calendar_year'] = 1950 + voting_results['year']
 
 # Majority voting: try different thresholds
 voting_results['ensemble_prediction_20'] = (voting_results['anomaly_ratio'] > 0.2).astype(int)
+voting_results['ensemble_prediction_25'] = (voting_results['anomaly_ratio'] > 0.25).astype(int)
 voting_results['ensemble_prediction_30'] = (voting_results['anomaly_ratio'] > 0.3).astype(int)
 voting_results['ensemble_prediction_40'] = (voting_results['anomaly_ratio'] > 0.4).astype(int)
 voting_results['ensemble_prediction_50'] = (voting_results['anomaly_ratio'] > 0.5).astype(int)
-voting_results['ensemble_prediction'] = voting_results['ensemble_prediction_30']  # Use 30% as default
+voting_results['ensemble_prediction'] = voting_results['ensemble_prediction_25']  # Use 25% as default
 
 print(f"\nVoting statistics:")
 print(f"  Years analyzed: {len(voting_results)}")
@@ -132,12 +133,14 @@ print("="*80)
 
 y_true = df_comparison['enso_anomaly'].values
 y_pred_20 = df_comparison['ensemble_prediction_20'].values
+y_pred_25 = df_comparison['ensemble_prediction_25'].values
 y_pred_30 = df_comparison['ensemble_prediction_30'].values
 y_pred_40 = df_comparison['ensemble_prediction_40'].values
 y_pred_50 = df_comparison['ensemble_prediction_50'].values
 
 thresholds = {
     '20%': y_pred_20,
+    '25%': y_pred_25,
     '30%': y_pred_30,
     '40%': y_pred_40,
     '50%': y_pred_50
@@ -175,12 +178,12 @@ print(f"\n{'='*80}")
 print(f"Best Threshold: {best_threshold} (F1-Score: {best_f1:.4f})")
 print(f"{'='*80}")
 
-# Use 30% threshold as default for detailed analysis
-y_pred = y_pred_30
+# Use 25% threshold as default for detailed analysis
+y_pred = y_pred_25
 
 # Confusion Matrix
 cm = confusion_matrix(y_true, y_pred)
-print(f"\nConfusion Matrix (30% threshold):")
+print(f"\nConfusion Matrix (25% threshold):")
 print(f"  TN={cm[0,0]}, FP={cm[0,1]}")
 print(f"  FN={cm[1,0]}, TP={cm[1,1]}")
 
@@ -244,13 +247,15 @@ if PLOTTING_AVAILABLE:
 
     ax2.plot(years, df_comparison['anomaly_ratio'], 
              color='purple', linewidth=2, label='Station Anomaly Ratio', alpha=0.7)
-    ax2.axhline(y=0.2, color='green', linestyle='--', linewidth=1.5, 
+    ax2.axhline(y=0.2, color='green', linestyle=':', linewidth=1.5, 
                 label='20% Threshold', alpha=0.5)
-    ax2.axhline(y=0.3, color='orange', linestyle='--', linewidth=2, 
-                label='30% Threshold (Default)', alpha=0.7)
-    ax2.axhline(y=0.4, color='blue', linestyle='--', linewidth=1.5, 
+    ax2.axhline(y=0.25, color='orange', linestyle='--', linewidth=2, 
+                label='25% Threshold (Default)', alpha=0.7)
+    ax2.axhline(y=0.3, color='blue', linestyle=':', linewidth=1.5, 
+                label='30% Threshold', alpha=0.5)
+    ax2.axhline(y=0.4, color='cyan', linestyle=':', linewidth=1.5, 
                 label='40% Threshold', alpha=0.5)
-    ax2.axhline(y=0.5, color='red', linestyle='--', linewidth=1.5, 
+    ax2.axhline(y=0.5, color='red', linestyle=':', linewidth=1.5, 
                 label='50% Threshold', alpha=0.5)
 
     # Shade ground truth anomaly periods
@@ -276,7 +281,7 @@ if PLOTTING_AVAILABLE:
                 yticklabels=['Actual: Normal', 'Actual: Anomaly'],
                 ax=ax3, annot_kws={'size': 14, 'weight': 'bold'})
 
-    ax3.set_title('Confusion Matrix (30% Threshold)', fontsize=12, fontweight='bold', pad=10)
+    ax3.set_title('Confusion Matrix (25% Threshold)', fontsize=12, fontweight='bold', pad=10)
     ax3.set_xlabel('Predicted Label', fontsize=11, fontweight='bold')
     ax3.set_ylabel('True Label', fontsize=11, fontweight='bold')
 
@@ -287,11 +292,11 @@ if PLOTTING_AVAILABLE:
 
     metrics = ['Accuracy', 'Precision', 'Recall', 'F1-Score']
     x = np.arange(len(metrics))
-    width = 0.2
+    width = 0.16
 
-    for i, threshold_name in enumerate(['20%', '30%', '40%', '50%']):
+    for i, threshold_name in enumerate(['20%', '25%', '30%', '40%', '50%']):
         values = df_results[df_results['Threshold'] == threshold_name][metrics].values[0]
-        offset = (i - 1.5) * width
+        offset = (i - 2) * width
         bars = ax4.bar(x + offset, values, width, label=f'Threshold {threshold_name}', alpha=0.8)
         
         # Add value labels on bars
@@ -385,18 +390,19 @@ else:
 output_df = df_comparison[[
     'calendar_year', 'enso_type', 'enso_anomaly', 
     'total_stations', 'anomaly_votes', 'anomaly_ratio',
-    'ensemble_prediction_20', 'ensemble_prediction_30', 
+    'ensemble_prediction_20', 'ensemble_prediction_25', 'ensemble_prediction_30', 
     'ensemble_prediction_40', 'ensemble_prediction_50'
 ]].copy()
 
 output_df.columns = [
     'Year', 'ENSO_Type', 'Ground_Truth', 
     'Total_Stations', 'Anomaly_Votes', 'Anomaly_Ratio',
-    'Ensemble_20pct', 'Ensemble_30pct', 'Ensemble_40pct', 'Ensemble_50pct'
+    'Ensemble_20pct', 'Ensemble_25pct', 'Ensemble_30pct', 'Ensemble_40pct', 'Ensemble_50pct'
 ]
 
 # Add match indicator
 output_df['Match_20pct'] = (output_df['Ground_Truth'] == output_df['Ensemble_20pct']).astype(int)
+output_df['Match_25pct'] = (output_df['Ground_Truth'] == output_df['Ensemble_25pct']).astype(int)
 output_df['Match_30pct'] = (output_df['Ground_Truth'] == output_df['Ensemble_30pct']).astype(int)
 output_df['Match_40pct'] = (output_df['Ground_Truth'] == output_df['Ensemble_40pct']).astype(int)
 output_df['Match_50pct'] = (output_df['Ground_Truth'] == output_df['Ensemble_50pct']).astype(int)

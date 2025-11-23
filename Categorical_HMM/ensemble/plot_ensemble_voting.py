@@ -31,9 +31,9 @@ x = np.arange(len(years))
 bars1 = ax.bar(x - width/2, ground_truth, width, label='Ground Truth', 
                alpha=0.7, color='red', edgecolor='black', linewidth=0.5)
 
-# Use 30% threshold as default
-prediction_30 = df['Ensemble_30pct'].values if 'Ensemble_30pct' in df.columns else df['Ensemble_50pct'].values
-bars2 = ax.bar(x + width/2, prediction_30, width, label='Ensemble Prediction (30%)', 
+# Use 25% threshold as default
+prediction_25 = df['Ensemble_25pct'].values if 'Ensemble_25pct' in df.columns else df['Ensemble_30pct'].values
+bars2 = ax.bar(x + width/2, prediction_25, width, label='Ensemble Prediction (25%)', 
                alpha=0.7, color='blue', edgecolor='black', linewidth=0.5)
 
 ax.set_xlabel('Year', fontsize=12, fontweight='bold')
@@ -54,9 +54,11 @@ ax.plot(years, df['Anomaly_Ratio'], color='purple', linewidth=2,
         label='Station Anomaly Ratio', alpha=0.8, marker='o', markersize=4)
 ax.axhline(y=0.2, color='green', linestyle=':', linewidth=1.5, 
           label='20% Threshold', alpha=0.6)
-ax.axhline(y=0.3, color='orange', linestyle='--', linewidth=2, 
-          label='30% Threshold (Default)', alpha=0.8)
-ax.axhline(y=0.4, color='blue', linestyle=':', linewidth=1.5, 
+ax.axhline(y=0.25, color='orange', linestyle='--', linewidth=2, 
+          label='25% Threshold (Default)', alpha=0.8)
+ax.axhline(y=0.3, color='blue', linestyle=':', linewidth=1.5, 
+          label='30% Threshold', alpha=0.6)
+ax.axhline(y=0.4, color='cyan', linestyle=':', linewidth=1.5, 
           label='40% Threshold', alpha=0.6)
 ax.axhline(y=0.5, color='red', linestyle=':', linewidth=1.5, 
           label='50% Threshold', alpha=0.6)
@@ -79,13 +81,13 @@ ax.legend(loc='best', framealpha=0.9)
 # ============================================================================
 ax = axes[2]
 
-# Calculate metrics using 30% threshold
-prediction_30 = df['Ensemble_30pct'].values if 'Ensemble_30pct' in df.columns else df['Ensemble_50pct'].values
+# Calculate metrics using 25% threshold
+prediction_25 = df['Ensemble_25pct'].values if 'Ensemble_25pct' in df.columns else df['Ensemble_30pct'].values
 
-tn = np.sum((df['Ground_Truth'] == 0) & (prediction_30 == 0))
-fp = np.sum((df['Ground_Truth'] == 0) & (prediction_30 == 1))
-fn = np.sum((df['Ground_Truth'] == 1) & (prediction_30 == 0))
-tp = np.sum((df['Ground_Truth'] == 1) & (prediction_30 == 1))
+tn = np.sum((df['Ground_Truth'] == 0) & (prediction_25 == 0))
+fp = np.sum((df['Ground_Truth'] == 0) & (prediction_25 == 1))
+fn = np.sum((df['Ground_Truth'] == 1) & (prediction_25 == 0))
+tp = np.sum((df['Ground_Truth'] == 1) & (prediction_25 == 1))
 
 accuracy = (tp + tn) / len(df)
 precision = tp / (tp + fp) if (tp + fp) > 0 else 0
@@ -108,7 +110,7 @@ ax.text(0.65, 0.15, cm_text, transform=ax.transAxes, fontsize=10,
         bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
 
 ax.set_xlabel('Score', fontsize=12, fontweight='bold')
-ax.set_title('Ensemble Performance Metrics (30% Threshold)', 
+ax.set_title('Ensemble Performance Metrics (25% Threshold)', 
              fontsize=13, fontweight='bold', pad=10)
 ax.set_xlim(0, 1.1)
 ax.grid(True, alpha=0.3, axis='x', linestyle='--')
@@ -136,10 +138,10 @@ for idx, row in df.iterrows():
     enso_type = row['ENSO_Type'].replace('_', ' ')
     truth = 'Anomaly' if row['Ground_Truth'] == 1 else 'Normal'
     vote_pct = f"{row['Anomaly_Ratio']*100:.1f}%"
-    # Use 30% threshold
-    prediction_col = 'Ensemble_30pct' if 'Ensemble_30pct' in row else 'Ensemble_50pct'
+    # Use 25% threshold
+    prediction_col = 'Ensemble_25pct' if 'Ensemble_25pct' in row else 'Ensemble_30pct'
     prediction = 'Anomaly' if row[prediction_col] == 1 else 'Normal'
-    match_col = 'Match_30pct' if 'Match_30pct' in row else 'Match_50pct'
+    match_col = 'Match_25pct' if 'Match_25pct' in row else 'Match_30pct'
     match = '✓' if row[match_col] == 1 else '✗'
     
     table_data.append([year, enso_type, truth, vote_pct, prediction, match])
