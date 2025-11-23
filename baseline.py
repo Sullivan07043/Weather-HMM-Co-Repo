@@ -359,8 +359,9 @@ def plot_all_sites(expanded_states, gt_df, max_sites=10):
 
     plt.tight_layout()
     plt.subplots_adjust(hspace=0.55)   # avoid overlap
-    plt.show()
     plt.savefig("pelt_vs_gt.png", dpi=200, bbox_inches="tight")
+    plt.show()
+
 
 
 
@@ -370,7 +371,7 @@ if __name__ == "__main__":
         # segments.to_csv("pelt_segments_enso24_yearly.csv", index=False)
 
         segments_with_states = assign_states(site_dict, segments, quantile=0.75)
-        segments_with_states.to_csv("pelt_segments_with_states.csv", index = False)
+        # segments_with_states.to_csv("pelt_segments_with_states.csv", index = False)
 
         expanded_states = expand_segments_to_years(segments_with_states)
         expanded_states.to_csv("pelt_top10_states_expanded.csv", index = False)
