@@ -111,7 +111,7 @@ def breakpoints_to_segments(dates, breakpoints):
 
         return segments
 
-def run_pelt_all_sites(site_dict, model="rbf", penalty=2):
+def run_pelt_all_sites(site_dict, model="rbf", penalty=0.5):
     all_rows = []
 
     for site_id, data in site_dict.items():
@@ -143,7 +143,7 @@ def run_pelt_all_sites(site_dict, model="rbf", penalty=2):
     return pd.DataFrame(all_rows)
 
 
-def assign_states(site_dict, segments_df, quantile=0.66):
+def assign_states(site_dict, segments_df, quantile=0.75):
     """
     Assign anomaly states to segments.
 
@@ -359,7 +359,7 @@ def plot_all_sites(expanded_states, gt_df, max_sites=10):
 
     plt.tight_layout()
     plt.subplots_adjust(hspace=0.55)   # avoid overlap
-    plt.savefig("pelt_vs_gt.png", dpi=200, bbox_inches="tight")
+    fig.savefig("pelt_vs_gt.png", dpi=150, facecolor="white")
     plt.show()
 
 
@@ -368,7 +368,7 @@ def plot_all_sites(expanded_states, gt_df, max_sites=10):
 if __name__ == "__main__":
         site_dict =  load_data("./weather_1901_2019_yearly_continuous.csv")
         segments = run_pelt_all_sites(site_dict)
-        # segments.to_csv("pelt_segments_enso24_yearly.csv", index=False)
+        segments.to_csv("pelt_segments_enso24_yearly.csv", index=False)
 
         segments_with_states = assign_states(site_dict, segments, quantile=0.75)
         # segments_with_states.to_csv("pelt_segments_with_states.csv", index = False)
