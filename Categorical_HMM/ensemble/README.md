@@ -312,13 +312,13 @@ For questions or suggestions about the ensemble voting system, please open an is
 
 ## Version History
 
-- **v1.1** (2024-11-22): Added 25% threshold
+- **v1.1** (2025-11-22): Added 25% threshold
   - Added 25% threshold evaluation for better balance
   - 25% threshold achieves F1=0.7937 with 89.3% recall and 71.4% precision
   - Updated visualizations to include all 5 thresholds
   - Recommended 25% as default for early warning systems
 
-- **v1.0** (2024-11-22): Initial release
+- **v1.0** (2025-11-22): Initial release
   - Implemented majority voting ensemble
   - Evaluated 4 different thresholds (20%, 30%, 40%, 50%)
   - Achieved F1-score of 0.81 with 20% threshold
