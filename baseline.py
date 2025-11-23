@@ -1,6 +1,7 @@
 import pandas as pd
-from pathlib import Path
+import numpy as np
 import ruptures as rpt
+import matplotlib.pyplot as plt
 
 '''
 Used for dataloader2.py, the site to process parameters
@@ -88,7 +89,7 @@ def run_pelt_one_site(X, model="rbf", penalty=10):
 
 def breakpoints_to_segments(dates, breakpoints):
         """
-        dates: list of timestamps (length T)
+        dates: list of timestamps (length T)777
         breakpoints: list of end indices from ruptures
 
         Returns list of dicts:
@@ -110,7 +111,7 @@ def breakpoints_to_segments(dates, breakpoints):
 
         return segments
 
-def run_pelt_all_sites(site_dict, model="rbf", penalty=10):
+def run_pelt_all_sites(site_dict, model="rbf", penalty=2):
     all_rows = []
 
     for site_id, data in site_dict.items():
@@ -141,7 +142,238 @@ def run_pelt_all_sites(site_dict, model="rbf", penalty=10):
 
     return pd.DataFrame(all_rows)
 
+
+def assign_states(site_dict, segments_df, quantile=0.66):
+    """
+    Assign anomaly states to segments.
+
+    state = 0 -> normal
+    state = 1 -> anomaly (large deviation from site mean climate)
+
+    quantile controls how strict the anomaly threshold is.
+    """
+
+    feature_cols = [
+        "mean_temp", "max_temp", "min_temp",
+        "sea_level_pressure", "wind_speed", "precipitation"
+    ]
+
+    # We must re-load the full data to compute features per segment
+    df_states = []
+    distances = []
+
+    for idx, row in segments_df.iterrows():
+        sid = row["site_id"]
+        start = row["start_idx"]
+        end = row["end_idx"]
+
+        # X for this site
+        X = site_dict[sid]["X"]
+
+        seg_X = X[start:end + 1]
+        seg_mean = seg_X.mean(axis=0)
+
+        global_mean = X.mean(axis=0)
+
+        # L2 norm distance between segment mean and long-term mean
+        dist = np.linalg.norm(seg_mean - global_mean)
+
+        distances.append(dist)
+
+        df_states.append({
+            "site_id": sid,
+            "segment_id": row["segment_id"],
+            "start_idx": start,
+            "end_idx": end,
+            "start_date": row["start_date"],
+            "end_date": row["end_date"],
+            "length": row["length"],
+            "dist": dist,
+        })
+
+    df_states = pd.DataFrame(df_states)
+
+    # Compute threshold
+    threshold = df_states["dist"].quantile(quantile)
+
+    # Assign anomaly state
+    df_states["state"] = (df_states["dist"] > threshold).astype(int)
+
+    return df_states
+
+
+def expand_segments_to_years(segments_df):
+    """
+    Input: segments_df with columns:
+       - site_id
+       - segment_id
+       - start_date (Timestamp)
+       - end_date   (Timestamp)
+       - state (optional)
+
+    Output:
+       DataFrame where each row is a single year with the segment state.
+    """
+
+    rows = []
+
+    for idx, row in segments_df.iterrows():
+        sid = row["site_id"]
+        seg_id = row["segment_id"]
+        state = row.get("state", None)
+
+        start_year = row["start_date"].year
+        end_year = row["end_date"].year
+
+        for year in range(start_year, end_year + 1):
+            rows.append({
+                "site_id": sid,
+                "segment_id": seg_id,
+                "year": year,
+                "state": state,
+            })
+
+    return pd.DataFrame(rows)
+
+
+def load_enso_ground_truth(path):
+    """
+    Load ENSO ONI ground truth.
+    Returns a DataFrame with only:
+       - year
+       - enso_anomaly (0 = normal, 1 = ENSO event)
+    """
+    df = pd.read_csv(path)
+
+    # Keep only relevant columns
+    df = df[["year", "enso_anomaly"]]
+
+    # Ensure year is int
+    df["year"] = df["year"].astype(int)
+
+    # Ensure anomaly is int: 0 or 1
+    df["enso_anomaly"] = df["enso_anomaly"].astype(int)
+
+    return df
+
+def plot_site_predictions(site_id, df_site, gt_df, ax=None, title_prefix=""):
+    """
+    df_site: predicted states for one site (year, state)
+    gt_df:   ground truth ENSO anomaly (year, enso_anomaly)
+    """
+
+    # -------- Restrict to ground-truth year range --------
+    yr_min = gt_df["year"].min()
+    yr_max = gt_df["year"].max()
+
+    df_site = df_site[(df_site["year"] >= yr_min) & (df_site["year"] <= yr_max)]
+    gt_df = gt_df[(gt_df["year"] >= yr_min) & (gt_df["year"] <= yr_max)]
+
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(12, 3))
+
+    # -------- Merge for metrics --------
+    merged = df_site.merge(gt_df, on="year", how="inner")
+    y_true = merged["enso_anomaly"].astype(int).values
+    y_pred = merged["state"].astype(int).values
+
+    # -------- Compute metrics --------
+    TP = np.sum((y_pred == 1) & (y_true == 1))
+    FP = np.sum((y_pred == 1) & (y_true == 0))
+    FN = np.sum((y_pred == 0) & (y_true == 1))
+    TN = np.sum((y_pred == 0) & (y_true == 0))
+
+    precision = TP / (TP + FP + 1e-9)
+    recall = TP / (TP + FN + 1e-9)
+    f1 = 2 * precision * recall / (precision + recall + 1e-9)
+    accuracy = (TP + TN) / (TP + TN + FP + FN + 1e-9)
+
+    # -------- Plot predicted anomaly states --------
+    years = df_site["year"].values
+    preds = df_site["state"].values
+    ax.plot(years, preds, "-o", color="blue", label="Predicted Anomaly")
+
+    # -------- Shade ENSO anomaly years --------
+    first_shade = True
+    for _, row in gt_df[gt_df["enso_anomaly"] == 1].iterrows():
+        y = row["year"]
+        ax.axvspan(
+            y - 0.5,
+            y + 0.5,
+            color="orange",
+            alpha=0.3,
+            label="Actual ENSO Years" if first_shade else ""
+        )
+        first_shade = False
+
+    # -------- Title & Metrics --------
+    title = f"{title_prefix} {site_id}"
+    metrics = (
+        f"F1: {f1:.3f} | Precision: {precision:.3f} | "
+        f"Recall: {recall:.3f} | Accuracy: {accuracy:.3f}"
+    )
+
+    # Title above
+    ax.set_title(title, fontsize=12, pad=22)
+
+    # Metrics above plot area (avoid overlap)
+    ax.text(0.0, 1.12, metrics,
+            transform=ax.transAxes,
+            fontsize=10, va='bottom')
+
+    # -------- Formatting --------
+    ax.set_ylim(-0.1, 1.1)
+    ax.set_yticks([0, 1])
+    ax.set_ylabel("State\n(1 = Anomaly)")
+    ax.set_xlabel("Year")
+
+    ax.legend(loc="upper left")
+    return ax
+
+
+# ============================================================
+#  PLOT MANY SITES (stacked vertically)
+# ============================================================
+
+def plot_all_sites(expanded_states, gt_df, max_sites=10):
+    site_list = expanded_states["site_id"].unique()[:max_sites]
+
+    fig, axes = plt.subplots(
+        len(site_list), 1,
+        figsize=(18, 3.3 * len(site_list)),
+        sharex=True
+    )
+
+    if len(site_list) == 1:
+        axes = [axes]
+
+    for i, site_id in enumerate(site_list):
+        df_site = expanded_states[expanded_states["site_id"] == site_id]
+        plot_site_predictions(
+            site_id,
+            df_site,
+            gt_df,
+            ax=axes[i],
+            title_prefix=f"#{i+1}:"
+        )
+
+    plt.tight_layout()
+    plt.subplots_adjust(hspace=0.55)   # avoid overlap
+    plt.show()
+    plt.savefig("pelt_vs_gt.png", dpi=200, bbox_inches="tight")
+
+
+
 if __name__ == "__main__":
-        site_dict =  load_data("./weather_1901_2019_monthly_continuous.csv")
+        site_dict =  load_data("./weather_1901_2019_yearly_continuous.csv")
         segments = run_pelt_all_sites(site_dict)
-        segments.to_csv("pelt_segments_enso24.csv", index=False)
+        # segments.to_csv("pelt_segments_enso24_yearly.csv", index=False)
+
+        segments_with_states = assign_states(site_dict, segments, quantile=0.75)
+        segments_with_states.to_csv("pelt_segments_with_states.csv", index = False)
+
+        expanded_states = expand_segments_to_years(segments_with_states)
+        expanded_states.to_csv("pelt_top10_states_expanded.csv", index = False)
+
+        ground_truth = load_enso_ground_truth("enso_oni_data_1950_1990.csv")
+        plot_all_sites(expanded_states, ground_truth, max_sites=10)
