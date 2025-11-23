@@ -21,8 +21,8 @@ top10 = df_results.head(10).copy()
 # Station info is already in the CSV from evaluate_enso_f1.py
 
 # Create figure with 2 subplots
-fig = plt.figure(figsize=(16, 10))
-gs = fig.add_gridspec(2, 1, height_ratios=[1, 1], hspace=0.3)
+fig = plt.figure(figsize=(16, 13))
+gs = fig.add_gridspec(2, 1, height_ratios=[1, 1], hspace=0.4)
 
 # ============================================================================
 # Plot 1: Performance Metrics Comparison
