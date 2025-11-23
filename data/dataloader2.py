@@ -26,6 +26,8 @@ class GSODDataLoader:
         discretize=True,
         station_list_csv=None,   # 新增：只处理这些站点
         time_aggregation='daily',   # 新增：时间聚合方式 ('daily', 'monthly', 'quarterly', 'yearly')
+        detrend=False,   # 新增：是否去趋势
+        detrend_method='difference',   # 新增：去趋势方法
     ):
         """
         初始化数据加载器
@@ -42,6 +44,12 @@ class GSODDataLoader:
                 - 'monthly': 聚合为月平均
                 - 'quarterly': 聚合为季度平均
                 - 'yearly': 聚合为年平均
+            detrend: 是否对连续特征进行去趋势处理（默认False）
+            detrend_method: 去趋势方法
+                - 'difference': 一阶差分（最常用）
+                - 'linear': 线性去趋势
+                - 'moving_average': 移动平均去趋势
+                - 'seasonal': 季节性差分（适合有明显季节性的数据）
         """
         if data_root is None:
             # 自动检测数据路径
@@ -73,6 +81,12 @@ class GSODDataLoader:
         if time_aggregation not in ['daily', 'monthly', 'quarterly', 'yearly']:
             raise ValueError("time_aggregation 必须是 'daily', 'monthly', 'quarterly' 或 'yearly'")
         self.time_aggregation = time_aggregation
+        
+        # 去趋势参数
+        self.detrend = detrend
+        if detrend_method not in ['difference', 'linear', 'moving_average', 'seasonal']:
+            raise ValueError("detrend_method 必须是 'difference', 'linear', 'moving_average' 或 'seasonal'")
+        self.detrend_method = detrend_method
 
         # 数据格式定义（基于 GSOD 文档）
         self.missing_values = {
@@ -417,7 +431,11 @@ class GSODDataLoader:
             df_cleaned = self.aggregate_to_yearly(df_cleaned)
         # 如果是 'daily'，则不做聚合
         
-        # 3. 进行归一化和离散化（如果启用）
+        # 3. 进行去趋势处理（如果启用）
+        if self.detrend:
+            df_cleaned = self.detrend_data(df_cleaned)
+        
+        # 4. 进行归一化和离散化（如果启用）
         if self.discretize:
             df_cleaned = self.normalize_and_discretize(df_cleaned)
 
@@ -505,6 +523,128 @@ class GSODDataLoader:
         print(f"   ✅ 缺失值填充完成")
         
         return df_filled
+
+    def detrend_data(self, df):
+        """
+        对连续特征进行去趋势处理（按站点分组）
+        
+        Args:
+            df: 输入数据框
+            
+        Returns:
+            DataFrame: 去趋势后的数据
+        """
+        print(f"\n对连续特征进行去趋势处理（方法: {self.detrend_method}）...")
+        
+        df_detrended = df.copy()
+        detrend_info = {}
+        
+        # 确保数据按站点和日期排序
+        df_detrended = df_detrended.sort_values(['site_id', 'date']).reset_index(drop=True)
+        
+        for feature in self.continuous_features:
+            if feature not in df_detrended.columns:
+                continue
+            
+            # 保存原始值
+            df_detrended[f'{feature}_before_detrend'] = df_detrended[feature].copy()
+            
+            removed_count = 0
+            
+            # 按站点分组处理
+            for site_id in tqdm(df_detrended['site_id'].unique(), desc=f"   去趋势 {feature}", leave=False):
+                site_mask = df_detrended['site_id'] == site_id
+                site_data = df_detrended.loc[site_mask, feature].copy()
+                
+                # 跳过全是 NaN 的数据
+                if site_data.isna().all():
+                    continue
+                
+                # 应用不同的去趋势方法
+                if self.detrend_method == 'difference':
+                    # 一阶差分: X(t) - X(t-1)
+                    detrended = site_data.diff()
+                    # 第一个值会是 NaN，我们保留原值或删除
+                    # 这里选择删除第一个观测（因为没有前一个值可以计算差分）
+                    removed_count += 1
+                    
+                elif self.detrend_method == 'linear':
+                    # 线性去趋势：拟合线性趋势并减去
+                    valid_mask = site_data.notna()
+                    if valid_mask.sum() > 1:
+                        x = np.arange(len(site_data))
+                        valid_x = x[valid_mask]
+                        valid_y = site_data[valid_mask].values
+                        
+                        # 拟合线性回归
+                        coeffs = np.polyfit(valid_x, valid_y, 1)
+                        trend = np.polyval(coeffs, x)
+                        
+                        # 减去趋势
+                        detrended = site_data - trend
+                    else:
+                        detrended = site_data
+                
+                elif self.detrend_method == 'moving_average':
+                    # 移动平均去趋势：减去移动平均值
+                    # 窗口大小根据时间聚合方式调整
+                    window_size_map = {
+                        'daily': 30,      # 30天
+                        'monthly': 12,    # 12个月
+                        'quarterly': 4,   # 4个季度
+                        'yearly': 5       # 5年
+                    }
+                    window = window_size_map.get(self.time_aggregation, 30)
+                    
+                    # 计算移动平均（中心对齐）
+                    ma = site_data.rolling(window=window, center=True, min_periods=1).mean()
+                    detrended = site_data - ma
+                
+                elif self.detrend_method == 'seasonal':
+                    # 季节性差分
+                    # 周期根据时间聚合方式调整
+                    period_map = {
+                        'daily': 365,     # 年周期
+                        'monthly': 12,    # 年周期
+                        'quarterly': 4,   # 年周期
+                        'yearly': 1       # 不适用
+                    }
+                    period = period_map.get(self.time_aggregation, 12)
+                    
+                    if period > 1:
+                        detrended = site_data.diff(periods=period)
+                        removed_count += period
+                    else:
+                        # 年度数据不适合季节性差分，使用一阶差分
+                        detrended = site_data.diff()
+                        removed_count += 1
+                
+                # 更新数据
+                df_detrended.loc[site_mask, feature] = detrended
+            
+            # 统计信息
+            detrend_info[feature] = {
+                'method': self.detrend_method,
+                'removed_per_site': removed_count / df_detrended['site_id'].nunique() if df_detrended['site_id'].nunique() > 0 else 0
+            }
+            
+            print(f"      {feature:25s}: 完成")
+        
+        # 如果使用差分方法，删除产生的 NaN 行
+        if self.detrend_method in ['difference', 'seasonal']:
+            original_len = len(df_detrended)
+            
+            # 只删除因去趋势产生的 NaN（所有连续特征都是 NaN 的行）
+            continuous_cols_in_df = [f for f in self.continuous_features if f in df_detrended.columns]
+            if continuous_cols_in_df:
+                df_detrended = df_detrended.dropna(subset=continuous_cols_in_df, how='all')
+                removed_rows = original_len - len(df_detrended)
+                print(f"\n   因差分产生的 NaN 行已删除: {removed_rows:,} 行")
+        
+        print(f"   ✅ 去趋势处理完成")
+        print(f"   保留数据行数: {len(df_detrended):,}")
+        
+        return df_detrended
 
     def normalize_and_discretize(self, df):
         """
@@ -753,6 +893,17 @@ class GSODDataLoader:
         print(f"   站点数: {df['site_id'].nunique()}")
         print(f"   日期范围: {df['date'].min()} 到 {df['date'].max()}")
         print(f"   时间粒度: {time_granularity_map[self.time_aggregation]}")
+        
+        if self.detrend:
+            detrend_method_map = {
+                'difference': '一阶差分',
+                'linear': '线性去趋势',
+                'moving_average': '移动平均去趋势',
+                'seasonal': '季节性差分'
+            }
+            print(f"   去趋势方法: {detrend_method_map[self.detrend_method]}")
+            before_detrend_cols = [c for c in df.columns if c.endswith('_before_detrend')]
+            print(f"   去趋势前的原始值列（*_before_detrend）: {len(before_detrend_cols)} 个")
 
         if self.discretize:
             raw_cols = [c for c in df.columns if c.endswith('_raw')]
@@ -832,8 +983,44 @@ def main():
     }
     print(f"✓ 已选择: {time_display[time_aggregation]}")
 
-    # 2. 离散化选择
-    print("\n【2/4】是否对连续特征进行归一化和离散化？")
+    # 2. 去趋势选择
+    print("\n【2/5】是否对连续特征进行去趋势（Detrend）处理？")
+    print("说明：去趋势可以移除数据中的长期趋势，使数据更加平稳（stationary）")
+    print("1. 否 - 保留原始趋势（默认）")
+    print("2. 是 - 移除趋势")
+    
+    detrend_choice = input("\n请选择 (1/2) [默认: 1]: ").strip() or "1"
+    detrend = (detrend_choice == "2")
+    
+    detrend_method = 'difference'  # 默认方法
+    if detrend:
+        print("\n   选择去趋势方法：")
+        print("   1. 一阶差分（First Difference）- 最常用，计算相邻值差异")
+        print("   2. 线性去趋势（Linear Detrend）- 移除线性趋势")
+        print("   3. 移动平均去趋势（Moving Average）- 减去移动平均值")
+        print("   4. 季节性差分（Seasonal Difference）- 适合有明显季节性的数据")
+        
+        method_choice = input("\n   请选择去趋势方法 (1/2/3/4) [默认: 1]: ").strip() or "1"
+        method_map = {
+            "1": "difference",
+            "2": "linear",
+            "3": "moving_average",
+            "4": "seasonal"
+        }
+        detrend_method = method_map.get(method_choice, "difference")
+        
+        method_display = {
+            "difference": "一阶差分",
+            "linear": "线性去趋势",
+            "moving_average": "移动平均去趋势",
+            "seasonal": "季节性差分"
+        }
+        print(f"   ✓ 将使用 {method_display[detrend_method]} 方法")
+    else:
+        print("   ✓ 保留原始趋势")
+
+    # 3. 离散化选择
+    print("\n【3/5】是否对连续特征进行归一化和离散化？")
     print("1. 是 - 归一化到 [0,1] 并离散化为 N 组（推荐用于 HMM）")
     print("2. 否 - 保持原始连续值")
 
@@ -850,8 +1037,8 @@ def main():
     else:
         print("   ✓ 保持连续值")
 
-    # 3. 站点选择
-    print("\n【3/4】选择要处理的站点：")
+    # 4. 站点选择
+    print("\n【4/5】选择要处理的站点：")
     station_csv_input = input(
         "   站点列表 CSV 路径（包含 USAF, WBAN；留空使用默认站点列表）: "
     ).strip() or None
@@ -865,7 +1052,9 @@ def main():
         n_bins=n_bins,
         discretize=discretize,
         station_list_csv=station_csv_input,
-        time_aggregation=time_aggregation
+        time_aggregation=time_aggregation,
+        detrend=detrend,
+        detrend_method=detrend_method
     )
 
     # 加载站点元数据（这里会生成 target_site_ids）
@@ -880,8 +1069,8 @@ def main():
 
     print(f"   找到 {len(available_years)} 个年份: {available_years[0]} - {available_years[-1]}")
 
-    # 4. 年份范围选择
-    print("\n【4/4】选择处理哪些年份的数据：")
+    # 5. 年份范围选择
+    print("\n【5/5】选择处理哪些年份的数据：")
     print("1. 快速测试（2015年，前50个目标站点文件）")
     print("2. 单年完整（2015年，所有目标站点文件）")
     print("3. 近期数据（1973-2019 年，所有目标站点）")
@@ -894,7 +1083,8 @@ def main():
     print("=" * 80)
 
     # 根据选项生成文件名后缀
-    time_suffix = time_aggregation  # 'daily', 'monthly', 或 'quarterly'
+    time_suffix = time_aggregation  # 'daily', 'monthly', 'quarterly', 'yearly'
+    detrend_suffix = f"detrend_{detrend_method}" if detrend else "raw"
     discrete_suffix = f"bins{n_bins}" if discretize else "continuous"
     
     if choice == "1":
@@ -902,7 +1092,7 @@ def main():
         df = loader.process_year_data(2015, max_stations=50)
         if df is not None:
             cleaned_df = loader.clean_and_transform(df)
-            filename = f'weather_2015_sample_{time_suffix}_{discrete_suffix}.csv'
+            filename = f'weather_2015_sample_{time_suffix}_{detrend_suffix}_{discrete_suffix}.csv'
             loader.save_processed_data(cleaned_df, filename)
             loader.generate_summary_statistics(cleaned_df)
 
@@ -911,7 +1101,7 @@ def main():
         df = loader.process_year_data(2015)
         if df is not None:
             cleaned_df = loader.clean_and_transform(df)
-            filename = f'weather_2015_full_{time_suffix}_{discrete_suffix}.csv'
+            filename = f'weather_2015_full_{time_suffix}_{detrend_suffix}_{discrete_suffix}.csv'
             loader.save_processed_data(cleaned_df, filename)
             loader.generate_summary_statistics(cleaned_df)
 
@@ -921,7 +1111,7 @@ def main():
         print(f"   将处理 {len(years)} 个年份")
         cleaned_df = loader.process_multiple_years(years)
         if cleaned_df is not None:
-            filename = f'weather_1973_2019_{time_suffix}_{discrete_suffix}.csv'
+            filename = f'weather_1973_2019_{time_suffix}_{detrend_suffix}_{discrete_suffix}.csv'
             loader.save_processed_data(cleaned_df, filename)
             loader.generate_summary_statistics(cleaned_df)
 
@@ -932,7 +1122,7 @@ def main():
         if confirm == "yes":
             cleaned_df = loader.process_multiple_years(available_years)
             if cleaned_df is not None:
-                filename = f'weather_1901_2019_{time_suffix}_{discrete_suffix}.csv'
+                filename = f'weather_1901_2019_{time_suffix}_{detrend_suffix}_{discrete_suffix}.csv'
                 loader.save_processed_data(cleaned_df, filename)
                 loader.generate_summary_statistics(cleaned_df)
         else:
