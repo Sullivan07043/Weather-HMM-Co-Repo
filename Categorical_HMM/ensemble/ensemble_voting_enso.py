@@ -63,9 +63,13 @@ print("="*80)
 df_states = pd.read_csv('../enso_factorized_categorical_hmm_states.csv')
 print(f"Loaded HMM states: {len(df_states)} records")
 
+# Filter to 1950-2000 time window
+df_states = df_states[(df_states['year'] >= 1950) & (df_states['year'] <= 2000)]
+print(f"Filtered to 1950-2000: {len(df_states)} records")
+
 # Load ground truth ENSO data
-df_truth = pd.read_csv('../enso_oni_data_1950_1990.csv')
-print(f"Loaded ground truth: {len(df_truth)} years (1950-1990)")
+df_truth = pd.read_csv('../enso_oni_data_1950_2000.csv')
+print(f"Loaded ground truth: {len(df_truth)} years (1950-2000)")
 
 # Load station metadata to get station names
 try:
@@ -82,7 +86,7 @@ except Exception as e:
     print(f"Warning: Could not load station metadata: {e}")
 
 print(f"\nTotal stations in analysis: {df_states['site_id'].nunique()}")
-print(f"Time range: {df_states['t'].min()} to {df_states['t'].max()}")
+print(f"Time range: {df_states['year'].min()} to {df_states['year'].max()}")
 
 # ============================================================================
 # Majority Voting
@@ -91,23 +95,21 @@ print("\n" + "="*80)
 print("Performing Majority Voting Ensemble...")
 print("="*80)
 
-# Group by time (year) and count votes
-voting_results = df_states.groupby('t').agg({
+# Group by year and count votes
+voting_results = df_states.groupby('year').agg({
     'state': ['sum', 'count', 'mean']
 }).reset_index()
 
 voting_results.columns = ['year', 'anomaly_votes', 'total_stations', 'anomaly_ratio']
 
-# Calculate year from time index (assuming t=0 is 1950)
-voting_results['calendar_year'] = 1950 + voting_results['year']
-
 # Majority voting: try different thresholds
-voting_results['ensemble_prediction_20'] = (voting_results['anomaly_ratio'] > 0.2).astype(int)
-voting_results['ensemble_prediction_25'] = (voting_results['anomaly_ratio'] > 0.25).astype(int)
 voting_results['ensemble_prediction_30'] = (voting_results['anomaly_ratio'] > 0.3).astype(int)
+voting_results['ensemble_prediction_35'] = (voting_results['anomaly_ratio'] > 0.35).astype(int)
 voting_results['ensemble_prediction_40'] = (voting_results['anomaly_ratio'] > 0.4).astype(int)
+voting_results['ensemble_prediction_45'] = (voting_results['anomaly_ratio'] > 0.45).astype(int)
 voting_results['ensemble_prediction_50'] = (voting_results['anomaly_ratio'] > 0.5).astype(int)
-voting_results['ensemble_prediction'] = voting_results['ensemble_prediction_25']  # Use 25% as default
+voting_results['ensemble_prediction_60'] = (voting_results['anomaly_ratio'] > 0.6).astype(int)
+voting_results['ensemble_prediction'] = voting_results['ensemble_prediction_35']  # Use 35% as default
 
 print(f"\nVoting statistics:")
 print(f"  Years analyzed: {len(voting_results)}")
@@ -117,8 +119,7 @@ print(f"  Average anomaly ratio: {voting_results['anomaly_ratio'].mean():.3f}")
 # Merge with ground truth
 df_comparison = voting_results.merge(
     df_truth[['year', 'enso_type', 'enso_anomaly']], 
-    left_on='calendar_year', 
-    right_on='year',
+    on='year',
     how='inner'
 )
 
@@ -132,18 +133,20 @@ print("Ensemble Performance Evaluation")
 print("="*80)
 
 y_true = df_comparison['enso_anomaly'].values
-y_pred_20 = df_comparison['ensemble_prediction_20'].values
-y_pred_25 = df_comparison['ensemble_prediction_25'].values
 y_pred_30 = df_comparison['ensemble_prediction_30'].values
+y_pred_35 = df_comparison['ensemble_prediction_35'].values
 y_pred_40 = df_comparison['ensemble_prediction_40'].values
+y_pred_45 = df_comparison['ensemble_prediction_45'].values
 y_pred_50 = df_comparison['ensemble_prediction_50'].values
+y_pred_60 = df_comparison['ensemble_prediction_60'].values
 
 thresholds = {
-    '20%': y_pred_20,
-    '25%': y_pred_25,
     '30%': y_pred_30,
+    '35%': y_pred_35,
     '40%': y_pred_40,
-    '50%': y_pred_50
+    '45%': y_pred_45,
+    '50%': y_pred_50,
+    '60%': y_pred_60
 }
 
 results = []
@@ -178,12 +181,12 @@ print(f"\n{'='*80}")
 print(f"Best Threshold: {best_threshold} (F1-Score: {best_f1:.4f})")
 print(f"{'='*80}")
 
-# Use 25% threshold as default for detailed analysis
-y_pred = y_pred_25
+# Use 35% threshold as default for detailed analysis
+y_pred = y_pred_35
 
 # Confusion Matrix
 cm = confusion_matrix(y_true, y_pred)
-print(f"\nConfusion Matrix (25% threshold):")
+print(f"\nConfusion Matrix (35% threshold):")
 print(f"  TN={cm[0,0]}, FP={cm[0,1]}")
 print(f"  FN={cm[1,0]}, TP={cm[1,1]}")
 
@@ -204,7 +207,7 @@ if PLOTTING_AVAILABLE:
     # ============================================================================
     ax1 = fig.add_subplot(gs[0, :])
 
-    years = df_comparison['calendar_year'].values
+    years = df_comparison['year'].values
     y_true_plot = y_true * 0.95  # Offset for visibility
     y_pred_plot = y_pred * 1.05
 
@@ -218,7 +221,7 @@ if PLOTTING_AVAILABLE:
         if row['enso_anomaly'] == 1:
             color = 'darkred' if row['enso_type'] == 'El_Nino' else 'darkblue'
             marker = '^' if row['enso_type'] == 'El_Nino' else 'v'
-            ax1.scatter(row['calendar_year'], 0.9, color=color, marker=marker, 
+            ax1.scatter(row['year'], 0.9, color=color, marker=marker, 
                        s=100, alpha=0.6, edgecolors='black', linewidth=0.5)
 
     ax1.set_xlabel('Year', fontsize=12, fontweight='bold')
@@ -261,7 +264,7 @@ if PLOTTING_AVAILABLE:
     # Shade ground truth anomaly periods
     for idx, row in df_comparison.iterrows():
         if row['enso_anomaly'] == 1:
-            ax2.axvspan(row['calendar_year']-0.5, row['calendar_year']+0.5, 
+            ax2.axvspan(row['year']-0.5, row['year']+0.5, 
                        alpha=0.1, color='red')
 
     ax2.set_xlabel('Year', fontsize=12, fontweight='bold')
@@ -334,7 +337,7 @@ if PLOTTING_AVAILABLE:
                       'Ensemble\nPrediction', 'Match'])
 
     for idx, row in df_comparison.iterrows():
-        year = int(row['calendar_year'])
+        year = int(row['year'])
         enso_type = row['enso_type'].replace('_', ' ')
         truth = 'Anomaly' if row['enso_anomaly'] == 1 else 'Normal'
         vote_pct = f"{row['anomaly_ratio']*100:.1f}%"
@@ -388,24 +391,25 @@ else:
 # Save results to CSV
 # ============================================================================
 output_df = df_comparison[[
-    'calendar_year', 'enso_type', 'enso_anomaly', 
+    'year', 'enso_type', 'enso_anomaly', 
     'total_stations', 'anomaly_votes', 'anomaly_ratio',
-    'ensemble_prediction_20', 'ensemble_prediction_25', 'ensemble_prediction_30', 
-    'ensemble_prediction_40', 'ensemble_prediction_50'
+    'ensemble_prediction_30', 'ensemble_prediction_35', 'ensemble_prediction_40', 
+    'ensemble_prediction_45', 'ensemble_prediction_50', 'ensemble_prediction_60'
 ]].copy()
 
 output_df.columns = [
     'Year', 'ENSO_Type', 'Ground_Truth', 
     'Total_Stations', 'Anomaly_Votes', 'Anomaly_Ratio',
-    'Ensemble_20pct', 'Ensemble_25pct', 'Ensemble_30pct', 'Ensemble_40pct', 'Ensemble_50pct'
+    'Ensemble_30pct', 'Ensemble_35pct', 'Ensemble_40pct', 'Ensemble_45pct', 'Ensemble_50pct', 'Ensemble_60pct'
 ]
 
 # Add match indicator
-output_df['Match_20pct'] = (output_df['Ground_Truth'] == output_df['Ensemble_20pct']).astype(int)
-output_df['Match_25pct'] = (output_df['Ground_Truth'] == output_df['Ensemble_25pct']).astype(int)
 output_df['Match_30pct'] = (output_df['Ground_Truth'] == output_df['Ensemble_30pct']).astype(int)
+output_df['Match_35pct'] = (output_df['Ground_Truth'] == output_df['Ensemble_35pct']).astype(int)
 output_df['Match_40pct'] = (output_df['Ground_Truth'] == output_df['Ensemble_40pct']).astype(int)
+output_df['Match_45pct'] = (output_df['Ground_Truth'] == output_df['Ensemble_45pct']).astype(int)
 output_df['Match_50pct'] = (output_df['Ground_Truth'] == output_df['Ensemble_50pct']).astype(int)
+output_df['Match_60pct'] = (output_df['Ground_Truth'] == output_df['Ensemble_60pct']).astype(int)
 
 output_df.to_csv('ensemble_voting_results.csv', index=False)
 print("  Saved: ensemble_voting_results.csv")
@@ -418,7 +422,7 @@ print("ENSEMBLE VOTING SUMMARY")
 print("="*80)
 
 print(f"\nData Overview:")
-print(f"  Analysis Period: 1950-1990 ({len(df_comparison)} years)")
+print(f"  Analysis Period: 1950-2000 ({len(df_comparison)} years)")
 print(f"  Total Stations: {df_comparison['total_stations'].iloc[0]}")
 print(f"  Ground Truth Anomalies: {y_true.sum()}/{len(y_true)} years ({y_true.sum()/len(y_true)*100:.1f}%)")
 
@@ -430,12 +434,14 @@ print(f"  F1-Score:  {df_results.loc[best_idx, 'F1-Score']:.4f}")
 
 print(f"\nMisclassified Years ({best_threshold} threshold):")
 # Get predictions for best threshold
-best_threshold_col = f"ensemble_prediction_{best_threshold.replace('%', '')}"
+# Map threshold like "30%" to column "ensemble_prediction_30"
+threshold_num = best_threshold.replace('%', '')
+best_threshold_col = f"ensemble_prediction_{threshold_num}"
 misclassified = df_comparison[df_comparison['enso_anomaly'] != df_comparison[best_threshold_col]]
 if len(misclassified) > 0:
     for idx, row in misclassified.iterrows():
         pred_val = row[best_threshold_col]
-        print(f"  {int(row['calendar_year'])}: True={row['enso_type']:10s}, "
+        print(f"  {int(row['year'])}: True={row['enso_type']:10s}, "
               f"Predicted={'Anomaly' if pred_val==1 else 'Normal':7s}, "
               f"Vote={row['anomaly_ratio']*100:5.1f}%")
 else:

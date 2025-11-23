@@ -498,9 +498,9 @@ def train_all_sites_factorized(data_dict, n_categories, max_K=8):
     return results
 
 
-def output_results(results, out_path):
+def output_results(results, out_path, csv_path):
     """
-    Save hidden state sequences to CSV.
+    Save hidden state sequences to CSV with actual years.
     
     Parameters:
     -----------
@@ -508,14 +508,29 @@ def output_results(results, out_path):
         Dictionary containing results for each site
     out_path : str
         Output CSV file path
+    csv_path : str
+        Path to the original CSV to get year information
     """
+    # Load yearly data to get actual years
+    df_yearly = pd.read_csv(csv_path, parse_dates=["date"])
+    df_yearly['year'] = df_yearly['date'].dt.year
+    
     rows = []
     for sid, info in results.items():
         states = info["hidden_states"]
-        for t, s in enumerate(states):
-            rows.append([sid, t, s])
+        
+        # Get actual years for this site
+        site_data = df_yearly[df_yearly['site_id'] == sid].sort_values('date')
+        years = site_data['year'].values
+        
+        if len(years) != len(states):
+            print(f"Warning: {sid} has {len(states)} states but {len(years)} years")
+            continue
+        
+        for t, (s, year) in enumerate(zip(states, years)):
+            rows.append([sid, t, year, s])
 
-    df = pd.DataFrame(rows, columns=["site_id", "t", "state"])
+    df = pd.DataFrame(rows, columns=["site_id", "t", "year", "state"])
     df.to_csv(out_path, index=False)
     print(f"Saved results to {out_path}")
 
@@ -613,6 +628,7 @@ def save_parameters(results, out_path, feature_cols):
 # ========================
 if __name__ == "__main__":
     # Selected ENSO-sensitive sites (USAF-WBAN format)
+    # Updated list: 17 stations with actual 1950-2000 coverage
     site_ids = [
         "942030-99999",
         "943350-99999",
@@ -625,14 +641,7 @@ if __name__ == "__main__":
         "471100-99999",
         "471080-99999",
         "471420-99999",
-        "471510-99999",
-        "760500-99999",
-        "760610-99999",
-        "761130-99999",
-        "761220-99999",
         "843900-99999",
-        "844520-99999",
-        "846910-99999",
         "847520-99999",
         "726810-24131",
         "726815-24106",
@@ -657,6 +666,6 @@ if __name__ == "__main__":
         n_categories=n_categories,
         max_K=8,
     )
-    output_results(results, "enso_factorized_categorical_hmm_states.csv")
+    output_results(results, "enso_factorized_categorical_hmm_states.csv", csv_path)
     save_k_values(results, "hmm_k_values.txt")
     save_parameters(results, "hmm_parameters.txt", feature_cols)

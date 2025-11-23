@@ -22,28 +22,51 @@ ax = axes[0]
 
 years = df['Year'].values
 ground_truth = df['Ground_Truth'].values
-prediction = df['Ensemble_50pct'].values
 
-# Plot bars
-width = 0.35
+# Use 35% threshold as default
+prediction_35 = df['Ensemble_35pct'].values
+match_35 = df['Match_35pct'].values
+
+# Plot bars with color based on match
 x = np.arange(len(years))
+width = 0.6
 
-bars1 = ax.bar(x - width/2, ground_truth, width, label='Ground Truth', 
-               alpha=0.7, color='red', edgecolor='black', linewidth=0.5)
+# Create colors based on match: green for correct, red for incorrect
+colors = ['green' if m == 1 else 'red' for m in match_35]
 
-# Use 25% threshold as default
-prediction_25 = df['Ensemble_25pct'].values if 'Ensemble_25pct' in df.columns else df['Ensemble_30pct'].values
-bars2 = ax.bar(x + width/2, prediction_25, width, label='Ensemble Prediction (25%)', 
-               alpha=0.7, color='blue', edgecolor='black', linewidth=0.5)
+# Plot single bars
+bars = ax.bar(x, ground_truth, width, alpha=0.7, color=colors, 
+              edgecolor='black', linewidth=1)
+
+# Add prediction markers on top
+for i, (pred, truth) in enumerate(zip(prediction_35, ground_truth)):
+    if pred == 1:
+        # Show prediction as a marker
+        marker_color = 'darkgreen' if pred == truth else 'darkred'
+        ax.plot(i, 0.9, marker='v', markersize=10, color=marker_color, 
+                markeredgecolor='black', markeredgewidth=0.5)
+
+# Create custom legend
+from matplotlib.patches import Patch
+legend_elements = [
+    Patch(facecolor='green', alpha=0.7, edgecolor='black', label='Correct Prediction'),
+    Patch(facecolor='red', alpha=0.7, edgecolor='black', label='Incorrect Prediction'),
+    plt.Line2D([0], [0], marker='v', color='w', markerfacecolor='darkgreen', 
+               markersize=8, markeredgecolor='black', label='Predicted Anomaly (Correct)'),
+    plt.Line2D([0], [0], marker='v', color='w', markerfacecolor='darkred', 
+               markersize=8, markeredgecolor='black', label='Predicted Anomaly (Wrong)')
+]
 
 ax.set_xlabel('Year', fontsize=12, fontweight='bold')
 ax.set_ylabel('ENSO Anomaly (0=Normal, 1=Anomaly)', fontsize=11, fontweight='bold')
-ax.set_title('Ensemble ENSO Prediction vs Ground Truth (1950-1990)', 
+ax.set_title('Ensemble ENSO Prediction vs Ground Truth (1950-2000) - Green=Match, Red=Mismatch', 
              fontsize=13, fontweight='bold', pad=10)
 ax.set_xticks(x[::5])  # Show every 5th year
 ax.set_xticklabels(years[::5], rotation=45)
-ax.legend(loc='upper left', framealpha=0.9)
+ax.legend(handles=legend_elements, loc='center left', bbox_to_anchor=(1.01, 0.5), 
+          framealpha=0.9, fontsize=9)
 ax.grid(True, alpha=0.3, axis='y', linestyle='--')
+ax.set_ylim(-0.1, 1.1)
 
 # ============================================================================
 # Plot 2: Anomaly Voting Ratio Time Series
@@ -52,16 +75,18 @@ ax = axes[1]
 
 ax.plot(years, df['Anomaly_Ratio'], color='purple', linewidth=2, 
         label='Station Anomaly Ratio', alpha=0.8, marker='o', markersize=4)
-ax.axhline(y=0.2, color='green', linestyle=':', linewidth=1.5, 
-          label='20% Threshold', alpha=0.6)
-ax.axhline(y=0.25, color='orange', linestyle='--', linewidth=2, 
-          label='25% Threshold (Default)', alpha=0.8)
-ax.axhline(y=0.3, color='blue', linestyle=':', linewidth=1.5, 
-          label='30% Threshold', alpha=0.6)
-ax.axhline(y=0.4, color='cyan', linestyle=':', linewidth=1.5, 
+ax.axhline(y=0.3, color='green', linestyle=':', linewidth=1.5, 
+          label='30% Threshold (Min)', alpha=0.6)
+ax.axhline(y=0.35, color='orange', linestyle='--', linewidth=2, 
+          label='35% Threshold (Default)', alpha=0.8)
+ax.axhline(y=0.4, color='blue', linestyle=':', linewidth=1.5, 
           label='40% Threshold', alpha=0.6)
-ax.axhline(y=0.5, color='red', linestyle=':', linewidth=1.5, 
+ax.axhline(y=0.45, color='cyan', linestyle=':', linewidth=1.5, 
+          label='45% Threshold', alpha=0.6)
+ax.axhline(y=0.5, color='brown', linestyle=':', linewidth=1.5, 
           label='50% Threshold', alpha=0.6)
+ax.axhline(y=0.6, color='red', linestyle=':', linewidth=1.5, 
+          label='60% Threshold (Max)', alpha=0.6)
 
 # Shade ground truth anomaly periods
 for idx, row in df.iterrows():
@@ -74,20 +99,20 @@ ax.set_title('Station Voting Ratio Over Time', fontsize=13, fontweight='bold', p
 ax.set_ylim(0, 1)
 ax.set_xlim(years[0]-1, years[-1]+1)
 ax.grid(True, alpha=0.3, linestyle='--')
-ax.legend(loc='best', framealpha=0.9)
+ax.legend(loc='center left', bbox_to_anchor=(1.01, 0.5), framealpha=0.9, fontsize=9)
 
 # ============================================================================
 # Plot 3: Performance Metrics
 # ============================================================================
 ax = axes[2]
 
-# Calculate metrics using 25% threshold
-prediction_25 = df['Ensemble_25pct'].values if 'Ensemble_25pct' in df.columns else df['Ensemble_30pct'].values
+# Calculate metrics using 35% threshold
+prediction_35 = df['Ensemble_35pct'].values
 
-tn = np.sum((df['Ground_Truth'] == 0) & (prediction_25 == 0))
-fp = np.sum((df['Ground_Truth'] == 0) & (prediction_25 == 1))
-fn = np.sum((df['Ground_Truth'] == 1) & (prediction_25 == 0))
-tp = np.sum((df['Ground_Truth'] == 1) & (prediction_25 == 1))
+tn = np.sum((df['Ground_Truth'] == 0) & (prediction_35 == 0))
+fp = np.sum((df['Ground_Truth'] == 0) & (prediction_35 == 1))
+fn = np.sum((df['Ground_Truth'] == 1) & (prediction_35 == 0))
+tp = np.sum((df['Ground_Truth'] == 1) & (prediction_35 == 1))
 
 accuracy = (tp + tn) / len(df)
 precision = tp / (tp + fp) if (tp + fp) > 0 else 0
@@ -104,13 +129,14 @@ bars = ax.barh(metrics, values, color=colors, alpha=0.8, edgecolor='black', line
 for i, (bar, val) in enumerate(zip(bars, values)):
     ax.text(val + 0.02, i, f'{val:.3f}', va='center', fontsize=11, fontweight='bold')
 
-# Add confusion matrix text
+# Add confusion matrix text on the right side
 cm_text = f'Confusion Matrix:\nTN={tn}, FP={fp}\nFN={fn}, TP={tp}'
-ax.text(0.65, 0.15, cm_text, transform=ax.transAxes, fontsize=10,
-        bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
+ax.text(1.05, 0.5, cm_text, transform=ax.transAxes, fontsize=10,
+        bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8),
+        verticalalignment='center')
 
 ax.set_xlabel('Score', fontsize=12, fontweight='bold')
-ax.set_title('Ensemble Performance Metrics (25% Threshold)', 
+ax.set_title('Ensemble Performance Metrics (35% Threshold)', 
              fontsize=13, fontweight='bold', pad=10)
 ax.set_xlim(0, 1.1)
 ax.grid(True, alpha=0.3, axis='x', linestyle='--')
@@ -118,7 +144,7 @@ ax.grid(True, alpha=0.3, axis='x', linestyle='--')
 plt.suptitle('Ensemble ENSO Detection: Majority Voting Across All Stations', 
              fontsize=15, fontweight='bold', y=0.995)
 
-plt.tight_layout()
+plt.tight_layout(rect=[0, 0, 0.85, 1])  # Leave space on the right for legends
 plt.savefig('ensemble_voting_enso_analysis.png', dpi=300, bbox_inches='tight')
 print("✓ Saved: ensemble_voting_enso_analysis.png")
 
@@ -138,11 +164,9 @@ for idx, row in df.iterrows():
     enso_type = row['ENSO_Type'].replace('_', ' ')
     truth = 'Anomaly' if row['Ground_Truth'] == 1 else 'Normal'
     vote_pct = f"{row['Anomaly_Ratio']*100:.1f}%"
-    # Use 25% threshold
-    prediction_col = 'Ensemble_25pct' if 'Ensemble_25pct' in row else 'Ensemble_30pct'
-    prediction = 'Anomaly' if row[prediction_col] == 1 else 'Normal'
-    match_col = 'Match_25pct' if 'Match_25pct' in row else 'Match_30pct'
-    match = '✓' if row[match_col] == 1 else '✗'
+    # Use 35% threshold
+    prediction = 'Anomaly' if row['Ensemble_35pct'] == 1 else 'Normal'
+    match = '✓' if row['Match_35pct'] == 1 else '✗'
     
     table_data.append([year, enso_type, truth, vote_pct, prediction, match])
 
@@ -178,7 +202,7 @@ for i in range(1, len(table_data)):
             cell.set_text_props(color='green', weight='bold', fontsize=10)
 
 # Add title with more space above the table
-ax.text(0.5, 0.98, 'Year-by-Year Ensemble Prediction vs Ground Truth (1950-1990)', 
+ax.text(0.5, 0.98, 'Year-by-Year Ensemble Prediction vs Ground Truth (1950-2000)', 
         ha='center', va='top', fontsize=14, fontweight='bold', 
         transform=ax.transAxes)
 
