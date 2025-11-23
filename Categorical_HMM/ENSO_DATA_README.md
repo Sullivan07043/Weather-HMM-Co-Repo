@@ -1,4 +1,4 @@
-# ENSO ONI Historical Data (1950-1990)
+# ENSO ONI Historical Data (1950-2000)
 
 ## Data Source
 
@@ -6,17 +6,17 @@ This dataset is derived from the official **Oceanic Niño Index (ONI)** maintain
 
 **Source**: [https://ggweather.com/enso/oni.htm](https://ggweather.com/enso/oni.htm)
 
-## File: `enso_oni_data_1950_1990.csv`
+## File: `enso_oni_data_1950_2000.csv`
 
 ### Description
 
-A comprehensive record of ENSO (El Niño-Southern Oscillation) events from 1950 to 1990, classifying each year as El Niño, La Niña, or Normal conditions.
+A comprehensive record of ENSO (El Niño-Southern Oscillation) events from 1950 to 2000, classifying each year as El Niño, La Niña, or Normal conditions based on official ONI records.
 
 ### Column Definitions
 
 | Column | Type | Description |
 |--------|------|-------------|
-| `year` | Integer | Calendar year (1950-1990) |
+| `year` | Integer | Calendar year (1950-2000) |
 | `enso_type` | String | Event classification: `El_Nino`, `La_Nina`, or `Normal` |
 | `is_el_nino` | Binary | 1 if El Niño year, 0 otherwise |
 | `is_la_nina` | Binary | 1 if La Niña year, 0 otherwise |
@@ -24,30 +24,44 @@ A comprehensive record of ENSO (El Niño-Southern Oscillation) events from 1950 
 
 ### Data Statistics
 
-**Time Period**: 1950-1990 (41 years)
+**Time Period**: 1950-2000 (51 years)
 
 **Event Distribution**:
-- **El Niño**: 13 years (31.7%)
-- **La Niña**: 15 years (36.6%)
-- **Normal**: 13 years (31.7%)
-- **Total Anomalies**: 28 years (68.3%)
+- **El Niño**: 18 years (35.3%)
+- **La Niña**: 17 years (33.3%)
+- **Normal**: 16 years (31.4%)
+- **Total Anomalies**: 35 years (68.6%)
 
-### El Niño Years (13 total)
-
-```
-1951, 1953, 1957, 1958, 1963, 1965, 1969, 1972, 1976, 1977, 1982, 1986, 1987
-```
-
-### La Niña Years (15 total)
+### El Niño Years (18 total)
 
 ```
-1950, 1954, 1955, 1956, 1964, 1970, 1971, 1973, 1974, 1975, 1983, 1984, 1985, 1988, 1989
+1951, 1952, 1953, 1957, 1958, 1963, 1965, 1968, 1969, 1972, 1976, 1977, 1979, 1982, 1986, 1987, 1991, 1994, 1997
 ```
 
-### Normal Years (13 total)
+**Notable Events**:
+- **1982-83**: Very Strong El Niño (strongest of 20th century until 1997-98)
+- **1997-98**: Very Strong El Niño (strongest on record for the period)
+- **1957-58**: Strong El Niño
+- **1987-88**: Strong El Niño
+- **1991-92**: Strong El Niño
+
+### La Niña Years (17 total)
 
 ```
-1952, 1959, 1960, 1961, 1962, 1966, 1967, 1968, 1978, 1979, 1980, 1981, 1990
+1954, 1955, 1956, 1964, 1970, 1971, 1974, 1975, 1983, 1984, 1985, 1988, 1995, 1998, 1999, 2000
+```
+
+**Notable Events**:
+- **1973-74**: Strong La Niña
+- **1975-76**: Strong La Niña
+- **1988-89**: Strong La Niña
+- **1998-99**: Strong La Niña
+- **1999-00**: Strong La Niña
+
+### Normal Years (16 total)
+
+```
+1950, 1959, 1960, 1961, 1962, 1966, 1967, 1973, 1978, 1980, 1981, 1989, 1990, 1992, 1993, 1996
 ```
 
 ## Usage Examples
@@ -124,6 +138,7 @@ Retrieved from https://ggweather.com/enso/oni.htm
 
 ## Version History
 
+- **v2.0** (2025-11-23): Updated with official ONI data covering 1950-2000, corrected classification based on NOAA records
 - **v1.0** (2025-11-22): Initial release covering 1950-1990
 
 ## License
