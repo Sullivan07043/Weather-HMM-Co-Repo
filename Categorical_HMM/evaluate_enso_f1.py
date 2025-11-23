@@ -15,8 +15,9 @@ df_states = df_states[(df_states['year'] >= 1950) & (df_states['year'] <= 2000)]
 # Load ground truth ENSO data (corrected official ONI records)
 df_truth = pd.read_csv('enso_oni_data_1950_2000.csv')
 
-# Load station metadata
-df_stations = pd.read_csv('data/stations_1960_2000_covered_top_each_country.csv')
+# Load station metadata from official ISD history
+df_stations = pd.read_csv('/Users/shuhaozhang/PycharmProjects/CSE250A/HW/kaggle_data/datasets/noaa/noaa-global-surface-summary-of-the-day/versions/2/isd-history.csv')
+df_stations['USAF-WBAN'] = df_stations['USAF'].astype(str) + '-' + df_stations['WBAN'].astype(str).str.zfill(5)
 
 print("="*80)
 print("ENSO Detection Performance Evaluation (Individual Stations)")
@@ -53,12 +54,12 @@ for site_id in df_states['site_id'].unique():
     cm = confusion_matrix(y_true, y_pred)
     
     # Get station info
-    station_info = df_stations[df_stations['USAF'] == site_id]
+    station_info = df_stations[df_stations['USAF-WBAN'] == site_id]
     if len(station_info) > 0:
-        station_name = station_info.iloc[0]['Name']
-        country = station_info.iloc[0]['Country']
-        lat = station_info.iloc[0]['Lat']
-        lon = station_info.iloc[0]['Lon']
+        station_name = station_info.iloc[0]['STATION NAME']
+        country = station_info.iloc[0]['CTRY']
+        lat = station_info.iloc[0]['LAT']
+        lon = station_info.iloc[0]['LON']
     else:
         station_name = "Unknown"
         country = "Unknown"
