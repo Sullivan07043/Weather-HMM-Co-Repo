@@ -125,7 +125,7 @@ print("✓ Saved: ensemble_voting_enso_analysis.png")
 # ============================================================================
 # Create detailed comparison table visualization
 # ============================================================================
-fig2, ax = plt.subplots(figsize=(12, 14))
+fig2, ax = plt.subplots(figsize=(12, 16))
 ax.axis('tight')
 ax.axis('off')
 
@@ -146,9 +146,10 @@ for idx, row in df.iterrows():
     
     table_data.append([year, enso_type, truth, vote_pct, prediction, match])
 
-# Create table
-table = ax.table(cellText=table_data, cellLoc='center', loc='center',
-                colWidths=[0.15, 0.20, 0.17, 0.15, 0.18, 0.15])
+# Create table - position it lower in the figure
+table = ax.table(cellText=table_data, cellLoc='center', loc='upper center',
+                colWidths=[0.15, 0.20, 0.17, 0.15, 0.18, 0.15],
+                bbox=[0, 0, 1, 0.92])
 
 table.auto_set_font_size(False)
 table.set_fontsize(9)
@@ -176,8 +177,10 @@ for i in range(1, len(table_data)):
         elif j == 5 and table_data[i][5] == '✓':
             cell.set_text_props(color='green', weight='bold', fontsize=10)
 
-plt.title('Year-by-Year Ensemble Prediction vs Ground Truth (1950-1990)', 
-          fontsize=14, fontweight='bold', pad=20)
+# Add title with more space above the table
+ax.text(0.5, 0.98, 'Year-by-Year Ensemble Prediction vs Ground Truth (1950-1990)', 
+        ha='center', va='top', fontsize=14, fontweight='bold', 
+        transform=ax.transAxes)
 
 plt.savefig('ensemble_voting_detailed_comparison.png', dpi=300, bbox_inches='tight')
 print("✓ Saved: ensemble_voting_detailed_comparison.png")
