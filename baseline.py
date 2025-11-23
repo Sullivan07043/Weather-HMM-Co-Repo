@@ -111,7 +111,7 @@ def breakpoints_to_segments(dates, breakpoints):
 
         return segments
 
-def run_pelt_all_sites(site_dict, model="rbf", penalty=0.5):
+def run_pelt_all_sites(site_dict, model="rbf", penalty=0.1):
     all_rows = []
 
     for site_id, data in site_dict.items():
@@ -366,7 +366,7 @@ def plot_all_sites(expanded_states, gt_df, max_sites=10):
 
 
 if __name__ == "__main__":
-        site_dict =  load_data("./weather_1901_2019_yearly_continuous.csv")
+        site_dict =  load_data("./weather_1901_2019_yearly_continuous_filled.csv")
         segments = run_pelt_all_sites(site_dict)
         segments.to_csv("pelt_segments_enso24_yearly.csv", index=False)
 
@@ -377,4 +377,4 @@ if __name__ == "__main__":
         expanded_states.to_csv("pelt_top10_states_expanded.csv", index = False)
 
         ground_truth = load_enso_ground_truth("enso_oni_data_1950_1990.csv")
-        plot_all_sites(expanded_states, ground_truth, max_sites=10)
+        plot_all_sites(expanded_states, ground_truth, max_sites=21)
