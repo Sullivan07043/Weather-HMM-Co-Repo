@@ -6,8 +6,8 @@ from sklearn.mixture import GaussianMixture
 
 
 def run_gmm_per_site(
-    input_csv: str = "data/processed/weather_1901_2019_monthly_continuous.csv",
-    n_components: int = 3,
+    input_csv: str = "data/weather_1901_2019_yearly_detrend_adaptive_continuous.csv",
+    n_components: int = 2,
     output_csv: str = "gmm_per_site_results.csv",
 ):
     df = pd.read_csv(input_csv)
@@ -37,14 +37,20 @@ def run_gmm_per_site(
         if n_samples_site < 2:
             print(
                 f"[WARN] site_id={site_id} has only {n_samples_site} sample(s), "
-                f"skip GMM and set pred_state = -1"
+                f"skip GMM and set state = -1"
             )
+
             g_res = g.copy()
-            g_res["pred_state"] = -1  # 标记一下：这个站点没真正聚类
+
+            # ---- 新增：生成 year 列 ----
+            g_res["year"] = pd.to_datetime(g_res["date"]).dt.year
+
+            # ---- 新增：重命名 pred_state → state ----
+            g_res["state"] = -1
             g_res["model_name"] = f"gmm_{n_components}_insufficient_samples"
 
-            # 只保留需要的列：site_id, date, 6个特征, pred_state, model_name
-            g_res = g_res[["site_id", "date"] + feature_cols + ["pred_state", "model_name"]]
+            # 只保留所需列
+            g_res = g_res[["site_id", "year"] + feature_cols + ["state", "model_name"]]
             all_results.append(g_res)
             continue
 
@@ -65,20 +71,28 @@ def run_gmm_per_site(
         labels = gmm.fit_predict(X_scaled)
 
         g_res = g.copy()
-        g_res["pred_state"] = labels
+
+        # ---- 新增：生成 year 列 ----
+        g_res["year"] = pd.to_datetime(g_res["date"]).dt.year
+
+        # ---- 新增：重命名 pred_state → state ----
+        g_res["state"] = labels
         g_res["model_name"] = f"gmm_{n_components_site}"
 
-        # 只保留需要的列
-        g_res = g_res[["site_id", "date"] + feature_cols + ["pred_state", "model_name"]]
+        # 只保留所需列
+        g_res = g_res[["site_id", "year"] + feature_cols + ["state", "model_name"]]
         all_results.append(g_res)
 
+    # 合并全部
     out_df = pd.concat(all_results, ignore_index=True)
-    out_df = out_df.sort_values(["site_id", "date"])
+    out_df = out_df.sort_values(["site_id", "year"])
 
+    # 保存
     out_dir = Path("outputs")
     out_dir.mkdir(exist_ok=True, parents=True)
     out_path = out_dir / output_csv
     out_df.to_csv(out_path, index=False)
+
     print("Saved GMM results to:", out_path)
 
 
