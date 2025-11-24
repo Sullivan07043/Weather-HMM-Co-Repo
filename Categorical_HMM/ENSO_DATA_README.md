@@ -12,6 +12,12 @@ This dataset is derived from the official **Oceanic Niño Index (ONI)** maintain
 
 A comprehensive record of ENSO (El Niño-Southern Oscillation) events from 1950 to 2010, classifying each year as El Niño, La Niña, or Normal conditions based on official ONI records. This dataset includes **all ENSO events regardless of strength** (Weak, Moderate, Strong, Very Strong).
 
+**Note**: For v3.1 analysis, we focus on **Moderate, Strong, and Very Strong events only**, treating Weak events as Normal conditions. This approach:
+- Reduces false positives from Weak events
+- Focuses on events with significant climate impacts
+- Provides more meaningful detection for applications
+- Results in 21 anomaly years (34.4%) vs 40 normal years (65.6%)
+
 ### Column Definitions
 
 | Column | Type | Description |
@@ -21,12 +27,13 @@ A comprehensive record of ENSO (El Niño-Southern Oscillation) events from 1950 
 | `is_el_nino` | Binary | 1 if El Niño year (any strength), 0 otherwise |
 | `is_la_nina` | Binary | 1 if La Niña year (any strength), 0 otherwise |
 | `enso_anomaly` | Binary | 1 if any ENSO anomaly (El Niño or La Niña, including Weak), 0 if Normal |
+| `enso_anomaly_moderate_plus` | Binary | **(v3.1)** 1 if Moderate+ ENSO anomaly (excludes Weak), 0 otherwise |
 
 ### Data Statistics
 
 **Time Period**: 1950-2010 (61 years)
 
-**Event Distribution**:
+**Event Distribution (All Strengths)**:
 - **El Niño (All strengths)**: 27 years (44.3%)
   - Weak: 11 years
   - Moderate: 7 years
@@ -37,7 +44,18 @@ A comprehensive record of ENSO (El Niño-Southern Oscillation) events from 1950 
   - Moderate: 6 years
   - Strong: 7 years
 - **Normal**: 17 years (27.9%)
-- **Total Anomalies**: 44 years (72.1%)
+- **Total Anomalies (All)**: 44 years (72.1%)
+
+**Event Distribution (Moderate+ Only, v3.1 Focus)**:
+- **El Niño (Moderate+)**: 13 years (21.3%)
+  - Moderate: 7 years
+  - Strong: 6 years (some overlap with Moderate classification)
+  - Very Strong: 3 years
+- **La Niña (Moderate+)**: 8 years (13.1%)
+  - Moderate: 6 years
+  - Strong: 7 years (some overlap)
+- **Normal + Weak**: 40 years (65.6%)
+- **Total Moderate+ Anomalies**: 21 years (34.4%)
 
 ### El Niño Years (27 total)
 
@@ -170,42 +188,56 @@ This dataset is used for:
 4. **Machine learning**: Training and evaluating ENSO detection algorithms
 5. **Ensemble voting**: Ground truth for majority voting across weather stations
 6. **Trend analysis**: Understanding ENSO behavior over 61 years
+7. **Moderate+ event detection** (v3.1): Focusing on significant ENSO events with major climate impacts
+8. **Multi-strength analysis**: Comparing model performance across different ENSO intensity thresholds
 
 ## Model Performance Against This Dataset
 
-### Individual Station Performance (Top 10)
+### v3.1 Configuration (Moderate+ ENSO Definition)
+
+**Features**: 13 meteorological features
+- 6 continuous: temperature (mean/max/min), sea level pressure, wind speed, precipitation
+- 7 binary: visibility, fog, rain, snow, hail, thunder, tornado
+
+**ENSO Definition**: Moderate, Strong, and Very Strong events only (21 anomaly years)
+
+### Individual Station Performance (Top 10, Moderate+ ENSO)
 
 | Rank | Station | Country | F1 Score | Precision | Recall | Accuracy |
 |------|---------|---------|----------|-----------|--------|----------|
-| 1 | TOKYO INTL | Japan | 0.7586 | 73.33% | 79.55% | 70.49% |
-| 2 | BROOME INTL | Australia | 0.7397 | 75.86% | 72.73% | 68.85% |
-| 3 | IWOTO | Japan | 0.7170 | 73.17% | 70.45% | 65.57% |
-| 4 | NAHA | Japan | 0.7170 | 73.17% | 70.45% | 65.57% |
-| 5 | MONCLOVA INTL | Mexico | 0.7143 | 72.22% | 70.45% | 65.57% |
-| 6 | SOTO LA MARINA TAMPS. | Mexico | 0.7143 | 72.22% | 70.45% | 65.57% |
-| 7 | MARCH AIR RESERVE BASE | USA | 0.7132 | 67.57% | 75.00% | 63.93% |
-| 8 | KALGOORLIE BOULDER | Australia | 0.7119 | 72.41% | 70.00% | 65.57% |
-| 9 | CEDUNA AMO | Australia | 0.7080 | 66.67% | 75.00% | 62.30% |
-| 10 | GENERAL IGNACIO P GARCIA INTL | Mexico | 0.7048 | 65.63% | 75.00% | 60.66% |
+| 1 | MONCLOVA INTL | Mexico | 0.5588 | 45.16% | 73.68% | 63.93% |
+| 2 | TOKYO INTL | Japan | 0.5507 | 40.74% | 84.62% | 59.02% |
+| 3 | RONALD REAGAN WASHINGTON NATL AP | USA | 0.5484 | 40.74% | 84.62% | 59.02% |
+| 4 | RODRIGUEZ BALLON | Peru | 0.5352 | 38.71% | 85.71% | 57.38% |
+| 5 | HONOLULU INTERNATIONAL AIRPORT | USA | 0.5122 | 35.48% | 91.67% | 54.10% |
+| 6 | DAEGU AB | South Korea | 0.5000 | 35.48% | 84.62% | 52.46% |
+| 7 | FUKUOKA | Japan | 0.5000 | 35.48% | 84.62% | 52.46% |
+| 8 | CAPITAN MONTES | Chile | 0.4938 | 35.48% | 80.00% | 52.46% |
+| 9 | MARCH AIR RESERVE BASE | USA | 0.4898 | 33.33% | 88.89% | 50.82% |
+| 10 | NAHA | Japan | 0.4746 | 32.26% | 90.91% | 49.18% |
 
-**Average Top 10 F1-Score**: 0.7048
+**Average Top 10 F1-Score**: 0.5164
+**Average Recall**: 84.93% (high sensitivity to Moderate+ events)
+**Average Precision**: 37.29% (reflects challenge of distinguishing Moderate+ from Weak/Normal)
 
-### Ensemble Voting Performance (Top 14 Stations)
+### Ensemble Voting Performance (All 21 Stations, Moderate+ ENSO)
 
 | Configuration | Threshold | Accuracy | Precision | Recall | F1-Score |
 |---------------|-----------|----------|-----------|--------|----------|
-| **Top 14 (Recommended)** | **40%** | **73.77%** | **74.14%** | **97.73%** | **0.8431** |
-| Top 14 | 35% | 72.13% | 73.58% | 97.73% | 0.8387 |
-| Top 14 | 30% | 70.49% | 71.67% | 97.73% | 0.8269 |
-| Top 10 | 35% | 73.77% | 76.92% | 90.91% | 0.8333 |
-| All 21 | 35% | 65.57% | 70.91% | 88.64% | 0.7879 |
+| All 21 | 30% | 34.43% | 34.43% | 100.00% | 0.5122 |
+| All 21 | 40% | 44.26% | 37.25% | 90.48% | 0.5278 |
+| **All 21 (Recommended)** | **50%** | **57.38%** | **43.24%** | **76.19%** | **0.5517** |
+| All 21 | 55% | 59.02% | 43.33% | 61.90% | 0.5098 |
+| All 21 | 60% | 62.30% | 45.83% | 52.38% | 0.4889 |
 
-**Best Configuration**: Top 14 stations with 40% threshold
-- **F1-Score**: 0.8431 (highest overall)
-- **Recall**: 97.73% (misses only 1 event out of 44)
-- **Precision**: 74.14% (3 out of 4 predictions correct)
+**Best Configuration**: All 21 stations with 50% threshold
+- **F1-Score**: 0.5517 (highest for Moderate+ detection)
+- **Recall**: 76.19% (catches 16 out of 21 Moderate+ events)
+- **Precision**: 43.24% (balances detection with false positives)
+- **Missed Events**: 5 Moderate+ events (mainly early period: 1957, 1958, 1965, 1966, 1973)
+- **False Positives**: 21 years (many are Weak ENSO events)
 
-**Key Finding**: Using Top 14 stations (by F1-score) with 40% voting threshold provides the best balance between detecting ENSO events (high recall) and avoiding false alarms (good precision).
+**Key Finding**: Using all 21 stations with 50% voting threshold provides optimal balance for detecting significant (Moderate+) ENSO events. Lower thresholds increase recall but include many Weak events as false positives.
 
 ## Data Quality
 
@@ -249,13 +281,20 @@ Retrieved from https://ggweather.com/enso/oni.htm
 
 ## Version History
 
+- **v3.1** (2025-11-24): Moderate+ ENSO definition with enhanced features
+  - **ENSO Definition**: Focus on Moderate, Strong, Very Strong events only (21 anomaly years)
+  - **Features**: Expanded to 13 features (added visibility + 6 binary weather events)
+  - **Configuration**: All 21 stations with 50% threshold
+  - **Performance**: F1=0.5517, Recall=76.19%, Precision=43.24%
+  - **Focus**: Detecting significant ENSO events with major climate impacts
+  - Added `enso_anomaly_moderate_plus` column for Moderate+ classification
+  - 5 missed Moderate+ events, 21 false positives (mainly Weak events)
+
 - **v3.0** (2025-11-24): Extended to 1950-2010 with strength classification
   - Extended period from 1950-2000 to 1950-2010 (61 years)
   - Added ENSO event strength information (Weak/Moderate/Strong/Very Strong)
-  - 44 total anomaly years (27 El Niño, 25 La Niña)
-  - Updated model performance metrics with Top 14 ensemble
-  - Best ensemble F1: 0.8431 (Top 14, 40% threshold)
-  - 97.73% recall with only 1 missed event
+  - 44 total anomaly years (27 El Niño, 25 La Niña, all strengths)
+  - All stations select K=2 (100% consensus)
 
 - **v2.1** (2025-11-23): Updated model performance metrics
   - All 17 stations have complete 1950-2000 coverage
