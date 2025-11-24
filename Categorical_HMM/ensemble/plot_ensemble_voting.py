@@ -59,7 +59,7 @@ legend_elements = [
 
 ax.set_xlabel('Year', fontsize=12, fontweight='bold')
 ax.set_ylabel('ENSO Anomaly (0=Normal, 1=Anomaly)', fontsize=11, fontweight='bold')
-ax.set_title('Ensemble ENSO Prediction vs Ground Truth (1950-2010)\nAll Stations (21 sites) - Green=Match, Red=Mismatch', 
+ax.set_title('Ensemble ENSO Prediction vs Ground Truth (1950-2000)\nAll Stations (21 sites) - Green=Match, Red=Mismatch', 
              fontsize=13, fontweight='bold', pad=10)
 ax.set_xticks(x[::5])  # Show every 5th year
 ax.set_xticklabels(years[::5], rotation=45)
@@ -197,7 +197,7 @@ for i in range(1, len(table_data)):
             cell.set_text_props(color='green', weight='bold', fontsize=10)
 
 # Add title with more space above the table
-ax.text(0.5, 0.98, 'Year-by-Year Ensemble Prediction vs Ground Truth (1950-2010)\nAll Stations (21 sites)', 
+ax.text(0.5, 0.98, 'Year-by-Year Ensemble Prediction vs Ground Truth (1950-2000)\nAll Stations (21 sites)', 
         ha='center', va='top', fontsize=14, fontweight='bold', 
         transform=ax.transAxes)
 

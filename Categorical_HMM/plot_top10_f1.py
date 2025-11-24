@@ -51,7 +51,7 @@ for i, (metric, color, label) in enumerate(zip(metrics, colors, labels)):
 # Customize plot
 ax1.set_xlabel('Station', fontsize=12, fontweight='bold')
 ax1.set_ylabel('Score', fontsize=12, fontweight='bold')
-ax1.set_title('Top 10 Stations: ENSO Detection Performance Metrics (1950-2010)', 
+ax1.set_title('Top 10 Stations: ENSO Detection Performance Metrics (1950-2000)', 
              fontsize=14, fontweight='bold', pad=15)
 ax1.set_xticks(x)
 ax1.set_xticklabels([f"#{i+1}\n{row['site_id']}\n{row['country']}" 
@@ -112,7 +112,7 @@ ax2.set_title('Confusion Matrix Breakdown (% of total predictions per station)',
 ax2.set_xlabel('Station Rank', fontsize=12, fontweight='bold')
 
 # Add overall title
-plt.suptitle('ENSO Detection: Top 10 Stations by F1-Score\nBased on Official ONI Records (1950-2010)', 
+plt.suptitle('ENSO Detection: Top 10 Stations by F1-Score\nBased on Official ONI Records (1950-2000)', 
              fontsize=16, fontweight='bold', y=0.98)
 
 plt.tight_layout(rect=[0, 0, 1, 0.96])
@@ -183,7 +183,7 @@ for i in range(1, len(table_data)):
                 cell.set_facecolor('#f39c12')
                 cell.set_text_props(weight='bold', color='white')
 
-plt.title('Top 10 ENSO Detection Stations: Detailed Performance Breakdown\nOfficial ONI Records (1950-2010)', 
+plt.title('Top 10 ENSO Detection Stations: Detailed Performance Breakdown\nOfficial ONI Records (1950-2000)', 
          fontsize=14, fontweight='bold', pad=20)
 
 plt.savefig('top10_f1_enso_sites_table.png', dpi=300, bbox_inches='tight')

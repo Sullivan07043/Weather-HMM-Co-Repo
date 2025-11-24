@@ -63,9 +63,9 @@ print("="*80)
 df_states = pd.read_csv('../enso_factorized_categorical_hmm_states.csv')
 print(f"Loaded HMM states: {len(df_states)} records from {df_states['site_id'].nunique()} stations")
 
-# Filter to 1950-2010 time window
-df_states = df_states[(df_states['year'] >= 1950) & (df_states['year'] <= 2010)]
-print(f"Filtered to 1950-2010: {len(df_states)} records")
+# Filter to 1950-2000 time window
+df_states = df_states[(df_states['year'] >= 1950) & (df_states['year'] <= 2000)]
+print(f"Filtered to 1950-2000: {len(df_states)} records")
 
 # Load F1 evaluation results for reference
 df_f1 = pd.read_csv('../enso_evaluation_f1_results.csv')
@@ -81,7 +81,8 @@ print(f"\n✓ Using all {df_states['site_id'].nunique()} stations: {len(df_state
 
 # Load ground truth ENSO data
 df_truth = pd.read_csv('../enso_oni_data_1950_2010.csv')
-print(f"Loaded ground truth: {len(df_truth)} years (1950-2010)")
+df_truth = df_truth[(df_truth['year'] >= 1950) & (df_truth['year'] <= 2000)]
+print(f"Loaded ground truth: {len(df_truth)} years (1950-2000)")
 
 print(f"\nTotal stations in ensemble: {df_states['site_id'].nunique()}")
 print(f"Time range: {df_states['year'].min()} to {df_states['year'].max()}")
@@ -227,7 +228,7 @@ if PLOTTING_AVAILABLE:
 
     ax1.set_xlabel('Year', fontsize=12, fontweight='bold')
     ax1.set_ylabel('ENSO Anomaly (0=Normal, 1=Anomaly)', fontsize=12, fontweight='bold')
-    ax1.set_title('Ensemble ENSO Prediction vs Ground Truth (1950-2010)\nAll Stations (21 sites)', 
+    ax1.set_title('Ensemble ENSO Prediction vs Ground Truth (1950-2000)\nAll Stations (21 sites)', 
                   fontsize=14, fontweight='bold', pad=15)
     ax1.set_ylim(-0.1, 1.2)
     ax1.grid(True, alpha=0.3, linestyle='--')
@@ -375,7 +376,7 @@ if PLOTTING_AVAILABLE:
             elif j == 5 and table_data[i][5] == '✓':
                 cell.set_text_props(color='green', weight='bold', fontsize=11)
 
-    plt.title('Year-by-Year Ensemble Prediction vs Ground Truth (1950-2010)\nAll Stations (21 sites)', 
+    plt.title('Year-by-Year Ensemble Prediction vs Ground Truth (1950-2000)\nAll Stations (21 sites)', 
               fontsize=14, fontweight='bold', pad=20)
 
     plt.savefig('ensemble_voting_detailed_comparison.png', dpi=300, bbox_inches='tight')
@@ -422,7 +423,7 @@ print("ENSEMBLE VOTING SUMMARY")
 print("="*80)
 
 print(f"\nData Overview:")
-print(f"  Analysis Period: 1950-2010 ({len(df_comparison)} years)")
+print(f"  Analysis Period: 1950-2000 ({len(df_comparison)} years)")
 print(f"  Ensemble Stations: All Stations")
 print(f"  Total Stations: {df_comparison['total_stations'].iloc[0]}")
 print(f"  Ground Truth Anomalies: {y_true.sum()}/{len(y_true)} years ({y_true.sum()/len(y_true)*100:.1f}%)")

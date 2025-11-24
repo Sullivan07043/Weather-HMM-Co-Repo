@@ -89,7 +89,7 @@ for i in range(1, len(table_data)):
                 cell.set_facecolor('#3498db')
                 cell.set_text_props(weight='bold', color='white')
 
-plt.title('Top 10 ENSO Detection Stations by F1-Score\nBased on Official ONI Records (1950-2010)', 
+plt.title('Top 10 ENSO Detection Stations by F1-Score\nBased on Official ONI Records (1950-2000)', 
          fontsize=16, fontweight='bold', pad=20)
 
 plt.savefig('top10_f1_enso_sites_table.png', dpi=300, bbox_inches='tight')
@@ -101,8 +101,9 @@ print("✓ Saved: top10_f1_enso_sites_table.png")
 
 # Load HMM predictions and ground truth
 df_states = pd.read_csv('enso_factorized_categorical_hmm_states.csv')
-df_states = df_states[(df_states['year'] >= 1950) & (df_states['year'] <= 2010)]
+df_states = df_states[(df_states['year'] >= 1950) & (df_states['year'] <= 2000)]
 df_truth = pd.read_csv('enso_oni_data_1950_2010.csv')
+df_truth = df_truth[(df_truth['year'] >= 1950) & (df_truth['year'] <= 2000)]
 
 # Create a large figure with subplots for top 10 stations
 fig2 = plt.figure(figsize=(18, 16))
@@ -178,7 +179,7 @@ fig2.legend(legend_handles, legend_labels, loc='upper right',
            bbox_to_anchor=(0.98, 0.98), fontsize=11, framealpha=0.95,
            edgecolor='black', fancybox=True)
 
-plt.suptitle('Top 10 Stations: ENSO Detection Time Series (1950-2010)\nBlue Line = HMM Prediction, Red Fill = Ground Truth, Red X = Mismatch', 
+plt.suptitle('Top 10 Stations: ENSO Detection Time Series (1950-2000)\nBlue Line = HMM Prediction, Red Fill = Ground Truth, Red X = Mismatch', 
              fontsize=16, fontweight='bold', y=0.995)
 
 plt.savefig('top10_f1_time_series_comparison.png', dpi=300, bbox_inches='tight')
