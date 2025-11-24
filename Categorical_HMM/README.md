@@ -43,12 +43,13 @@ where each feature `f` is a categorical variable. This approach allows modeling 
 
 ```
 Categorical_HMM/
-├── Categorical_HMM.py                          # Main implementation
+├── Categorical_HMM.py                          # Main HMM implementation
 ├── README.md                                    # This file
+├── ENSO_DATA_README.md                         # ENSO data documentation
+├── enso_oni_data_1950_2010.csv                 # ENSO ground truth (1950-2010)
 ├── enso_factorized_categorical_hmm_states.csv  # Hidden state sequences (21 stations)
 ├── hmm_k_values.txt                            # Selected K values per site
 ├── hmm_parameters.txt                          # Trained model parameters
-├── enso_oni_data_1950_2010.csv                 # ENSO ground truth (1950-2010)
 ├── evaluate_enso_f1.py                         # ENSO anomaly evaluation (F1-based)
 ├── enso_evaluation_f1_results.csv              # Evaluation results
 ├── visualize_top10_f1.py                       # Visualization script
@@ -66,9 +67,12 @@ Categorical_HMM/
 └── data/                                        # Data preprocessing
     ├── searcher.py                             # Station filtering
     ├── dataloader2.py                          # Data loading, cleaning & detrending
-    ├── fill_missing_years_detrended.py         # Time series completion
+    ├── stations_1950_2010_covered_top_each_country.csv  # Selected stations
     └── processed/
-        └── weather_1901_2019_yearly_bins10_detrended_filled.csv  # Complete dataset
+        ├── weather_1901_2019_yearly_detrend_adaptive_bins10.csv  # Processed dataset
+        ├── normalization_info.txt             # Feature normalization parameters
+        ├── trend_removal_summary.txt          # Trend removal summary
+        └── trend_removal_detailed_report.csv  # Detailed trend removal report
 ```
 
 ## Output Files
