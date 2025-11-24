@@ -14,13 +14,20 @@ where each feature `f` is a categorical variable. This approach allows modeling 
 
 ## Features
 
-- **Multi-feature modeling**: Handles 6 ENSO-related meteorological features:
+- **Multi-feature modeling**: Handles 13 ENSO-related meteorological features:
   - Mean temperature
   - Maximum temperature
   - Minimum temperature
   - Sea level pressure
   - Wind speed
   - Precipitation
+  - Visibility
+  - Fog occurrence
+  - Rain occurrence
+  - Snow occurrence
+  - Hail occurrence
+  - Thunder occurrence
+  - Tornado occurrence
 
 - **Automatic model selection**: Uses BIC (Bayesian Information Criterion) to select optimal number of hidden states (K) for each site
 
@@ -49,9 +56,9 @@ Categorical_HMM/
 ├── top10_f1_enso_sites_table.png               # Top 10 sites table
 ├── top10_f1_time_series_comparison.png         # Time series comparison
 ├── top10_f1_performance_comparison.png         # Performance metrics
-├── ensemble/                                    # Ensemble voting system (Top 14)
+├── ensemble/                                    # Ensemble voting system (All 21)
 │   ├── README.md                               # Ensemble documentation
-│   ├── ensemble_voting_enso.py                 # Voting analysis (40% threshold)
+│   ├── ensemble_voting_enso.py                 # Voting analysis (50% threshold)
 │   ├── plot_ensemble_voting.py                 # Voting visualizations
 │   ├── ensemble_voting_results.csv             # Year-by-year results
 │   ├── ensemble_voting_enso_analysis.png       # Analysis plots
@@ -123,68 +130,78 @@ Based on BIC criterion across 21 globally distributed stations with complete 195
 
 The model's ability to detect ENSO events was evaluated using official ONI data (1950-2010) from [NOAA](https://ggweather.com/enso/oni.htm):
 
-### Historical ENSO Events (1950-2010)
-- **El Niño years**: 27 years (44.3%)
-- **La Niña years**: 25 years (41.0%)
-- **Total anomaly years**: 44 out of 61 years (72.1%)
-- **Normal years**: 17 years (27.9%)
+### Historical ENSO Events (1950-2010, Moderate+ Strength)
+- **El Niño years**: 13 years (Moderate or stronger)
+- **La Niña years**: 8 years (Moderate or stronger)
+- **Total anomaly years**: 21 out of 61 years (34.4%)
+- **Normal years**: 40 years (65.6%)
+- **Note**: Only Moderate, Strong, and Very Strong ENSO events are classified as anomalies
 
-### TOP 10 Sites by F1 Score
+### TOP 10 Sites by F1 Score (Moderate+ ENSO Definition)
 
 | Rank | Site ID | Station Name | Country | F1 Score | Precision | Recall | Accuracy |
 |------|---------|--------------|---------|----------|-----------|--------|----------|
-| 1 | 476710-99999 | TOKYO INTL | Japan | 0.7586 | 0.7333 | 0.7955 | 70.49% |
-| 2 | 942030-99999 | BROOME INTL | Australia | 0.7397 | 0.7586 | 0.7273 | 68.85% |
-| 3 | 479810-99999 | IWOTO | Japan | 0.7170 | 0.7317 | 0.7045 | 65.57% |
-| 4 | 479300-99999 | NAHA | Japan | 0.7170 | 0.7317 | 0.7045 | 65.57% |
-| 5 | 763420-99999 | MONCLOVA INTL | Mexico | 0.7143 | 0.7222 | 0.7045 | 65.57% |
-| 6 | 764990-99999 | SOTO LA MARINA TAMPS. | Mexico | 0.7143 | 0.7222 | 0.7045 | 65.57% |
-| 7 | 722860-23119 | MARCH AIR RESERVE BASE | USA | 0.7132 | 0.6757 | 0.7500 | 63.93% |
-| 8 | 946370-99999 | KALGOORLIE BOULDER | Australia | 0.7119 | 0.7241 | 0.7000 | 65.57% |
-| 9 | 946530-99999 | CEDUNA AMO | Australia | 0.7080 | 0.6667 | 0.7500 | 62.30% |
-| 10 | 761600-99999 | GENERAL IGNACIO P GARCIA INTL | Mexico | 0.7048 | 0.6563 | 0.7500 | 60.66% |
+| 1 | 763420-99999 | MONCLOVA INTL | Mexico | 0.5588 | 0.4516 | 0.7368 | 63.93% |
+| 2 | 476710-99999 | TOKYO INTL | Japan | 0.5507 | 0.4074 | 0.8462 | 59.02% |
+| 3 | 724050-13743 | RONALD REAGAN WASHINGTON NATL AP | USA | 0.5484 | 0.4074 | 0.8462 | 59.02% |
+| 4 | 847520-99999 | RODRIGUEZ BALLON | Peru | 0.5352 | 0.3871 | 0.8571 | 57.38% |
+| 5 | 911820-22521 | HONOLULU INTERNATIONAL AIRPORT | USA | 0.5122 | 0.3548 | 0.9167 | 54.10% |
+| 6 | 471420-99999 | DAEGU AB | South Korea | 0.5000 | 0.3548 | 0.8462 | 52.46% |
+| 7 | 478080-99999 | FUKUOKA | Japan | 0.5000 | 0.3548 | 0.8462 | 52.46% |
+| 8 | 843900-99999 | CAPITAN MONTES | Chile | 0.4938 | 0.3548 | 0.8000 | 52.46% |
+| 9 | 722860-23119 | MARCH AIR RESERVE BASE | USA | 0.4898 | 0.3333 | 0.8889 | 50.82% |
+| 10 | 479300-99999 | NAHA | Japan | 0.4746 | 0.3226 | 0.9091 | 49.18% |
 
 **Average Performance (TOP 10)**:
-- **F1 Score**: 0.7048
-- **Precision**: 0.7122
-- **Recall**: 0.7291
-- **Accuracy**: 64.92%
+- **F1 Score**: 0.5164
+- **Precision**: 0.3729
+- **Recall**: 0.8493
+- **Accuracy**: 55.08%
 
-**Geographic Distribution**: Pacific Rim sites (Japan, Australia, Mexico, USA West Coast) show strong correlation between hidden states and ENSO anomalies, validating the model's effectiveness for climate pattern analysis.
+**Geographic Distribution**: Pacific Rim sites (Mexico, Japan, USA, Peru, Chile, South Korea) show strong correlation between hidden states and Moderate+ ENSO anomalies. The higher recall (84.93%) indicates the model is effective at detecting significant ENSO events, while lower precision reflects the challenge of distinguishing Moderate+ events from Weak events and normal conditions.
 
-## Ensemble Voting Performance
+## Ensemble Voting Performance (Moderate+ ENSO Definition)
 
-Majority voting across **Top 14 stations** (selected by F1-score) significantly improves detection accuracy:
+Majority voting across **All 21 stations** provides comprehensive ENSO detection for Moderate and stronger events:
 
-### Best Configuration: Top 14 Stations, 40% Threshold (Recommended Default)
+### Best Configuration: All 21 Stations, 50% Threshold (Recommended Default)
 
 | Metric | Value | Description |
 |--------|-------|-------------|
-| **Accuracy** | 73.77% | Overall correctness |
-| **Precision** | 74.14% | Accuracy when predicting anomaly |
-| **Recall** | 97.73% | **Detection rate** - catches 43 out of 44 ENSO events |
-| **F1-Score** | 0.8431 | Harmonic mean of precision and recall |
+| **Accuracy** | 57.38% | Overall correctness |
+| **Precision** | 43.24% | Accuracy when predicting anomaly |
+| **Recall** | 76.19% | **Detection rate** - catches 16 out of 21 Moderate+ ENSO events |
+| **F1-Score** | 0.5517 | **Optimal balance** - highest among all thresholds |
 
-**Confusion Matrix (40% threshold, Top 14):**
+**Confusion Matrix (50% threshold, All 21):**
 ```
                 Predicted: Normal    Predicted: Anomaly
-Actual: Normal           2                  15
-Actual: Anomaly          1                  43
+Actual: Normal          19                  21
+Actual: Anomaly          5                  16
 ```
 
-**Key Improvements**:
-- ✅ **Ensemble F1 (0.8431)** vs **Best Individual F1 (0.7586)**: +11.1% improvement
-- ✅ **97.73% Recall**: Catches nearly all ENSO events (only misses 1968 El Niño)
-- ✅ **74.14% Precision**: 3 out of 4 anomaly predictions are correct
-- ✅ **Top 14 selection**: Uses only highest-quality stations for optimal balance
+**Key Findings**:
+- ✅ **Best F1-Score (0.5517)** at 50% threshold - optimal balance for Moderate+ events
+- ✅ **76.19% Recall**: Catches most significant ENSO events (16/21)
+- ✅ **43.24% Precision**: Balances detection with false positive control
+- ⚠️ **5 Missed Events**: Mainly early period Moderate events (1957, 1958, 1965, 1966, 1973)
+- ⚠️ **21 False Positives**: Includes Weak ENSO events and borderline years
 
-### Configuration Comparison
+### Threshold Comparison (All 21 Stations)
 
-| Configuration | Stations | F1 Score | Recall | Precision | Threshold |
-|---------------|----------|----------|--------|-----------|-----------|
-| **Top 14** (Recommended) | 14 | **0.8431** | 97.73% | 74.14% | 40% |
-| Top 10 | 10 | 0.8333 | 90.91% | 76.92% | 35% |
-| All 21 | 21 | 0.7879 | 88.64% | 70.91% | 35% |
+| Threshold | F1 Score | Recall | Precision | Accuracy | Use Case |
+|-----------|----------|--------|-----------|----------|----------|
+| 30% | 0.5122 | 100.00% | 34.43% | 34.43% | Maximum sensitivity |
+| 40% | 0.5278 | 90.48% | 37.25% | 44.26% | High sensitivity |
+| **50%** ⭐ | **0.5517** | **76.19%** | **43.24%** | **57.38%** | **Optimal balance** |
+| 55% | 0.5098 | 61.90% | 43.33% | 59.02% | Conservative |
+| 60% | 0.4889 | 52.38% | 45.83% | 62.30% | High confidence |
+
+**Threshold Selection Rationale**:
+- 50% threshold provides the best F1-score (0.5517)
+- Balances recall (76.19%) with acceptable precision (43.24%)
+- Suitable for detecting Moderate and stronger ENSO events
+- Lower thresholds increase recall but reduce precision significantly
 
 See `ensemble/README.md` for detailed ensemble voting analysis.
 
@@ -220,7 +237,7 @@ python visualize_top10_f1.py
 python plot_top10_f1.py
 ```
 
-5. Run ensemble voting (Top 14, 40% threshold):
+5. Run ensemble voting (All 21 stations, 50% threshold):
 ```bash
 cd ensemble
 python ensemble_voting_enso.py
@@ -289,18 +306,18 @@ Detailed table showing station metadata, location, and performance metrics for t
 ### Ensemble Voting Analysis
 ![Ensemble Analysis](ensemble/ensemble_voting_enso_analysis.png)
 
-Three-panel analysis showing time series predictions, voting ratios over time, and performance metrics at 40% threshold (Top 14 stations).
+Three-panel analysis showing time series predictions, voting ratios over time, and performance metrics at 50% threshold (All 21 stations) for Moderate+ ENSO events.
 
 ## Applications
 
 This model can be used for:
 
 1. **Climate state identification**: Discover latent weather regimes
-2. **ENSO phase detection**: Correlate hidden states with El Niño/La Niña events (ensemble F1: 0.8431)
+2. **ENSO phase detection**: Correlate hidden states with Moderate+ El Niño/La Niña events (ensemble F1: 0.5517)
 3. **Weather forecasting**: Predict future states based on transitions
-4. **Anomaly detection**: Identify unusual weather patterns with high precision (ensemble: 74.14%)
+4. **Anomaly detection**: Identify significant ENSO patterns (ensemble recall: 76.19%)
 5. **Multi-site comparison**: Compare climate dynamics across different locations
-6. **Early warning systems**: Ensemble voting provides 97.73% recall for ENSO detection
+6. **Significant event detection**: Focus on Moderate and stronger ENSO events with 50% consensus threshold
 
 ## Data Sources
 
@@ -312,7 +329,8 @@ This model can be used for:
   
 - **ENSO Index**: Oceanic Niño Index (ONI) from [NOAA Climate Prediction Center](https://ggweather.com/enso/oni.htm)
   - Official records (1950-2010)
-  - 44 anomaly years (27 El Niño, 25 La Niña, including all strengths)
+  - 21 Moderate+ anomaly years (13 El Niño, 8 La Niña)
+  - Focus on significant ENSO events (Moderate, Strong, Very Strong)
 
 ## References
 
@@ -322,12 +340,19 @@ This model can be used for:
 
 ## Version History
 
+- **v3.1** (2025-11-24): Moderate+ ENSO definition with enhanced features
+  - **ENSO Definition**: Moderate, Strong, and Very Strong events only (21 anomaly years)
+  - **Features**: Expanded to 13 features (added visibility + 6 binary weather events)
+  - **Ensemble**: All 21 stations with 50% threshold (F1=0.5517)
+  - **Performance**: 76.19% recall, 43.24% precision for significant ENSO events
+  - **Threshold**: 50% provides optimal F1-score for Moderate+ detection
+  - All stations select K=2 (100% consensus)
+
 - **v3.0** (2025-11-24): Extended period and trend removal
   - Extended analysis period to 1950-2010 (61 years)
   - Added adaptive trend removal (polynomial, differencing, high-pass filtering)
   - 21 stations with complete 1950-2010 coverage
-  - Top 14 ensemble configuration with 40% threshold (F1=0.8431)
-  - 97.73% recall with only 1 missed event
+  - All ENSO strengths included (44 anomaly years)
   - All stations select K=2 (100% consensus)
 
 - **v2.0** (2025-11-23): Major data quality update

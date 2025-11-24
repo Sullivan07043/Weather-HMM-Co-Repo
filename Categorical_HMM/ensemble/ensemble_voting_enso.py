@@ -67,18 +67,17 @@ print(f"Loaded HMM states: {len(df_states)} records from {df_states['site_id'].n
 df_states = df_states[(df_states['year'] >= 1950) & (df_states['year'] <= 2010)]
 print(f"Filtered to 1950-2010: {len(df_states)} records")
 
-# Load F1 evaluation results to get top 14 stations
+# Load F1 evaluation results for reference
 df_f1 = pd.read_csv('../enso_evaluation_f1_results.csv')
 df_f1_sorted = df_f1.sort_values('f1_score', ascending=False)
-top14_station_ids = df_f1_sorted.head(14)['site_id'].tolist()
 
-print(f"\nTop 14 stations by F1-score:")
-for i, (idx, row) in enumerate(df_f1_sorted.head(14).iterrows(), 1):
+print(f"\nUsing ALL {df_states['site_id'].nunique()} stations for ensemble voting")
+print(f"Station F1-scores (sorted):")
+for i, (idx, row) in enumerate(df_f1_sorted.iterrows(), 1):
     print(f"  #{i:2d}. {row['site_id']} - {row['station_name']:30s} F1={row['f1_score']:.4f}")
 
-# Filter to only use top 14 stations for ensemble
-df_states = df_states[df_states['site_id'].isin(top14_station_ids)]
-print(f"\n✓ Filtered to Top 14 stations: {len(df_states)} records")
+# Use all stations for ensemble (no filtering)
+print(f"\n✓ Using all {df_states['site_id'].nunique()} stations: {len(df_states)} records")
 
 # Load ground truth ENSO data
 df_truth = pd.read_csv('../enso_oni_data_1950_2010.csv')
@@ -107,8 +106,9 @@ voting_results['ensemble_prediction_35'] = (voting_results['anomaly_ratio'] > 0.
 voting_results['ensemble_prediction_40'] = (voting_results['anomaly_ratio'] > 0.4).astype(int)
 voting_results['ensemble_prediction_45'] = (voting_results['anomaly_ratio'] > 0.45).astype(int)
 voting_results['ensemble_prediction_50'] = (voting_results['anomaly_ratio'] > 0.5).astype(int)
+voting_results['ensemble_prediction_55'] = (voting_results['anomaly_ratio'] > 0.55).astype(int)
 voting_results['ensemble_prediction_60'] = (voting_results['anomaly_ratio'] > 0.6).astype(int)
-voting_results['ensemble_prediction'] = voting_results['ensemble_prediction_40']  # Use 40% as default
+voting_results['ensemble_prediction'] = voting_results['ensemble_prediction_50']  # Use 50% as default
 
 print(f"\nVoting statistics:")
 print(f"  Years analyzed: {len(voting_results)}")
@@ -137,6 +137,7 @@ y_pred_35 = df_comparison['ensemble_prediction_35'].values
 y_pred_40 = df_comparison['ensemble_prediction_40'].values
 y_pred_45 = df_comparison['ensemble_prediction_45'].values
 y_pred_50 = df_comparison['ensemble_prediction_50'].values
+y_pred_55 = df_comparison['ensemble_prediction_55'].values
 y_pred_60 = df_comparison['ensemble_prediction_60'].values
 
 thresholds = {
@@ -145,6 +146,7 @@ thresholds = {
     '40%': y_pred_40,
     '45%': y_pred_45,
     '50%': y_pred_50,
+    '55%': y_pred_55,
     '60%': y_pred_60
 }
 
@@ -180,12 +182,12 @@ print(f"\n{'='*80}")
 print(f"Best Threshold: {best_threshold} (F1-Score: {best_f1:.4f})")
 print(f"{'='*80}")
 
-# Use 35% threshold as default for detailed analysis
-y_pred = y_pred_35
+# Use 50% threshold as default for detailed analysis
+y_pred = y_pred_50
 
 # Confusion Matrix
 cm = confusion_matrix(y_true, y_pred)
-print(f"\nConfusion Matrix (35% threshold):")
+print(f"\nConfusion Matrix (50% threshold):")
 print(f"  TN={cm[0,0]}, FP={cm[0,1]}")
 print(f"  FN={cm[1,0]}, TP={cm[1,1]}")
 
@@ -225,7 +227,7 @@ if PLOTTING_AVAILABLE:
 
     ax1.set_xlabel('Year', fontsize=12, fontweight='bold')
     ax1.set_ylabel('ENSO Anomaly (0=Normal, 1=Anomaly)', fontsize=12, fontweight='bold')
-    ax1.set_title('Ensemble ENSO Prediction vs Ground Truth (1950-2010)\nTop 14 Stations by F1-Score', 
+    ax1.set_title('Ensemble ENSO Prediction vs Ground Truth (1950-2010)\nAll Stations (21 sites)', 
                   fontsize=14, fontweight='bold', pad=15)
     ax1.set_ylim(-0.1, 1.2)
     ax1.grid(True, alpha=0.3, linestyle='--')
@@ -249,16 +251,14 @@ if PLOTTING_AVAILABLE:
 
     ax2.plot(years, df_comparison['anomaly_ratio'], 
              color='purple', linewidth=2, label='Station Anomaly Ratio', alpha=0.7)
-    ax2.axhline(y=0.2, color='green', linestyle=':', linewidth=1.5, 
-                label='20% Threshold', alpha=0.5)
-    ax2.axhline(y=0.3, color='blue', linestyle=':', linewidth=1.5, 
+    ax2.axhline(y=0.3, color='green', linestyle=':', linewidth=1.5, 
                 label='30% Threshold', alpha=0.5)
-    ax2.axhline(y=0.35, color='orange', linestyle='--', linewidth=2, 
-                label='35% Threshold (Default)', alpha=0.7)
-    ax2.axhline(y=0.4, color='cyan', linestyle=':', linewidth=1.5, 
+    ax2.axhline(y=0.4, color='blue', linestyle=':', linewidth=1.5, 
                 label='40% Threshold', alpha=0.5)
-    ax2.axhline(y=0.5, color='red', linestyle=':', linewidth=1.5, 
-                label='50% Threshold', alpha=0.5)
+    ax2.axhline(y=0.5, color='orange', linestyle='--', linewidth=2, 
+                label='50% Threshold (Default)', alpha=0.7)
+    ax2.axhline(y=0.6, color='red', linestyle=':', linewidth=1.5, 
+                label='60% Threshold', alpha=0.5)
 
     # Shade ground truth anomaly periods
     for idx, row in df_comparison.iterrows():
@@ -375,7 +375,7 @@ if PLOTTING_AVAILABLE:
             elif j == 5 and table_data[i][5] == '✓':
                 cell.set_text_props(color='green', weight='bold', fontsize=11)
 
-    plt.title('Year-by-Year Ensemble Prediction vs Ground Truth (1950-2010)\nTop 14 Stations by F1-Score', 
+    plt.title('Year-by-Year Ensemble Prediction vs Ground Truth (1950-2010)\nAll Stations (21 sites)', 
               fontsize=14, fontweight='bold', pad=20)
 
     plt.savefig('ensemble_voting_detailed_comparison.png', dpi=300, bbox_inches='tight')
@@ -393,13 +393,13 @@ output_df = df_comparison[[
     'year', 'enso_type', 'enso_anomaly', 
     'total_stations', 'anomaly_votes', 'anomaly_ratio',
     'ensemble_prediction_30', 'ensemble_prediction_35', 'ensemble_prediction_40', 
-    'ensemble_prediction_45', 'ensemble_prediction_50', 'ensemble_prediction_60'
+    'ensemble_prediction_45', 'ensemble_prediction_50', 'ensemble_prediction_55', 'ensemble_prediction_60'
 ]].copy()
 
 output_df.columns = [
     'Year', 'ENSO_Type', 'Ground_Truth', 
     'Total_Stations', 'Anomaly_Votes', 'Anomaly_Ratio',
-    'Ensemble_30pct', 'Ensemble_35pct', 'Ensemble_40pct', 'Ensemble_45pct', 'Ensemble_50pct', 'Ensemble_60pct'
+    'Ensemble_30pct', 'Ensemble_35pct', 'Ensemble_40pct', 'Ensemble_45pct', 'Ensemble_50pct', 'Ensemble_55pct', 'Ensemble_60pct'
 ]
 
 # Add match indicator
@@ -408,6 +408,7 @@ output_df['Match_35pct'] = (output_df['Ground_Truth'] == output_df['Ensemble_35p
 output_df['Match_40pct'] = (output_df['Ground_Truth'] == output_df['Ensemble_40pct']).astype(int)
 output_df['Match_45pct'] = (output_df['Ground_Truth'] == output_df['Ensemble_45pct']).astype(int)
 output_df['Match_50pct'] = (output_df['Ground_Truth'] == output_df['Ensemble_50pct']).astype(int)
+output_df['Match_55pct'] = (output_df['Ground_Truth'] == output_df['Ensemble_55pct']).astype(int)
 output_df['Match_60pct'] = (output_df['Ground_Truth'] == output_df['Ensemble_60pct']).astype(int)
 
 output_df.to_csv('ensemble_voting_results.csv', index=False)
@@ -422,7 +423,7 @@ print("="*80)
 
 print(f"\nData Overview:")
 print(f"  Analysis Period: 1950-2010 ({len(df_comparison)} years)")
-print(f"  Ensemble Stations: Top 14 by F1-score")
+print(f"  Ensemble Stations: All Stations")
 print(f"  Total Stations: {df_comparison['total_stations'].iloc[0]}")
 print(f"  Ground Truth Anomalies: {y_true.sum()}/{len(y_true)} years ({y_true.sum()/len(y_true)*100:.1f}%)")
 

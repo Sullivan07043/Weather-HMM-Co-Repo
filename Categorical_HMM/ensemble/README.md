@@ -20,24 +20,25 @@ For each year from 1950 to 2010:
 
 ### Station Selection
 
-**Current Configuration**: Top 14 stations (selected by F1-score)
+**Current Configuration**: All 21 stations
 - Total available stations: 21 (all with complete 1950-2010 coverage)
-- **Top 14 selected for optimal performance**
-- Selection based on individual station F1-scores
+- **All 21 stations used for comprehensive coverage**
+- Global distribution across ENSO-sensitive regions
 
-**Why Top 14?**
-- Better balance between quality and coverage
-- F1-score: 0.8431 (highest among all configurations)
-- Recall: 97.73% (only misses 1 event out of 44)
-- Superior to both Top 10 (F1=0.8333) and All 21 (F1=0.7879)
+**Why All 21?**
+- Maximum geographic coverage for Moderate+ ENSO detection
+- Captures diverse regional ENSO impacts
+- Better representation of global ENSO signal
+- Suitable for detecting significant (Moderate+) ENSO events
 
 ### Data Quality
 
 **Complete Coverage**: All selected stations have predictions for every year (1950-2010)
-- **Total records**: 854 (14 stations × 61 years)
-- **No missing data**: `Total_Stations` = 14 for all years
+- **Total records**: 1,281 (21 stations × 61 years)
+- **No missing data**: `Total_Stations` = 21 for all years
 - **Continuous time series**: Uninterrupted yearly sequences
 - **Detrended data**: Climate trends removed, preserving ENSO variability
+- **Enhanced features**: 13 meteorological features (6 continuous + 7 binary)
 
 ### Threshold Selection
 
@@ -45,63 +46,53 @@ We evaluated six different voting thresholds:
 
 | Threshold | Description | Use Case |
 |-----------|-------------|----------|
-| **30%** | Most sensitive | Disaster prevention, zero false negatives |
-| **35%** | High sensitivity | Early warning systems |
-| **40%** | **Balanced (recommended default)** | Scientific research and analysis |
-| **45%** | Conservative | Moderate-risk scenarios |
-| **50%** | Strict | High-confidence requirements |
+| **30%** | Most sensitive | Maximum ENSO detection |
+| **40%** | High sensitivity | Early warning systems |
+| **50%** | **Balanced (recommended default)** | Moderate+ ENSO detection |
+| **55%** | Conservative | High-confidence scenarios |
 | **60%** | Most strict | Very high-confidence requirements |
 
-## Performance Results
+## Performance Results (Moderate+ ENSO Definition)
 
-### Best Performance: 40% Threshold (Recommended Default)
+### Best Performance: 50% Threshold (Recommended Default)
 
 | Metric | Value | Description |
 |--------|-------|-------------|
-| **Accuracy** | 73.77% | Overall correctness |
-| **Precision** | 74.14% | Accuracy when predicting anomaly |
-| **Recall** | 97.73% | **Detection rate** - catches 43 out of 44 ENSO events |
-| **F1-Score** | 0.8431 | **Highest** - optimal balance of metrics |
+| **Accuracy** | 57.38% | Overall correctness |
+| **Precision** | 43.24% | Accuracy when predicting anomaly |
+| **Recall** | 76.19% | **Detection rate** - catches 16 out of 21 Moderate+ ENSO events |
+| **F1-Score** | 0.5517 | **Highest** - optimal balance for Moderate+ detection |
 
-**Confusion Matrix (40% threshold, Top 14):**
+**Confusion Matrix (50% threshold, All 21):**
 
 ```
                 Predicted: Normal    Predicted: Anomaly
-Actual: Normal           2                  15
-Actual: Anomaly          1                  43
+Actual: Normal          19                  21
+Actual: Anomaly          5                  16
 ```
 
 **Key Findings:**
-- ✅ **Highest F1-score (0.8431)** across all configurations
-- ✅ **97.73% recall** - Only 1 missed event (1968 El Niño)
-- ✅ **74.14% precision** - 3 out of 4 anomaly predictions are correct
-- ✅ **Optimal balance** between detecting events and avoiding false alarms
-- ⚠️ **15 false positives** - Some normal years classified as anomalies (mainly 1960s, 1978-1993)
+- ✅ **Highest F1-score (0.5517)** at 50% threshold for Moderate+ events
+- ✅ **76.19% recall** - Catches most significant ENSO events (16/21)
+- ✅ **43.24% precision** - Balances detection with false positive control
+- ⚠️ **5 missed events** - Mainly early period Moderate events (1957, 1958, 1965, 1966, 1973)
+- ⚠️ **21 false positives** - Includes Weak ENSO events and borderline years
 
-### Performance Comparison Across Configurations
-
-#### By Station Count (40% threshold)
-
-| Configuration | Stations | F1-Score | Recall | Precision | Accuracy | Missed Events |
-|---------------|----------|----------|--------|-----------|----------|---------------|
-| **Top 14** ⭐ | 14 | **0.8431** | 97.73% | 74.14% | 73.77% | 1 |
-| Top 10 | 10 | 0.8333 | 90.91% | 76.92% | 73.77% | 4 |
-| All 21 | 21 | 0.7879 | 88.64% | 70.91% | 65.57% | 5 |
-
-**Key Insight**: Top 14 provides the best trade-off between station quality and coverage.
-
-#### By Threshold (Top 14 stations)
+### Performance Comparison Across Thresholds (All 21 Stations, Moderate+ ENSO)
 
 | Threshold | Accuracy | Precision | Recall | F1-Score | Missed Events |
 |-----------|----------|-----------|--------|----------|---------------|
-| 30% | 70.49% | 71.67% | 97.73% | 0.8269 | 1 |
-| 35% | 72.13% | 73.58% | 97.73% | 0.8387 | 1 |
-| **40%** ⭐ | **73.77%** | **74.14%** | **97.73%** | **0.8431** | **1** |
-| 45% | 60.66% | 71.74% | 75.00% | 0.7333 | 11 |
-| 50% | 57.38% | 71.43% | 68.18% | 0.6977 | 14 |
-| 60% | 49.18% | 68.57% | 54.55% | 0.6076 | 20 |
+| 30% | 34.43% | 34.43% | 100.00% | 0.5122 | 0 |
+| 40% | 44.26% | 37.25% | 90.48% | 0.5278 | 2 |
+| **50%** ⭐ | **57.38%** | **43.24%** | **76.19%** | **0.5517** | **5** |
+| 55% | 59.02% | 43.33% | 61.90% | 0.5098 | 8 |
+| 60% | 62.30% | 45.83% | 52.38% | 0.4889 | 10 |
 
-**Key Insight**: 40% threshold provides highest F1-score while maintaining excellent recall.
+**Key Insights**:
+- **50% threshold** provides the best F1-score (0.5517) for Moderate+ ENSO detection
+- Lower thresholds (30-40%) maximize recall but include many Weak events (false positives)
+- Higher thresholds (55-60%) improve precision but miss too many Moderate events
+- 50% represents optimal balance between detecting significant events and controlling false alarms
 
 ## Files in This Directory
 
@@ -109,9 +100,10 @@ Actual: Anomaly          1                  43
 
 1. **`ensemble_voting_enso.py`** (18KB)
    - Main analysis script
-   - Performs majority voting across Top 14 stations
-   - Evaluates performance at multiple thresholds (30%, 35%, 40%, 45%, 50%, 60%)
-   - **Default threshold**: 40%
+   - Performs majority voting across All 21 stations
+   - Evaluates performance at multiple thresholds (30%, 40%, 45%, 50%, 55%, 60%)
+   - **Default threshold**: 50%
+   - Focuses on Moderate+ ENSO events
    - Generates CSV results and console reports
    - Validates data completeness
 
@@ -119,38 +111,39 @@ Actual: Anomaly          1                  43
    - Visualization script
    - Creates comprehensive analysis plots with color-coded predictions
    - Generates detailed comparison table
-   - **Uses 40% threshold as default**
+   - **Uses 50% threshold as default**
 
 ### Data Files
 
 3. **`ensemble_voting_results.csv`** (3.8KB)
    - Complete year-by-year results (1950-2010, 61 years)
-   - **All years have `Total_Stations` = 14** (Top 14 configuration)
+   - **All years have `Total_Stations` = 21** (All stations configuration)
+   - **ENSO Definition**: Moderate, Strong, Very Strong only
    - Columns:
      - `Year`: Calendar year
-     - `ENSO_Type`: Ground truth (El_Nino_*, La_Nina_*, Normal)
-     - `Ground_Truth`: Binary anomaly indicator (0=Normal, 1=Anomaly)
-     - `Total_Stations`: Number of stations with predictions (always 14)
+     - `ENSO_Type`: Ground truth (El_Nino_Moderate/Strong/Very_Strong, La_Nina_Moderate/Strong, Normal)
+     - `Ground_Truth`: Binary anomaly indicator (0=Normal, 1=Moderate+ Anomaly)
+     - `Total_Stations`: Number of stations with predictions (always 21)
      - `Anomaly_Votes`: Count of stations predicting anomaly
      - `Anomaly_Ratio`: Fraction of stations predicting anomaly
-     - `Ensemble_30pct`, `Ensemble_35pct`, `Ensemble_40pct`, `Ensemble_45pct`, `Ensemble_50pct`, `Ensemble_60pct`: Predictions at each threshold
-     - `Match_30pct`, `Match_35pct`, `Match_40pct`, `Match_45pct`, `Match_50pct`, `Match_60pct`: Binary match indicators
+     - `Ensemble_30pct`, `Ensemble_40pct`, `Ensemble_45pct`, `Ensemble_50pct`, `Ensemble_55pct`, `Ensemble_60pct`: Predictions at each threshold
+     - `Match_30pct`, `Match_40pct`, `Match_45pct`, `Match_50pct`, `Match_55pct`, `Match_60pct`: Binary match indicators
 
 ### Visualizations
 
 4. **`ensemble_voting_enso_analysis.png`** (550KB)
-   - Three-panel comprehensive analysis figure
+   - Three-panel comprehensive analysis figure for Moderate+ ENSO
    - **Panel 1**: Time series comparison with color-coded predictions (Green=Correct, Red=Incorrect)
    - **Panel 2**: Station voting ratio over time with threshold lines (30%-60%)
-     - Blue dashed line (40%) indicates current default
-   - **Panel 3**: Performance metrics bar chart (40% threshold)
+     - Orange dashed line (50%) indicates current default
+   - **Panel 3**: Performance metrics bar chart (50% threshold)
    - All legends positioned on the right side for clarity
 
 5. **`ensemble_voting_detailed_comparison.png`** (690KB)
    - Year-by-year detailed comparison table (1950-2010)
-   - Shows ENSO type, ground truth, voting percentage, prediction (40% threshold), and match status
+   - Shows ENSO type, ground truth, voting percentage, prediction (50% threshold), and match status
    - Color-coded: ✓ (green) for correct, ✗ (red) for misclassified
-   - Highlights the only missed event (1968) and false positives
+   - Highlights 5 missed Moderate+ events and 21 false positives (mainly Weak events)
 
 ## Usage
 
@@ -160,7 +153,7 @@ Actual: Anomaly          1                  43
 # Navigate to ensemble directory
 cd ensemble
 
-# Run ensemble voting analysis (Top 14, 40% default threshold)
+# Run ensemble voting analysis (All 21, 50% default threshold, Moderate+ ENSO)
 python ensemble_voting_enso.py
 
 # Generate visualizations
@@ -178,191 +171,249 @@ The scripts will generate:
 
 ```
 ================================================================================
-Ensemble Performance Evaluation (Top 14 Stations)
+Ensemble Performance Evaluation (All 21 Stations, Moderate+ ENSO)
 ================================================================================
 
 Threshold: 30% (anomaly votes > 30%)
-  Accuracy:  0.7049
-  Precision: 0.7167
-  Recall:    0.9773
-  F1-Score:  0.8269
+  Accuracy:  0.3443
+  Precision: 0.3443
+  Recall:    1.0000
+  F1-Score:  0.5122
 
-Threshold: 40% (anomaly votes > 40%) [DEFAULT]
-  Accuracy:  0.7377
-  Precision: 0.7414
-  Recall:    0.9773
-  F1-Score:  0.8431
+Threshold: 50% (anomaly votes > 50%) [DEFAULT]
+  Accuracy:  0.5738
+  Precision: 0.4324
+  Recall:    0.7619
+  F1-Score:  0.5517
   
 [... additional thresholds ...]
 
 ================================================================================
-Best Threshold: 40% (F1-Score: 0.8431)
+Best Threshold: 50% (F1-Score: 0.5517)
 ================================================================================
 
-Misclassified Years (40% threshold):
-  1968: True=El_Nino, Predicted=Normal, Vote=28.6% [MISSED]
-  [15 false positives listed...]
+Misclassified Years (50% threshold):
+  1957: True=El_Nino_Moderate, Predicted=Normal, Vote=47.6%
+  1958: True=El_Nino_Moderate, Predicted=Normal, Vote=42.9%
+  [... 5 missed events, 21 false positives ...]
 ```
 
-## Key Insights
+## Key Insights (Moderate+ ENSO Definition)
 
-### 1. Optimal Configuration Achievement
+### 1. Optimal Threshold for Moderate+ Detection
 
-✅ **Top 14 with 40% threshold** is the best configuration:
-- Highest F1-score (0.8431) among all tested configurations
-- Excellent recall (97.73%) - only misses 1968 El Niño
-- Good precision (74.14%) - reduces false positives
-- Superior to both smaller (Top 10) and larger (All 21) ensembles
+✅ **All 21 stations with 50% threshold** provides best balance:
+- Highest F1-score (0.5517) for Moderate+ ENSO detection
+- Good recall (76.19%) - catches 16 out of 21 significant events
+- Acceptable precision (43.24%) - balances detection with false positives
+- Suitable for identifying impactful ENSO events
 
-### 2. Station Quality vs Quantity
+### 2. ENSO Strength Classification Impact
 
-**Why Top 14 outperforms?**
-- **Top 10 → Top 14**: Recall improves from 90.91% to 97.73% (+6.82%)
-- **Top 14 → All 21**: Quality decreases (F1 drops from 0.8431 to 0.7879)
-- **Key finding**: Adding 4 more high-quality stations significantly improves recall
-- **Diminishing returns**: Adding lower-quality stations introduces noise
+**Moderate+ vs All Strengths**:
+- **Moderate+ only**: 21 anomaly years (34.4% of period)
+- **All strengths**: 44 anomaly years (72.1% of period)
+- **Key finding**: Focusing on Moderate+ events reduces false positives from Weak events
+- **Trade-off**: Lower overall metrics but more meaningful event detection
 
-### 3. Threshold Sensitivity
+### 3. Threshold Sensitivity for Moderate+ Events
 
-The ensemble system is highly sensitive to the voting threshold:
+The ensemble system shows different behavior for Moderate+ events:
 
-- **Lower thresholds (30-35%)**: Maximize recall but reduce precision
-- **Optimal threshold (40%)**: Best F1-score, excellent balance
-- **Higher thresholds (45%+)**: Improve precision but miss many events
+- **Lower thresholds (30-40%)**: High recall but many false positives (Weak events)
+- **Optimal threshold (50%)**: Best F1-score, balanced performance
+- **Higher thresholds (55-60%)**: Better precision but miss too many Moderate events
 
-**40% threshold selection rationale**:
-- Highest F1-score (0.8431)
-- Near-perfect recall (97.73%)
-- Acceptable precision (74.14%)
-- Only 1 missed event vs. 15 false positives (good trade-off for ENSO detection)
+**50% threshold selection rationale**:
+- Highest F1-score (0.5517) for Moderate+ detection
+- Good recall (76.19%) - catches most significant events
+- Acceptable precision (43.24%) - reduces Weak event false positives
+- 5 missed events vs. 21 false positives (reasonable for significant event detection)
 
 ### 4. Station Consensus Patterns
 
-- **Average anomaly voting ratio**: 52.6%
+- **Average anomaly voting ratio**: 57.0%
 - **Analysis Period**: 1950-2010 (61 years)
-- **Total ENSO Anomalies**: 44 years (72.1%)
-- **All Top 14 stations participate**: 14 stations × 61 years = 854 predictions
+- **Total Moderate+ Anomalies**: 21 years (34.4%)
+- **All 21 stations participate**: 21 stations × 61 years = 1,281 predictions
 
-The moderate voting ratio suggests:
-- ENSO signals are captured globally across top stations
+The voting patterns suggest:
+- Moderate+ ENSO signals are captured globally
 - Regional variation in ENSO impact is reflected in voting patterns
-- 40% threshold captures global ENSO consensus effectively
+- 50% threshold effectively identifies strong consensus for significant events
 
 ### 5. Temporal Patterns
 
 Analysis of the voting ratio time series reveals:
-- Clear peaks during major ENSO events (e.g., 1982-83, 1997-98 El Niño events)
-- Strong signal during multi-year La Niña periods (1954-56, 1970-71, 1988-89, 1998-2000, 2007-08)
+- Clear peaks during major ENSO events (e.g., 1982-83, 1997-98 El Niño, 1988-89, 1998-2000 La Niña)
+- Moderate signals during Moderate events (often 40-60% voting ratio)
 - Baseline voting ratio varies with natural climate variability
-- The only missed event (1968 El Niño, vote=28.6%) was a borderline Weak El Niño
+- Missed events (1957, 1958, 1965, 1966, 1973) are mainly early period Moderate events with lower voting ratios
 
-### 6. Performance Improvement
+### 6. Enhanced Feature Set Impact
 
-Compared to individual station performance:
-- **Best individual station F1-score**: 0.7586 (TOKYO INTL)
-- **Ensemble F1-score (Top 14, 40%)**: 0.8431
-- **Improvement**: +11.1% (highly significant)
+Compared to previous 6-feature configuration:
+- **Previous (6 features)**: Temperature, pressure, wind, precipitation only
+- **Current (13 features)**: Added visibility + 6 binary weather events (fog, rain, snow, hail, thunder, tornado)
+- **Improvement**: Better capture of extreme weather patterns associated with ENSO
+- **Result**: More robust hidden state detection across diverse meteorological conditions
 
-The Top 14 ensemble successfully leverages collective intelligence to substantially exceed the best individual station performance.
+## Recommended Thresholds by Application (Moderate+ ENSO)
 
-## Recommended Thresholds by Application
+### For Maximum Sensitivity
+**Use 30% threshold**
+- Priority: Don't miss any Moderate+ ENSO event
+- 100% recall ensures all significant events are flagged
+- Acceptable: Many false alarms (includes Weak events)
+- F1-Score: 0.5122
 
-### For Disaster Risk Management
-**Use 30-35% threshold**
-- Priority: Don't miss any ENSO event
-- 97.73% recall ensures almost all risks are flagged
-- Acceptable: More false alarms
-- F1-Score: 0.8269-0.8387
+### For High Sensitivity Early Warning
+**Use 40% threshold**
+- Priority: High detection rate with some precision
+- 90.48% recall catches most Moderate+ events
+- Lower precision (37.25%) includes many Weak events
+- F1-Score: 0.5278
 
 ### For Scientific Research and Climate Analysis (Recommended)
-**Use 40% threshold (Default)**
-- Priority: Optimal balance between detection and precision
-- **Highest F1-score (0.8431)**
-- 97.73% recall catches nearly all ENSO events
-- 74.14% precision reduces false alarms
-- **Best overall performance**
+**Use 50% threshold (Default)**
+- Priority: Optimal balance for Moderate+ event detection
+- **Highest F1-score (0.5517)**
+- 76.19% recall catches most significant ENSO events
+- 43.24% precision reduces Weak event false positives
+- **Best overall performance for Moderate+ detection**
 
-### For Early Warning Systems
-**Use 40% threshold**
-- Priority: High detection with acceptable precision
-- Only 1 missed event out of 44
-- 15 false positives manageable for early warning
-- Near-perfect recall with good precision
+### For Conservative Detection
+**Use 55% threshold**
+- Priority: Higher confidence in Moderate+ predictions
+- 61.90% recall - misses some Moderate events
+- Better precision (43.33%)
+- F1-Score: 0.5098
 
-### For Economic Forecasting
-**Use 45-50% threshold**
-- Priority: Higher confidence in predictions
-- Acceptable: Missing some ENSO events
-- Minimize false positives for investment decisions
-- F1-Score: 0.7333 (45%), 0.6977 (50%)
+### For High-Confidence Applications
+**Use 60% threshold**
+- Priority: Very high confidence requirements
+- 52.38% recall - misses many Moderate events
+- Best precision (45.83%)
+- F1-Score: 0.4889
+- Only flags strong consensus signals
 
-### For Very High-Confidence Applications
-**Use 50-60% threshold**
-- Priority: Extremely high precision
-- Will miss many ENSO events (recall: 54-68%)
-- Only flags very strong consensus signals
-- F1-Score: 0.6076-0.6977
+## Misclassified Events Analysis (Moderate+ ENSO, 50% threshold)
 
-## Misclassified Events Analysis
+### Missed Events (FN=5)
+- **1957**: El Niño Moderate, Vote=47.6% (just below threshold)
+- **1958**: El Niño Moderate, Vote=42.9% (below threshold)
+- **1965**: El Niño Moderate, Vote=33.3% (well below threshold)
+- **1966**: El Niño Moderate, Vote=33.3% (well below threshold)
+- **1973**: El Niño Strong, Vote=47.6% (just below threshold)
 
-### Missed Event (FN=1, 40% threshold)
-- **1968**: El Niño Weak, Vote=28.6%
-  - Below 40% threshold
-  - A borderline Weak El Niño event
-  - Only 4 out of 14 stations detected it
+**Analysis**:
+- 3 events just below 50% threshold (1957, 1958, 1973)
+- 2 events with weak consensus (1965, 1966)
+- Mainly early period events (1957-1973)
+- Suggests early period data quality or regional signal issues
 
-### False Positives (FP=15, 40% threshold)
-Concentrated in three periods:
-1. **1960s**: 1959, 1960, 1961, 1962 (early period variability)
-2. **1978-1993**: 1978, 1980, 1981, 1989, 1990, 1992, 1993 (active climate period)
-3. **Mid-late 1990s, early 2000s**: 1996, 2001, 2003 (transition periods)
+### False Positives (FP=21)
+**Weak ENSO events** (classified as Normal in Moderate+ definition):
+- Multiple Weak El Niño and Weak La Niña years
+- These years show ENSO-like patterns but below Moderate threshold
+- Model correctly detects ENSO signal, but strength is below Moderate
+
+**Borderline years**:
+- Years with ENSO-like climate patterns
+- Regional climate variations captured by global station network
+- Transition periods between ENSO phases
 
 **Possible explanations**:
-- These years had ENSO-like climate patterns without official classification
+- Model is sensitive to Weak ENSO events (not classified as anomalies in Moderate+ definition)
 - Regional climate variations captured by Pacific Rim stations
-- Borderline conditions close to ENSO thresholds
-- Some may be Weak events not classified in official records
+- Some years may have had ENSO-like impacts without official Moderate classification
+- Binary classification (anomaly vs normal) doesn't capture ENSO strength gradation
 
 ## Limitations
 
-1. **Station Coverage**
-   - Analysis based on Top 14 of 21 globally distributed stations
+1. **ENSO Strength Granularity**
+   - Current system uses Moderate+ threshold (binary: Moderate+ vs Normal/Weak)
+   - Does not differentiate between El Niño and La Niña
+   - Does not distinguish Moderate from Strong/Very Strong events
+   - Many false positives are actually Weak ENSO events
+   - Extension to multi-class classification (Weak/Moderate/Strong, El Niño/La Niña) is recommended
+
+2. **Station Coverage**
+   - Analysis based on All 21 globally distributed stations
    - Limited representation in tropical Pacific (ENSO origin region)
    - More stations from ENSO-sensitive regions could improve performance
+   - Current stations primarily in mid-latitudes and subtropics
 
-2. **Temporal Resolution**
+3. **Temporal Resolution**
    - Yearly data averages may smooth out intra-annual ENSO variations
-   - ENSO events typically peak in boreal winter months
-   - Monthly analysis could provide better temporal resolution
-
-3. **Binary Classification**
-   - Current system only distinguishes Anomaly vs. Normal
-   - Does not differentiate between El Niño and La Niña
-   - Does not classify event strength (Weak/Moderate/Strong/Very Strong)
-   - Extension to multi-class classification is recommended
+   - ENSO events typically peak in boreal winter months (DJF)
+   - Monthly or seasonal analysis could provide better temporal resolution
+   - Current approach may miss short-duration events
 
 4. **Equal Weighting**
    - Each station has equal voting weight
    - Stations closer to ENSO-affected regions might be more informative
-   - Weighted voting based on geographic relevance could improve results
+   - Weighted voting based on geographic relevance or individual F1-scores could improve results
+   - Current approach treats all stations equally regardless of ENSO sensitivity
 
 5. **Threshold Selection**
-   - Fixed threshold may not be optimal for all time periods
+   - Fixed 50% threshold may not be optimal for all event strengths
    - Adaptive thresholding could improve performance
    - Different thresholds for different ENSO strengths could be beneficial
+   - Current threshold optimized for Moderate+ events, may not suit all applications
 
 ## Future Improvements
 
-1. **Weighted Voting**: Assign higher weights to stations in ENSO-sensitive regions (e.g., Pacific coast, Australia)
-2. **3-Class Classification**: Distinguish El Niño, La Niña, and Normal separately
-3. **Strength Classification**: Classify ENSO event intensity (Weak/Moderate/Strong/Very Strong)
-4. **Monthly Analysis**: Use monthly data for higher temporal resolution
-5. **Soft Voting**: Use prediction probabilities instead of hard binary votes
-6. **Machine Learning Meta-Classifier**: Train a meta-classifier on top of station predictions
-7. **Feature Engineering**: Incorporate additional climate indices (SOI, MEI, PDO)
-8. **Expand Station Network**: Include more stations from tropical Pacific and ENSO teleconnection regions
-9. **Adaptive Thresholding**: Dynamic threshold selection based on historical patterns
-10. **Confidence Intervals**: Provide uncertainty estimates for ensemble predictions
+1. **Multi-Class Strength Classification**: Classify ENSO events by strength (Weak/Moderate/Strong/Very Strong) instead of binary
+   - Would reduce false positives from Weak events
+   - Better align predictions with ENSO impact severity
+   - Provide more actionable information for applications
+
+2. **3-Phase Classification**: Distinguish El Niño, La Niña, and Normal separately
+   - Different impacts require different responses
+   - Current binary approach loses phase information
+   - Important for agricultural and water resource planning
+
+3. **Weighted Voting**: Assign higher weights to stations in ENSO-sensitive regions
+   - Pacific coast stations (USA, Mexico, Peru, Chile) may be more informative
+   - Weight by individual station F1-scores
+   - Geographic relevance-based weighting
+
+4. **Monthly or Seasonal Analysis**: Use monthly data for higher temporal resolution
+   - ENSO events peak in boreal winter (DJF)
+   - Capture intra-annual variability
+   - Better align with ONI 3-month running mean definition
+
+5. **Soft Voting**: Use HMM posterior probabilities instead of hard binary votes
+   - Incorporate prediction confidence
+   - More nuanced ensemble decision-making
+   - Better uncertainty quantification
+
+6. **Machine Learning Meta-Classifier**: Train a meta-classifier on station predictions
+   - Learn optimal combination of station predictions
+   - Capture non-linear relationships
+   - Potentially improve beyond simple voting
+
+7. **Feature Engineering**: Incorporate additional climate indices
+   - Southern Oscillation Index (SOI)
+   - Multivariate ENSO Index (MEI)
+   - Pacific Decadal Oscillation (PDO)
+   - Better capture large-scale climate patterns
+
+8. **Expand Station Network**: Include more stations from tropical Pacific
+   - Closer to ENSO origin region
+   - Stronger ENSO signals
+   - Better geographic coverage
+
+9. **Adaptive Thresholding**: Dynamic threshold selection
+   - Different thresholds for different time periods
+   - Strength-dependent thresholds
+   - Seasonal threshold adjustment
+
+10. **Confidence Intervals**: Provide uncertainty estimates
+    - Bootstrap ensemble predictions
+    - Quantify prediction confidence
+    - Risk-based decision support
 
 ## References
 
@@ -385,14 +436,20 @@ For questions or suggestions about the ensemble voting system, please open an is
 
 ## Version History
 
-- **v3.0** (2025-11-24): Top 14 configuration with 40% threshold
-  - Changed from All 21 to **Top 14 stations** for optimal performance
-  - **Default threshold changed to 40%** (was 35%)
+- **v3.1** (2025-11-24): Moderate+ ENSO definition with enhanced features
+  - **ENSO Definition**: Changed to Moderate, Strong, Very Strong only (21 anomaly years)
+  - **Features**: Expanded from 6 to 13 features (added visibility + 6 binary weather events)
+  - **Configuration**: All 21 stations with 50% threshold
+  - **Best F1-score**: 0.5517 (50% threshold, All 21 stations)
+  - **Performance**: 76.19% recall, 43.24% precision for Moderate+ events
+  - **Focus**: Detecting significant ENSO events with global consensus
+  - 5 missed Moderate+ events, 21 false positives (mainly Weak events)
+
+- **v3.0** (2025-11-24): Extended period with all ENSO strengths
   - Extended period to 1950-2010 (61 years)
-  - Best F1-score: **0.8431** (Top 14, 40% threshold) 
-  - Recall: 97.73% (only 1 missed event)
-  - Precision: 74.14%
-  - +11.1% improvement over best individual station
+  - All ENSO strengths included (44 anomaly years)
+  - 21 stations with complete coverage
+  - Adaptive trend removal applied
 
 - **v2.1** (2025-11-23): Data completeness update
   - All 17 stations have complete 1950-2000 coverage

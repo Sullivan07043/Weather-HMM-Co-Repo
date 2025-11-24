@@ -44,7 +44,28 @@ for site_id in df_states['site_id'].unique():
         continue
     
     y_true = df_eval['enso_anomaly'].values
-    y_pred = df_eval['state'].values
+    y_pred_raw = df_eval['state'].values
+    
+    # For multi-state HMMs or non-binary states, map to binary (0=Normal, 1=Anomaly)
+    # Strategy: Find which state(s) best align with ENSO anomalies
+    unique_states = np.unique(y_pred_raw)
+    
+    # Check if states are already binary {0, 1}
+    if set(unique_states) == {0, 1}:
+        y_pred = y_pred_raw
+    else:
+        # Need to map states to binary
+        # Try each state as "anomaly" and pick the one with best F1
+        best_f1 = 0
+        best_mapping = None
+        for anomaly_state in unique_states:
+            y_pred_temp = (y_pred_raw == anomaly_state).astype(int)
+            f1_temp = f1_score(y_true, y_pred_temp, zero_division=0)
+            if f1_temp > best_f1:
+                best_f1 = f1_temp
+                best_mapping = anomaly_state
+        # Map: best_mapping -> 1, others -> 0
+        y_pred = (y_pred_raw == best_mapping).astype(int)
     
     # Calculate metrics
     acc = accuracy_score(y_true, y_pred)

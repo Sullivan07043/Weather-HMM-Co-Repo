@@ -23,23 +23,23 @@ ax = axes[0]
 years = df['Year'].values
 ground_truth = df['Ground_Truth'].values
 
-# Use 40% threshold as default
-prediction_40 = df['Ensemble_40pct'].values
-match_40 = df['Match_40pct'].values
+# Use 50% threshold as default
+prediction_50 = df['Ensemble_50pct'].values
+match_50 = df['Match_50pct'].values
 
 # Plot bars with color based on match
 x = np.arange(len(years))
 width = 0.6
 
 # Create colors based on match: green for correct, red for incorrect
-colors = ['green' if m == 1 else 'red' for m in match_40]
+colors = ['green' if m == 1 else 'red' for m in match_50]
 
 # Plot single bars
 bars = ax.bar(x, ground_truth, width, alpha=0.7, color=colors, 
               edgecolor='black', linewidth=1)
 
 # Add prediction markers on top
-for i, (pred, truth) in enumerate(zip(prediction_40, ground_truth)):
+for i, (pred, truth) in enumerate(zip(prediction_50, ground_truth)):
     if pred == 1:
         # Show prediction as a marker
         marker_color = 'darkgreen' if pred == truth else 'darkred'
@@ -59,7 +59,7 @@ legend_elements = [
 
 ax.set_xlabel('Year', fontsize=12, fontweight='bold')
 ax.set_ylabel('ENSO Anomaly (0=Normal, 1=Anomaly)', fontsize=11, fontweight='bold')
-ax.set_title('Ensemble ENSO Prediction vs Ground Truth (1950-2010)\nTop 14 Stations - Green=Match, Red=Mismatch', 
+ax.set_title('Ensemble ENSO Prediction vs Ground Truth (1950-2010)\nAll Stations (21 sites) - Green=Match, Red=Mismatch', 
              fontsize=13, fontweight='bold', pad=10)
 ax.set_xticks(x[::5])  # Show every 5th year
 ax.set_xticklabels(years[::5], rotation=45)
@@ -77,14 +77,10 @@ ax.plot(years, df['Anomaly_Ratio'], color='purple', linewidth=2,
         label='Station Anomaly Ratio', alpha=0.8, marker='o', markersize=4)
 ax.axhline(y=0.3, color='green', linestyle=':', linewidth=1.5, 
           label='30% Threshold', alpha=0.6)
-ax.axhline(y=0.35, color='orange', linestyle=':', linewidth=1.5, 
-          label='35% Threshold', alpha=0.6)
-ax.axhline(y=0.4, color='blue', linestyle='--', linewidth=2, 
-          label='40% Threshold (Default)', alpha=0.8)
-ax.axhline(y=0.45, color='cyan', linestyle=':', linewidth=1.5, 
-          label='45% Threshold', alpha=0.6)
-ax.axhline(y=0.5, color='brown', linestyle=':', linewidth=1.5, 
-          label='50% Threshold', alpha=0.6)
+ax.axhline(y=0.4, color='cyan', linestyle=':', linewidth=1.5, 
+          label='40% Threshold', alpha=0.6)
+ax.axhline(y=0.5, color='orange', linestyle='--', linewidth=2, 
+          label='50% Threshold (Default)', alpha=0.8)
 ax.axhline(y=0.6, color='red', linestyle=':', linewidth=1.5, 
           label='60% Threshold', alpha=0.6)
 
@@ -106,13 +102,13 @@ ax.legend(loc='center left', bbox_to_anchor=(1.01, 0.5), framealpha=0.9, fontsiz
 # ============================================================================
 ax = axes[2]
 
-# Calculate metrics using 40% threshold
-prediction_40_metrics = df['Ensemble_40pct'].values
+# Calculate metrics using 50% threshold
+prediction_50_metrics = df['Ensemble_50pct'].values
 
-tn = np.sum((df['Ground_Truth'] == 0) & (prediction_40_metrics == 0))
-fp = np.sum((df['Ground_Truth'] == 0) & (prediction_40_metrics == 1))
-fn = np.sum((df['Ground_Truth'] == 1) & (prediction_40_metrics == 0))
-tp = np.sum((df['Ground_Truth'] == 1) & (prediction_40_metrics == 1))
+tn = np.sum((df['Ground_Truth'] == 0) & (prediction_50_metrics == 0))
+fp = np.sum((df['Ground_Truth'] == 0) & (prediction_50_metrics == 1))
+fn = np.sum((df['Ground_Truth'] == 1) & (prediction_50_metrics == 0))
+tp = np.sum((df['Ground_Truth'] == 1) & (prediction_50_metrics == 1))
 
 accuracy = (tp + tn) / len(df)
 precision = tp / (tp + fp) if (tp + fp) > 0 else 0
@@ -136,12 +132,12 @@ ax.text(1.05, 0.5, cm_text, transform=ax.transAxes, fontsize=10,
         verticalalignment='center')
 
 ax.set_xlabel('Score', fontsize=12, fontweight='bold')
-ax.set_title('Ensemble Performance Metrics (40% Threshold)', 
+ax.set_title('Ensemble Performance Metrics (50% Threshold)', 
              fontsize=13, fontweight='bold', pad=10)
 ax.set_xlim(0, 1.1)
 ax.grid(True, alpha=0.3, axis='x', linestyle='--')
 
-plt.suptitle('Ensemble ENSO Detection: Majority Voting Across Top 14 Stations', 
+plt.suptitle('Ensemble ENSO Detection: Majority Voting Across All Stations (21 sites)', 
              fontsize=15, fontweight='bold', y=0.995)
 
 plt.tight_layout(rect=[0, 0, 0.85, 1])  # Leave space on the right for legends
@@ -164,9 +160,8 @@ for idx, row in df.iterrows():
     enso_type = row['ENSO_Type'].replace('_', ' ')
     truth = 'Anomaly' if row['Ground_Truth'] == 1 else 'Normal'
     vote_pct = f"{row['Anomaly_Ratio']*100:.1f}%"
-    # Use 40% threshold
-    prediction = 'Anomaly' if row['Ensemble_40pct'] == 1 else 'Normal'
-    match = '✓' if row['Match_40pct'] == 1 else '✗'
+    prediction = 'Anomaly' if row['Ensemble_50pct'] == 1 else 'Normal'
+    match = '✓' if row['Match_50pct'] == 1 else '✗'
     
     table_data.append([year, enso_type, truth, vote_pct, prediction, match])
 
@@ -202,7 +197,7 @@ for i in range(1, len(table_data)):
             cell.set_text_props(color='green', weight='bold', fontsize=10)
 
 # Add title with more space above the table
-ax.text(0.5, 0.98, 'Year-by-Year Ensemble Prediction vs Ground Truth (1950-2010)\nTop 14 Stations by F1-Score', 
+ax.text(0.5, 0.98, 'Year-by-Year Ensemble Prediction vs Ground Truth (1950-2010)\nAll Stations (21 sites)', 
         ha='center', va='top', fontsize=14, fontweight='bold', 
         transform=ax.transAxes)
 

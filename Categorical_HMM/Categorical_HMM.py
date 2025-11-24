@@ -11,6 +11,13 @@ EL_NINO_FEATURES = [
     "sea_level_pressure",
     "wind_speed",
     "precipitation",
+    "visibility",
+    "fog",
+    "rain",
+    "snow",
+    "hail",
+    "thunder",
+    "tornado",
 ]
 
 
@@ -628,7 +635,7 @@ def save_parameters(results, out_path, feature_cols):
 # ========================
 if __name__ == "__main__":
     # Load station list from CSV file
-    station_csv = "data/stations_1950_2000_covered_top_each_country.csv"
+    station_csv = "data/stations_1950_2010_covered_top_each_country.csv"
     df_stations = pd.read_csv(station_csv)
     
     # Create site_id from USAF and WBAN columns
@@ -637,8 +644,8 @@ if __name__ == "__main__":
     
     print(f"Loaded {len(site_ids)} stations from {station_csv}")
     
-    # Path to preprocessed monthly data with discretized features (detrended version)
-    csv_path = "data/processed/weather_1901_2019_yearly_bins10_detrended_filled.csv"
+    # Path to preprocessed yearly data with discretized features (detrended version)
+    csv_path = "data/processed/weather_1901_2019_yearly_detrend_adaptive_bins10.csv"
     
     data_dict, lengths_dict, feature_cols, n_categories = load_data(
         csv_path,
