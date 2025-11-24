@@ -627,31 +627,19 @@ def save_parameters(results, out_path, feature_cols):
 # 8. Main: ENSO Sites + Monthly CSV
 # ========================
 if __name__ == "__main__":
-    # Selected ENSO-sensitive sites (USAF-WBAN format)
-    # Updated list: 17 stations with actual 1950-2000 coverage
-    site_ids = [
-        "942030-99999",
-        "943350-99999",
-        "943740-99999",
-        "944760-99999",
-        "474250-99999",
-        "477590-99999",
-        "477710-99999",
-        "478030-99999",
-        "471100-99999",
-        "471080-99999",
-        "471420-99999",
-        "843900-99999",
-        "847520-99999",
-        "726810-24131",
-        "726815-24106",
-        "722860-23119",
-        "722265-13821",
-    ]
-
-    # Path to preprocessed monthly data with discretized features
-    csv_path = "data/processed/weather_1901_2019_yearly_bins10.csv"
-
+    # Load station list from CSV file
+    station_csv = "data/stations_1950_2000_covered_top_each_country.csv"
+    df_stations = pd.read_csv(station_csv)
+    
+    # Create site_id from USAF and WBAN columns
+    site_ids = (df_stations['USAF'].astype(str).str.zfill(6) + '-' + 
+                df_stations['WBAN'].astype(str).str.zfill(5)).tolist()
+    
+    print(f"Loaded {len(site_ids)} stations from {station_csv}")
+    
+    # Path to preprocessed monthly data with discretized features (detrended version)
+    csv_path = "data/processed/weather_1901_2019_yearly_bins10_detrended_filled.csv"
+    
     data_dict, lengths_dict, feature_cols, n_categories = load_data(
         csv_path,
         site_ids=site_ids,

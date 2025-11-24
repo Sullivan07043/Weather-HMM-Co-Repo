@@ -89,7 +89,7 @@ for i in range(1, len(table_data)):
                 cell.set_facecolor('#3498db')
                 cell.set_text_props(weight='bold', color='white')
 
-plt.title('Top 10 ENSO Detection Stations by F1-Score\nBased on Official ONI Records (1950-2000)', 
+plt.title('Top 10 ENSO Detection Stations by F1-Score\nBased on Official ONI Records (1950-2010)', 
          fontsize=16, fontweight='bold', pad=20)
 
 plt.savefig('top10_f1_enso_sites_table.png', dpi=300, bbox_inches='tight')
@@ -101,12 +101,16 @@ print("✓ Saved: top10_f1_enso_sites_table.png")
 
 # Load HMM predictions and ground truth
 df_states = pd.read_csv('enso_factorized_categorical_hmm_states.csv')
-df_states = df_states[(df_states['year'] >= 1950) & (df_states['year'] <= 2000)]
-df_truth = pd.read_csv('enso_oni_data_1950_2000.csv')
+df_states = df_states[(df_states['year'] >= 1950) & (df_states['year'] <= 2010)]
+df_truth = pd.read_csv('enso_oni_data_1950_2010.csv')
 
 # Create a large figure with subplots for top 10 stations
-fig2 = plt.figure(figsize=(18, 14))
-gs = fig2.add_gridspec(5, 2, hspace=0.4, wspace=0.3)
+fig2 = plt.figure(figsize=(18, 16))
+gs = fig2.add_gridspec(5, 2, hspace=0.5, wspace=0.3)
+
+# Store handles and labels for unified legend
+legend_handles = None
+legend_labels = None
 
 for i, (idx, row) in enumerate(top10.iterrows()):
     site_id = row['site_id']
@@ -150,23 +154,31 @@ for i, (idx, row) in enumerate(top10.iterrows()):
     ax.scatter(mismatch_years, mismatch_truth, color='red', s=50, 
               marker='x', linewidths=2, zorder=5, label='Mismatch')
     
+    # Capture legend handles and labels from first subplot
+    if i == 0:
+        legend_handles, legend_labels = ax.get_legend_handles_labels()
+    
     # Customize subplot
     ax.set_title(f'#{i+1}. {site_id} - {station_name} ({country})\nF1={f1:.3f}', 
                 fontsize=10, fontweight='bold')
     ax.set_xlabel('Year', fontsize=9)
     ax.set_ylabel('Anomaly', fontsize=9)
     ax.set_ylim(-0.1, 1.2)
-    ax.set_xlim(1948, 2002)
+    ax.set_xlim(1948, 2012)
     ax.set_yticks([0, 1])
     ax.set_yticklabels(['Normal', 'ENSO'])
     ax.grid(True, alpha=0.3, linestyle='--')
-    ax.legend(loc='upper right', fontsize=7, framealpha=0.9)
     
     # Rotate x-axis labels
     ax.tick_params(axis='x', rotation=45, labelsize=8)
     ax.tick_params(axis='y', labelsize=8)
 
-plt.suptitle('Top 10 Stations: ENSO Detection Time Series (1950-2000)\nBlue Line = HMM Prediction, Red Fill = Ground Truth, Red X = Mismatch', 
+# Add unified legend at the top right of the figure
+fig2.legend(legend_handles, legend_labels, loc='upper right', 
+           bbox_to_anchor=(0.98, 0.98), fontsize=11, framealpha=0.95,
+           edgecolor='black', fancybox=True)
+
+plt.suptitle('Top 10 Stations: ENSO Detection Time Series (1950-2010)\nBlue Line = HMM Prediction, Red Fill = Ground Truth, Red X = Mismatch', 
              fontsize=16, fontweight='bold', y=0.995)
 
 plt.savefig('top10_f1_time_series_comparison.png', dpi=300, bbox_inches='tight')

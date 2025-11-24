@@ -9,11 +9,11 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 # Load HMM predictions
 df_states = pd.read_csv('enso_factorized_categorical_hmm_states.csv')
 
-# Filter to 1950-2000 period
-df_states = df_states[(df_states['year'] >= 1950) & (df_states['year'] <= 2000)]
+# Filter to 1950-2010 period
+df_states = df_states[(df_states['year'] >= 1950) & (df_states['year'] <= 2010)]
 
 # Load ground truth ENSO data (corrected official ONI records)
-df_truth = pd.read_csv('enso_oni_data_1950_2000.csv')
+df_truth = pd.read_csv('enso_oni_data_1950_2010.csv')
 
 # Load station metadata from official ISD history
 df_stations = pd.read_csv('/Users/shuhaozhang/PycharmProjects/CSE250A/HW/kaggle_data/datasets/noaa/noaa-global-surface-summary-of-the-day/versions/2/isd-history.csv')
@@ -22,7 +22,7 @@ df_stations['USAF-WBAN'] = df_stations['USAF'].astype(str) + '-' + df_stations['
 print("="*80)
 print("ENSO Detection Performance Evaluation (Individual Stations)")
 print("="*80)
-print(f"\nGround Truth: Official ONI records (1950-2000)")
+print(f"\nGround Truth: Official ONI records (1950-2010)")
 print(f"Source: https://ggweather.com/enso/oni.htm")
 print(f"\nTotal years: {len(df_truth)}")
 print(f"ENSO Anomalies: {df_truth['enso_anomaly'].sum()} years ({df_truth['enso_anomaly'].sum()/len(df_truth)*100:.1f}%)")

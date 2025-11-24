@@ -61,31 +61,30 @@ print("="*80)
 
 # Load HMM predictions for all stations
 df_states = pd.read_csv('../enso_factorized_categorical_hmm_states.csv')
-print(f"Loaded HMM states: {len(df_states)} records")
+print(f"Loaded HMM states: {len(df_states)} records from {df_states['site_id'].nunique()} stations")
 
-# Filter to 1950-2000 time window
-df_states = df_states[(df_states['year'] >= 1950) & (df_states['year'] <= 2000)]
-print(f"Filtered to 1950-2000: {len(df_states)} records")
+# Filter to 1950-2010 time window
+df_states = df_states[(df_states['year'] >= 1950) & (df_states['year'] <= 2010)]
+print(f"Filtered to 1950-2010: {len(df_states)} records")
+
+# Load F1 evaluation results to get top 14 stations
+df_f1 = pd.read_csv('../enso_evaluation_f1_results.csv')
+df_f1_sorted = df_f1.sort_values('f1_score', ascending=False)
+top14_station_ids = df_f1_sorted.head(14)['site_id'].tolist()
+
+print(f"\nTop 14 stations by F1-score:")
+for i, (idx, row) in enumerate(df_f1_sorted.head(14).iterrows(), 1):
+    print(f"  #{i:2d}. {row['site_id']} - {row['station_name']:30s} F1={row['f1_score']:.4f}")
+
+# Filter to only use top 14 stations for ensemble
+df_states = df_states[df_states['site_id'].isin(top14_station_ids)]
+print(f"\n✓ Filtered to Top 14 stations: {len(df_states)} records")
 
 # Load ground truth ENSO data
-df_truth = pd.read_csv('../enso_oni_data_1950_2000.csv')
-print(f"Loaded ground truth: {len(df_truth)} years (1950-2000)")
+df_truth = pd.read_csv('../enso_oni_data_1950_2010.csv')
+print(f"Loaded ground truth: {len(df_truth)} years (1950-2010)")
 
-# Load station metadata to get station names
-try:
-    df_stations = pd.read_csv('../data/stations_1960_2000_covered_top_each_country.csv')
-    # Create station ID from USAF and WBAN
-    df_stations['station_id'] = df_stations['USAF'].astype(str) + '-' + df_stations['WBAN'].astype(str)
-    station_dict = dict(zip(df_stations['station_id'], df_stations['Name']))
-    print(f"Loaded metadata for {len(station_dict)} stations")
-except FileNotFoundError:
-    station_dict = {}
-    print("Warning: Station metadata not found. Continuing without station names.")
-except Exception as e:
-    station_dict = {}
-    print(f"Warning: Could not load station metadata: {e}")
-
-print(f"\nTotal stations in analysis: {df_states['site_id'].nunique()}")
+print(f"\nTotal stations in ensemble: {df_states['site_id'].nunique()}")
 print(f"Time range: {df_states['year'].min()} to {df_states['year'].max()}")
 
 # ============================================================================
@@ -109,7 +108,7 @@ voting_results['ensemble_prediction_40'] = (voting_results['anomaly_ratio'] > 0.
 voting_results['ensemble_prediction_45'] = (voting_results['anomaly_ratio'] > 0.45).astype(int)
 voting_results['ensemble_prediction_50'] = (voting_results['anomaly_ratio'] > 0.5).astype(int)
 voting_results['ensemble_prediction_60'] = (voting_results['anomaly_ratio'] > 0.6).astype(int)
-voting_results['ensemble_prediction'] = voting_results['ensemble_prediction_35']  # Use 35% as default
+voting_results['ensemble_prediction'] = voting_results['ensemble_prediction_40']  # Use 40% as default
 
 print(f"\nVoting statistics:")
 print(f"  Years analyzed: {len(voting_results)}")
@@ -226,7 +225,7 @@ if PLOTTING_AVAILABLE:
 
     ax1.set_xlabel('Year', fontsize=12, fontweight='bold')
     ax1.set_ylabel('ENSO Anomaly (0=Normal, 1=Anomaly)', fontsize=12, fontweight='bold')
-    ax1.set_title('Ensemble ENSO Prediction vs Ground Truth (1950-1990)', 
+    ax1.set_title('Ensemble ENSO Prediction vs Ground Truth (1950-2010)\nTop 14 Stations by F1-Score', 
                   fontsize=14, fontweight='bold', pad=15)
     ax1.set_ylim(-0.1, 1.2)
     ax1.grid(True, alpha=0.3, linestyle='--')
@@ -252,10 +251,10 @@ if PLOTTING_AVAILABLE:
              color='purple', linewidth=2, label='Station Anomaly Ratio', alpha=0.7)
     ax2.axhline(y=0.2, color='green', linestyle=':', linewidth=1.5, 
                 label='20% Threshold', alpha=0.5)
-    ax2.axhline(y=0.25, color='orange', linestyle='--', linewidth=2, 
-                label='25% Threshold (Default)', alpha=0.7)
     ax2.axhline(y=0.3, color='blue', linestyle=':', linewidth=1.5, 
                 label='30% Threshold', alpha=0.5)
+    ax2.axhline(y=0.35, color='orange', linestyle='--', linewidth=2, 
+                label='35% Threshold (Default)', alpha=0.7)
     ax2.axhline(y=0.4, color='cyan', linestyle=':', linewidth=1.5, 
                 label='40% Threshold', alpha=0.5)
     ax2.axhline(y=0.5, color='red', linestyle=':', linewidth=1.5, 
@@ -284,7 +283,7 @@ if PLOTTING_AVAILABLE:
                 yticklabels=['Actual: Normal', 'Actual: Anomaly'],
                 ax=ax3, annot_kws={'size': 14, 'weight': 'bold'})
 
-    ax3.set_title('Confusion Matrix (25% Threshold)', fontsize=12, fontweight='bold', pad=10)
+    ax3.set_title('Confusion Matrix (35% Threshold)', fontsize=12, fontweight='bold', pad=10)
     ax3.set_xlabel('Predicted Label', fontsize=11, fontweight='bold')
     ax3.set_ylabel('True Label', fontsize=11, fontweight='bold')
 
@@ -295,11 +294,11 @@ if PLOTTING_AVAILABLE:
 
     metrics = ['Accuracy', 'Precision', 'Recall', 'F1-Score']
     x = np.arange(len(metrics))
-    width = 0.16
+    width = 0.15
 
-    for i, threshold_name in enumerate(['20%', '25%', '30%', '40%', '50%']):
+    for i, threshold_name in enumerate(['30%', '35%', '40%', '45%', '50%', '60%']):
         values = df_results[df_results['Threshold'] == threshold_name][metrics].values[0]
-        offset = (i - 2) * width
+        offset = (i - 2.5) * width
         bars = ax4.bar(x + offset, values, width, label=f'Threshold {threshold_name}', alpha=0.8)
         
         # Add value labels on bars
@@ -318,7 +317,7 @@ if PLOTTING_AVAILABLE:
     ax4.legend(loc='lower right', framealpha=0.9)
     ax4.grid(True, alpha=0.3, axis='y', linestyle='--')
 
-    plt.suptitle('Ensemble ENSO Detection: Majority Voting Across All Stations', 
+    plt.suptitle('Ensemble ENSO Detection: Majority Voting Across Top 14 Stations', 
                  fontsize=16, fontweight='bold', y=0.995)
 
     plt.savefig('ensemble_voting_enso_analysis.png', dpi=300, bbox_inches='tight')
@@ -376,7 +375,7 @@ if PLOTTING_AVAILABLE:
             elif j == 5 and table_data[i][5] == '✓':
                 cell.set_text_props(color='green', weight='bold', fontsize=11)
 
-    plt.title('Year-by-Year Ensemble Prediction vs Ground Truth (1950-1990)', 
+    plt.title('Year-by-Year Ensemble Prediction vs Ground Truth (1950-2010)\nTop 14 Stations by F1-Score', 
               fontsize=14, fontweight='bold', pad=20)
 
     plt.savefig('ensemble_voting_detailed_comparison.png', dpi=300, bbox_inches='tight')
@@ -422,7 +421,8 @@ print("ENSEMBLE VOTING SUMMARY")
 print("="*80)
 
 print(f"\nData Overview:")
-print(f"  Analysis Period: 1950-2000 ({len(df_comparison)} years)")
+print(f"  Analysis Period: 1950-2010 ({len(df_comparison)} years)")
+print(f"  Ensemble Stations: Top 14 by F1-score")
 print(f"  Total Stations: {df_comparison['total_stations'].iloc[0]}")
 print(f"  Ground Truth Anomalies: {y_true.sum()}/{len(y_true)} years ({y_true.sum()/len(y_true)*100:.1f}%)")
 

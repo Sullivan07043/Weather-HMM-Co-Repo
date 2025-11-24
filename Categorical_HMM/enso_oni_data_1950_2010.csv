@@ -22,7 +22,7 @@ year,enso_type,is_el_nino,is_la_nina,enso_anomaly
 1970,La_Nina,0,1,1
 1971,La_Nina,0,1,1
 1972,El_Nino,1,0,1
-1973,Normal,0,0,0
+1973,La_Nina,0,1,1
 1974,La_Nina,0,1,1
 1975,La_Nina,0,1,1
 1976,El_Nino,1,0,1
@@ -50,3 +50,14 @@ year,enso_type,is_el_nino,is_la_nina,enso_anomaly
 1998,La_Nina,0,1,1
 1999,La_Nina,0,1,1
 2000,La_Nina,0,1,1
+2001,Normal,0,0,0
+2002,El_Nino,1,0,1
+2003,Normal,0,0,0
+2004,El_Nino,1,0,1
+2005,La_Nina,0,1,1
+2006,El_Nino,1,0,1
+2007,La_Nina,0,1,1
+2008,La_Nina,0,1,1
+2009,El_Nino,1,0,1
+2010,La_Nina,0,1,1
+

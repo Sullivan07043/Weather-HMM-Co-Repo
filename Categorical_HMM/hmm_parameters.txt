@@ -6,7 +6,7 @@ Factorized Categorical HMM Parameters
 ================================================================================
 Site ID: 471080-99999
 Number of States (K): 2
-Log-Likelihood: -266.2663
+Log-Likelihood: -178.6753
 ================================================================================
 
 Initial State Distribution (π):
@@ -17,47 +17,47 @@ Initial State Distribution (π):
 Transition Matrix (A):
 ----------------------------------------
      State 0State 1
-State 0  0.9752  0.0248 
-State 1  0.0393  0.9607 
+State 0  0.8979  0.1021 
+State 1  0.4542  0.5458 
 
 Emission Probability Matrices (B):
 ----------------------------------------
 
 Feature: mean_temp (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.851  0.147  0.000  0.000  0.000  0.000 
-State 1  0.000  0.037  0.037  0.000  0.222  0.701  0.000  0.000  0.000  0.000 
+State 0  0.000  0.000  0.000  0.021  0.957  0.021  0.000  0.000  0.000  0.000 
+State 1  0.083  0.001  0.001  0.083  0.827  0.001  0.001  0.001  0.001  0.001 
 
 Feature: max_temp (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.949  0.049  0.000  0.000  0.000  0.000 
-State 1  0.037  0.000  0.037  0.000  0.923  0.000  0.000  0.000  0.000  0.000 
+State 0  0.000  0.000  0.000  0.122  0.856  0.021  0.000  0.000  0.000  0.000 
+State 1  0.083  0.001  0.001  0.166  0.745  0.001  0.001  0.001  0.001  0.001 
 
 Feature: min_temp (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.462  0.512  0.025  0.000  0.000  0.000 
-State 1  0.000  0.037  0.037  0.000  0.000  0.923  0.000  0.000  0.000  0.000 
+State 0  0.000  0.000  0.000  0.000  0.978  0.021  0.000  0.000  0.000  0.000 
+State 1  0.083  0.001  0.001  0.083  0.827  0.001  0.001  0.001  0.001  0.001 
 
 Feature: sea_level_pressure (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.000  0.658  0.292  0.025  0.000  0.025 
-State 1  0.000  0.000  0.000  0.000  0.000  0.923  0.000  0.037  0.037  0.000 
+State 0  0.000  0.000  0.000  0.000  0.041  0.957  0.000  0.000  0.000  0.000 
+State 1  0.001  0.001  0.001  0.001  0.001  0.745  0.001  0.166  0.001  0.083 
 
 Feature: wind_speed (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.097  0.901  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
-State 1  0.407  0.590  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+State 0  0.000  0.998  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+State 1  0.083  0.002  0.909  0.001  0.001  0.001  0.001  0.001  0.001  0.001 
 
 Feature: precipitation (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.705  0.000  0.049  0.123  0.049  0.025  0.025  0.000  0.000  0.025 
-State 1  0.037  0.037  0.111  0.294  0.370  0.111  0.037  0.000  0.000  0.000 
+State 0  0.102  0.184  0.550  0.122  0.021  0.000  0.021  0.000  0.000  0.000 
+State 1  0.084  0.579  0.001  0.331  0.001  0.001  0.001  0.001  0.001  0.001 
 
 
 ================================================================================
 Site ID: 471100-99999
 Number of States (K): 2
-Log-Likelihood: -238.2087
+Log-Likelihood: -240.7730
 ================================================================================
 
 Initial State Distribution (π):
@@ -68,47 +68,47 @@ Initial State Distribution (π):
 Transition Matrix (A):
 ----------------------------------------
      State 0State 1
-State 0  0.9414  0.0586 
-State 1  0.3552  0.6448 
+State 0  0.6778  0.3222 
+State 1  0.5878  0.4122 
 
 Emission Probability Matrices (B):
 ----------------------------------------
 
 Feature: mean_temp (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.904  0.079  0.016  0.000  0.000  0.000 
-State 1  0.001  0.001  0.087  0.174  0.733  0.001  0.001  0.001  0.001  0.001 
+State 0  0.000  0.000  0.000  0.000  0.972  0.026  0.000  0.000  0.000  0.000 
+State 1  0.000  0.000  0.045  0.847  0.104  0.000  0.000  0.000  0.000  0.000 
 
 Feature: max_temp (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.059  0.924  0.016  0.000  0.000  0.000  0.000 
-State 1  0.001  0.001  0.087  0.371  0.535  0.001  0.001  0.001  0.001  0.001 
+State 0  0.000  0.000  0.000  0.151  0.822  0.026  0.000  0.000  0.000  0.000 
+State 1  0.000  0.000  0.045  0.900  0.052  0.000  0.000  0.000  0.000  0.000 
 
 Feature: min_temp (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.642  0.341  0.016  0.000  0.000  0.000 
-State 1  0.001  0.001  0.087  0.174  0.272  0.462  0.001  0.001  0.001  0.001 
+State 0  0.000  0.000  0.000  0.055  0.917  0.026  0.000  0.000  0.000  0.000 
+State 1  0.000  0.000  0.045  0.620  0.332  0.000  0.000  0.000  0.000  0.000 
 
 Feature: sea_level_pressure (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.595  0.000  0.220  0.157  0.011  0.000  0.016 
-State 1  0.001  0.001  0.001  0.794  0.001  0.001  0.001  0.198  0.001  0.001 
+State 0  0.000  0.000  0.026  0.206  0.642  0.073  0.026  0.000  0.026  0.000 
+State 1  0.000  0.000  0.000  0.402  0.497  0.053  0.000  0.045  0.000  0.000 
 
 Feature: wind_speed (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.999  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
-State 1  0.433  0.560  0.001  0.001  0.001  0.001  0.001  0.001  0.001  0.001 
+State 0  0.000  0.457  0.541  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+State 1  0.000  0.460  0.536  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
 
 Feature: precipitation (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.967  0.000  0.000  0.016  0.000  0.000  0.000  0.000  0.000  0.016 
-State 1  0.733  0.087  0.174  0.001  0.001  0.001  0.001  0.001  0.001  0.001 
+State 0  0.918  0.002  0.078  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+State 1  0.866  0.086  0.000  0.000  0.000  0.000  0.000  0.045  0.000  0.000 
 
 
 ================================================================================
 Site ID: 471420-99999
 Number of States (K): 2
-Log-Likelihood: -238.7934
+Log-Likelihood: -174.7952
 ================================================================================
 
 Initial State Distribution (π):
@@ -119,251 +119,404 @@ Initial State Distribution (π):
 Transition Matrix (A):
 ----------------------------------------
      State 0State 1
-State 0  0.8770  0.1230 
-State 1  0.8690  0.1310 
+State 0  0.8995  0.1005 
+State 1  0.2710  0.7290 
 
 Emission Probability Matrices (B):
 ----------------------------------------
 
 Feature: mean_temp (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.000  0.998  0.000  0.000  0.000  0.000 
-State 1  0.001  0.001  0.109  0.109  0.648  0.127  0.001  0.001  0.001  0.001 
+State 0  0.000  0.000  0.000  0.000  0.839  0.159  0.000  0.000  0.000  0.000 
+State 1  0.001  0.058  0.001  0.001  0.878  0.059  0.001  0.001  0.001  0.001 
 
 Feature: max_temp (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.187  0.811  0.000  0.000  0.000  0.000 
-State 1  0.001  0.001  0.109  0.109  0.774  0.001  0.001  0.001  0.001  0.001 
+State 0  0.000  0.000  0.000  0.000  0.816  0.182  0.000  0.000  0.000  0.000 
+State 1  0.001  0.001  0.058  0.001  0.821  0.117  0.001  0.001  0.001  0.001 
 
 Feature: min_temp (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.000  0.981  0.017  0.000  0.000  0.000 
-State 1  0.001  0.001  0.217  0.001  0.540  0.235  0.001  0.001  0.001  0.001 
+State 0  0.000  0.000  0.000  0.000  0.907  0.091  0.000  0.000  0.000  0.000 
+State 1  0.001  0.058  0.001  0.001  0.937  0.001  0.001  0.001  0.001  0.001 
 
 Feature: sea_level_pressure (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.017  0.052  0.069  0.464  0.293  0.035  0.052  0.017 
-State 1  0.001  0.001  0.001  0.001  0.001  0.769  0.114  0.109  0.001  0.001 
+State 0  0.000  0.000  0.000  0.000  0.020  0.878  0.069  0.032  0.000  0.000 
+State 1  0.001  0.001  0.058  0.289  0.355  0.144  0.001  0.093  0.058  0.001 
 
 Feature: wind_speed (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.498  0.500  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
-State 1  0.771  0.220  0.001  0.001  0.001  0.001  0.001  0.001  0.001  0.001 
+State 0  0.046  0.952  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+State 1  0.001  0.592  0.404  0.001  0.001  0.001  0.001  0.001  0.001  0.001 
 
 Feature: precipitation (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.912  0.052  0.035  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
-State 1  0.990  0.001  0.001  0.001  0.001  0.001  0.001  0.001  0.001  0.001 
+State 0  0.998  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+State 1  0.765  0.173  0.058  0.001  0.001  0.001  0.001  0.001  0.001  0.001 
 
 
 ================================================================================
-Site ID: 474250-99999
+Site ID: 476710-99999
 Number of States (K): 2
-Log-Likelihood: -117.5786
+Log-Likelihood: -140.8003
 ================================================================================
 
 Initial State Distribution (π):
 ----------------------------------------
-  State 0: 0.990196
-  State 1: 0.009804
+  State 0: 0.009832
+  State 1: 0.990168
 
 Transition Matrix (A):
 ----------------------------------------
      State 0State 1
-State 0  0.3344  0.6656 
-State 1  0.0365  0.9635 
+State 0  0.8044  0.1956 
+State 1  0.0810  0.9190 
 
 Emission Probability Matrices (B):
 ----------------------------------------
 
 Feature: mean_temp (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.490  0.246  0.246  0.002  0.002  0.002  0.002  0.002  0.002  0.002 
+State 0  0.001  0.001  0.001  0.001  0.057  0.712  0.227  0.001  0.001  0.001 
+State 1  0.000  0.000  0.000  0.000  0.000  0.998  0.000  0.000  0.000  0.000 
+
+Feature: max_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.001  0.001  0.001  0.001  0.663  0.333  0.001  0.001  0.001  0.001 
+State 1  0.000  0.000  0.000  0.000  0.857  0.141  0.000  0.000  0.000  0.000 
+
+Feature: min_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.001  0.001  0.001  0.001  0.001  0.663  0.333  0.001  0.001  0.001 
+State 1  0.000  0.000  0.000  0.000  0.000  0.765  0.233  0.000  0.000  0.000 
+
+Feature: sea_level_pressure (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.001  0.001  0.001  0.001  0.995  0.001  0.001  0.001  0.001  0.001 
+State 1  0.000  0.000  0.000  0.023  0.975  0.000  0.000  0.000  0.000  0.000 
+
+Feature: wind_speed (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.001  0.001  0.001  0.994  0.001  0.001  0.001  0.001  0.001  0.001 
+State 1  0.000  0.000  0.000  0.217  0.781  0.000  0.000  0.000  0.000  0.000 
+
+Feature: precipitation (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.718  0.052  0.170  0.001  0.001  0.001  0.057  0.001  0.001  0.001 
+State 1  0.973  0.025  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+
+
+================================================================================
+Site ID: 478080-99999
+Number of States (K): 2
+Log-Likelihood: -102.7923
+================================================================================
+
+Initial State Distribution (π):
+----------------------------------------
+  State 0: 0.990166
+  State 1: 0.009834
+
+Transition Matrix (A):
+----------------------------------------
+     State 0State 1
+State 0  0.9763  0.0237 
+State 1  0.0763  0.9237 
+
+Emission Probability Matrices (B):
+----------------------------------------
+
+Feature: mean_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.000  0.977  0.022  0.000  0.000  0.000 
+State 1  0.001  0.001  0.001  0.001  0.001  0.924  0.070  0.001  0.001  0.001 
+
+Feature: max_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.116  0.882  0.000  0.000  0.000  0.000 
+State 1  0.001  0.001  0.001  0.001  0.180  0.814  0.001  0.001  0.001  0.001 
+
+Feature: min_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.000  0.870  0.128  0.000  0.000  0.000 
+State 1  0.001  0.001  0.001  0.001  0.001  0.854  0.140  0.001  0.001  0.001 
+
+Feature: sea_level_pressure (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.000  0.031  0.968  0.000  0.000  0.000 
+State 1  0.001  0.001  0.001  0.001  0.140  0.809  0.046  0.001  0.001  0.001 
+
+Feature: wind_speed (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.998  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+State 1  0.001  0.140  0.854  0.001  0.001  0.001  0.001  0.001  0.001  0.001 
+
+Feature: precipitation (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.891  0.086  0.000  0.022  0.000  0.000  0.000  0.000  0.000  0.000 
+State 1  0.994  0.001  0.001  0.001  0.001  0.001  0.001  0.001  0.001  0.001 
+
+
+================================================================================
+Site ID: 479300-99999
+Number of States (K): 2
+Log-Likelihood: -158.6184
+================================================================================
+
+Initial State Distribution (π):
+----------------------------------------
+  State 0: 0.990139
+  State 1: 0.009861
+
+Transition Matrix (A):
+----------------------------------------
+     State 0State 1
+State 0  0.8405  0.1595 
+State 1  0.0221  0.9779 
+
+Emission Probability Matrices (B):
+----------------------------------------
+
+Feature: mean_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.001  0.001  0.001  0.001  0.001  0.001  0.078  0.633  0.283  0.001 
+State 1  0.000  0.000  0.000  0.000  0.000  0.021  0.000  0.556  0.422  0.000 
+
+Feature: max_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.001  0.001  0.001  0.001  0.001  0.078  0.838  0.078  0.001  0.001 
+State 1  0.000  0.000  0.000  0.000  0.021  0.000  0.977  0.000  0.000  0.000 
+
+Feature: min_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.001  0.001  0.001  0.001  0.001  0.001  0.078  0.001  0.915  0.001 
+State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.021  0.000  0.977  0.000 
+
+Feature: sea_level_pressure (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.001  0.001  0.001  0.001  0.079  0.295  0.543  0.001  0.078  0.001 
+State 1  0.000  0.000  0.000  0.000  0.042  0.957  0.000  0.000  0.000  0.000 
+
+Feature: wind_speed (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.001  0.001  0.001  0.307  0.609  0.078  0.001  0.001  0.001  0.001 
+State 1  0.000  0.000  0.000  0.084  0.914  0.000  0.000  0.000  0.000  0.000 
+
+Feature: precipitation (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.322  0.672  0.001  0.001  0.001  0.001  0.001  0.001  0.001  0.001 
+State 1  0.887  0.028  0.021  0.021  0.000  0.021  0.021  0.000  0.000  0.000 
+
+
+================================================================================
+Site ID: 479810-99999
+Number of States (K): 2
+Log-Likelihood: -102.8024
+================================================================================
+
+Initial State Distribution (π):
+----------------------------------------
+  State 0: 0.990173
+  State 1: 0.009827
+
+Transition Matrix (A):
+----------------------------------------
+     State 0State 1
+State 0  0.9522  0.0478 
+State 1  0.0003  0.9997 
+
+Emission Probability Matrices (B):
+----------------------------------------
+
+Feature: mean_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.142  0.855  0.000 
+State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.998  0.000 
+
+Feature: max_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.000  0.000  0.807  0.189  0.000  0.000 
+State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.998  0.000  0.000  0.000 
+
+Feature: min_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.996  0.000 
+State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.948  0.050 
+
+Feature: sea_level_pressure (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.242  0.754  0.000  0.000  0.000  0.000  0.000 
 State 1  0.000  0.000  0.000  0.998  0.000  0.000  0.000  0.000  0.000  0.000 
 
-Feature: max_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.734  0.246  0.002  0.002  0.002  0.002  0.002  0.002  0.002  0.002 
-State 1  0.000  0.000  0.291  0.708  0.000  0.000  0.000  0.000  0.000  0.000 
-
-Feature: min_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.246  0.490  0.246  0.002  0.002  0.002  0.002  0.002  0.002  0.002 
-State 1  0.000  0.000  0.000  0.908  0.091  0.000  0.000  0.000  0.000  0.000 
-
-Feature: sea_level_pressure (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.002  0.002  0.002  0.002  0.734  0.246  0.002  0.002  0.002  0.002 
-State 1  0.000  0.000  0.000  0.018  0.962  0.018  0.000  0.000  0.000  0.000 
-
 Feature: wind_speed (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.002  0.490  0.490  0.002  0.002  0.002  0.002  0.002  0.002  0.002 
-State 1  0.000  0.036  0.926  0.036  0.000  0.000  0.000  0.000  0.000  0.000 
+State 0  0.000  0.000  0.000  0.377  0.525  0.095  0.000  0.000  0.000  0.000 
+State 1  0.000  0.000  0.000  0.100  0.773  0.125  0.000  0.000  0.000  0.000 
 
 Feature: precipitation (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.978  0.002  0.002  0.002  0.002  0.002  0.002  0.002  0.002  0.002 
-State 1  0.944  0.036  0.018  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
-
-
-================================================================================
-Site ID: 477590-99999
-Number of States (K): 2
-Log-Likelihood: -192.5529
-================================================================================
-
-Initial State Distribution (π):
-----------------------------------------
-  State 0: 0.009804
-  State 1: 0.990196
-
-Transition Matrix (A):
-----------------------------------------
-     State 0State 1
-State 0  0.9820  0.0180 
-State 1  0.9950  0.0050 
-
-Emission Probability Matrices (B):
-----------------------------------------
-
-Feature: mean_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.018  0.000  0.648  0.333  0.000  0.000  0.000 
-State 1  0.005  0.005  0.005  0.005  0.481  0.480  0.005  0.005  0.005  0.005 
-
-Feature: max_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.018  0.000  0.981  0.000  0.000  0.000  0.000 
-State 1  0.005  0.005  0.005  0.005  0.957  0.005  0.005  0.005  0.005  0.005 
-
-Feature: min_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.018  0.000  0.456  0.526  0.000  0.000  0.000 
-State 1  0.005  0.005  0.005  0.005  0.481  0.480  0.005  0.005  0.005  0.005 
-
-Feature: sea_level_pressure (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.000  0.981  0.018  0.000  0.000  0.000 
-State 1  0.005  0.005  0.005  0.005  0.005  0.480  0.005  0.005  0.481  0.005 
-
-Feature: wind_speed (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.946  0.053  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
-State 1  0.957  0.005  0.005  0.005  0.005  0.005  0.005  0.005  0.005  0.005 
-
-Feature: precipitation (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.018  0.035  0.263  0.438  0.228  0.018  0.000  0.000  0.000 
-State 1  0.481  0.005  0.480  0.005  0.005  0.005  0.005  0.005  0.005  0.005 
-
-
-================================================================================
-Site ID: 477710-99999
-Number of States (K): 2
-Log-Likelihood: -145.6396
-================================================================================
-
-Initial State Distribution (π):
-----------------------------------------
-  State 0: 0.990196
-  State 1: 0.009804
-
-Transition Matrix (A):
-----------------------------------------
-     State 0State 1
-State 0  0.9532  0.0468 
-State 1  0.0299  0.9701 
-
-Emission Probability Matrices (B):
-----------------------------------------
-
-Feature: mean_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.077  0.039  0.040  0.842  0.000  0.000  0.000 
-State 1  0.000  0.000  0.000  0.000  0.026  0.792  0.181  0.000  0.000  0.000 
-
-Feature: max_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.115  0.000  0.843  0.039  0.000  0.000  0.000 
-State 1  0.000  0.000  0.000  0.000  0.026  0.972  0.000  0.000  0.000  0.000 
-
-Feature: min_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.039  0.077  0.000  0.843  0.039  0.000  0.000 
-State 1  0.000  0.000  0.000  0.000  0.000  0.179  0.819  0.000  0.000  0.000 
-
-Feature: sea_level_pressure (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.039  0.881  0.077  0.000  0.000  0.000 
-State 1  0.000  0.000  0.000  0.000  0.077  0.921  0.000  0.000  0.000  0.000 
-
-Feature: wind_speed (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.997  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
-State 1  0.000  0.844  0.154  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
-
-Feature: precipitation (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.997  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
-State 1  0.947  0.051  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
-
-
-================================================================================
-Site ID: 478030-99999
-Number of States (K): 2
-Log-Likelihood: -193.2011
-================================================================================
-
-Initial State Distribution (π):
-----------------------------------------
-  State 0: 0.009804
-  State 1: 0.990196
-
-Transition Matrix (A):
-----------------------------------------
-     State 0State 1
-State 0  0.8184  0.1816 
-State 1  0.0739  0.9261 
-
-Emission Probability Matrices (B):
-----------------------------------------
-
-Feature: mean_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.001  0.001  0.001  0.001  0.052  0.670  0.274  0.001  0.001  0.001 
-State 1  0.000  0.021  0.000  0.021  0.000  0.553  0.404  0.000  0.000  0.000 
-
-Feature: max_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.001  0.001  0.001  0.001  0.202  0.794  0.001  0.001  0.001  0.001 
-State 1  0.021  0.000  0.000  0.021  0.043  0.915  0.000  0.000  0.000  0.000 
-
-Feature: min_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.001  0.001  0.001  0.001  0.001  0.154  0.842  0.001  0.001  0.001 
-State 1  0.000  0.000  0.021  0.000  0.021  0.001  0.957  0.000  0.000  0.000 
-
-Feature: sea_level_pressure (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.001  0.001  0.001  0.001  0.052  0.841  0.052  0.052  0.001  0.001 
-State 1  0.000  0.000  0.000  0.000  0.000  0.978  0.000  0.000  0.000  0.021 
-
-Feature: wind_speed (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.001  0.206  0.277  0.514  0.001  0.001  0.001  0.001  0.001  0.001 
-State 1  0.000  0.000  0.998  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
-
-Feature: precipitation (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.788  0.001  0.054  0.052  0.103  0.001  0.001  0.001  0.001  0.001 
-State 1  0.876  0.082  0.041  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+State 0  0.996  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+State 1  0.923  0.050  0.000  0.000  0.000  0.025  0.000  0.000  0.000  0.000 
 
 
 ================================================================================
 Site ID: 722265-13821
 Number of States (K): 2
-Log-Likelihood: -287.3787
+Log-Likelihood: -189.4083
+================================================================================
+
+Initial State Distribution (π):
+----------------------------------------
+  State 0: 0.009806
+  State 1: 0.990194
+
+Transition Matrix (A):
+----------------------------------------
+     State 0State 1
+State 0  0.9152  0.0848 
+State 1  0.2377  0.7623 
+
+Emission Probability Matrices (B):
+----------------------------------------
+
+Feature: mean_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.000  0.024  0.951  0.024  0.000  0.000 
+State 1  0.001  0.001  0.001  0.001  0.001  0.001  0.942  0.054  0.001  0.001 
+
+Feature: max_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.000  0.000  0.974  0.024  0.000  0.000 
+State 1  0.001  0.001  0.001  0.001  0.001  0.001  0.995  0.001  0.001  0.001 
+
+Feature: min_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.000  0.284  0.714  0.000  0.000  0.000 
+State 1  0.001  0.001  0.001  0.001  0.001  0.001  0.995  0.001  0.001  0.001 
+
+Feature: sea_level_pressure (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.000  0.350  0.648  0.000  0.000  0.000 
+State 1  0.001  0.001  0.001  0.001  0.001  0.381  0.615  0.001  0.001  0.001 
+
+Feature: wind_speed (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.015  0.983  0.001  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+State 1  0.179  0.080  0.685  0.053  0.001  0.001  0.001  0.001  0.001  0.001 
+
+Feature: precipitation (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.049  0.095  0.385  0.469  0.000  0.000  0.000  0.000  0.000  0.000 
+State 1  0.260  0.001  0.515  0.221  0.001  0.001  0.001  0.001  0.001  0.001 
+
+
+================================================================================
+Site ID: 722860-23119
+Number of States (K): 2
+Log-Likelihood: -142.5301
+================================================================================
+
+Initial State Distribution (π):
+----------------------------------------
+  State 0: 0.009822
+  State 1: 0.990178
+
+Transition Matrix (A):
+----------------------------------------
+     State 0State 1
+State 0  0.9161  0.0839 
+State 1  0.1052  0.8948 
+
+Emission Probability Matrices (B):
+----------------------------------------
+
+Feature: mean_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.000  0.310  0.688  0.000  0.000  0.000 
+State 1  0.000  0.000  0.000  0.000  0.000  0.996  0.001  0.000  0.000  0.000 
+
+Feature: max_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.000  0.000  0.997  0.000  0.000  0.000 
+State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.997  0.000  0.000  0.000 
+
+Feature: min_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.070  0.928  0.000  0.000  0.000  0.000 
+State 1  0.000  0.000  0.000  0.000  0.997  0.001  0.000  0.000  0.000  0.000 
+
+Feature: sea_level_pressure (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.808  0.190  0.000  0.000  0.000  0.000 
+State 1  0.000  0.000  0.000  0.000  0.505  0.493  0.000  0.000  0.000  0.000 
+
+Feature: wind_speed (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.030  0.818  0.150  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+State 1  0.072  0.925  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+
+Feature: precipitation (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.548  0.450  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+State 1  0.854  0.144  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+
+
+================================================================================
+Site ID: 724050-13743
+Number of States (K): 2
+Log-Likelihood: -233.5891
+================================================================================
+
+Initial State Distribution (π):
+----------------------------------------
+  State 0: 0.011293
+  State 1: 0.988707
+
+Transition Matrix (A):
+----------------------------------------
+     State 0State 1
+State 0  0.9434  0.0566 
+State 1  0.1737  0.8263 
+
+Emission Probability Matrices (B):
+----------------------------------------
+
+Feature: mean_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.286  0.713  0.000  0.000  0.000  0.000 
+State 1  0.001  0.001  0.001  0.001  0.470  0.525  0.001  0.001  0.001  0.001 
+
+Feature: max_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.098  0.900  0.000  0.000  0.000  0.000 
+State 1  0.001  0.001  0.001  0.001  0.881  0.115  0.001  0.001  0.001  0.001 
+
+Feature: min_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.728  0.270  0.000  0.000  0.000  0.000 
+State 1  0.001  0.001  0.001  0.001  0.438  0.557  0.001  0.001  0.001  0.001 
+
+Feature: sea_level_pressure (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.024  0.704  0.270  0.000  0.000  0.000 
+State 1  0.001  0.001  0.001  0.001  0.001  0.649  0.347  0.001  0.001  0.001 
+
+Feature: wind_speed (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.285  0.713  0.000  0.000  0.000  0.000  0.000  0.000 
+State 1  0.001  0.001  0.836  0.159  0.001  0.001  0.001  0.001  0.001  0.001 
+
+Feature: precipitation (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.665  0.286  0.048  0.000  0.000  0.000  0.000  0.000  0.000 
+State 1  0.261  0.631  0.104  0.001  0.001  0.001  0.001  0.001  0.001  0.001 
+
+
+================================================================================
+Site ID: 761600-99999
+Number of States (K): 2
+Log-Likelihood: -244.5406
 ================================================================================
 
 Initial State Distribution (π):
@@ -374,364 +527,7 @@ Initial State Distribution (π):
 Transition Matrix (A):
 ----------------------------------------
      State 0State 1
-State 0  0.9869  0.0131 
-State 1  0.5000  0.5000 
-
-Emission Probability Matrices (B):
-----------------------------------------
-
-Feature: mean_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.000  0.000  0.843  0.156  0.000  0.000 
-State 1  0.003  0.003  0.003  0.003  0.003  0.648  0.003  0.326  0.003  0.003 
-
-Feature: max_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.000  0.000  0.908  0.091  0.000  0.000 
-State 1  0.003  0.003  0.003  0.003  0.326  0.326  0.326  0.003  0.003  0.003 
-
-Feature: min_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.000  0.013  0.895  0.091  0.000  0.000 
-State 1  0.003  0.003  0.003  0.003  0.003  0.648  0.003  0.326  0.003  0.003 
-
-Feature: sea_level_pressure (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.000  0.052  0.947  0.000  0.000  0.000 
-State 1  0.003  0.003  0.003  0.003  0.003  0.003  0.003  0.971  0.003  0.003 
-
-Feature: wind_speed (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.532  0.415  0.052  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
-State 1  0.003  0.971  0.003  0.003  0.003  0.003  0.003  0.003  0.003  0.003 
-
-Feature: precipitation (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.143  0.013  0.143  0.480  0.208  0.013  0.000  0.000  0.000  0.000 
-State 1  0.648  0.003  0.326  0.003  0.003  0.003  0.003  0.003  0.003  0.003 
-
-
-================================================================================
-Site ID: 722860-23119
-Number of States (K): 2
-Log-Likelihood: -233.1243
-================================================================================
-
-Initial State Distribution (π):
-----------------------------------------
-  State 0: 0.990196
-  State 1: 0.009804
-
-Transition Matrix (A):
-----------------------------------------
-     State 0State 1
-State 0  0.8662  0.1338 
-State 1  0.0867  0.9133 
-
-Emission Probability Matrices (B):
-----------------------------------------
-
-Feature: mean_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.031  0.000  0.876  0.091  0.000  0.000 
-State 1  0.000  0.000  0.000  0.000  0.000  0.345  0.653  0.000  0.000  0.000 
-
-Feature: max_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.000  0.031  0.269  0.698  0.000  0.000 
-State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.998  0.000  0.000  0.000 
-
-Feature: min_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.031  0.000  0.694  0.274  0.000  0.000  0.000 
-State 1  0.000  0.000  0.000  0.000  0.021  0.978  0.000  0.000  0.000  0.000 
-
-Feature: sea_level_pressure (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.180  0.788  0.031  0.000  0.000  0.000 
-State 1  0.000  0.000  0.000  0.000  0.063  0.935  0.000  0.000  0.000  0.000 
-
-Feature: wind_speed (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.493  0.504  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
-State 1  0.686  0.313  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
-
-Feature: precipitation (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.782  0.216  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
-State 1  0.939  0.059  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
-
-
-================================================================================
-Site ID: 726810-24131
-Number of States (K): 2
-Log-Likelihood: -264.3267
-================================================================================
-
-Initial State Distribution (π):
-----------------------------------------
-  State 0: 0.990196
-  State 1: 0.009804
-
-Transition Matrix (A):
-----------------------------------------
-     State 0State 1
-State 0  0.8765  0.1235 
-State 1  0.1214  0.8786 
-
-Emission Probability Matrices (B):
-----------------------------------------
-
-Feature: mean_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.848  0.150  0.000  0.000  0.000  0.000 
-State 1  0.000  0.075  0.075  0.038  0.810  0.000  0.000  0.000  0.000  0.000 
-
-Feature: max_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.326  0.672  0.000  0.000  0.000  0.000 
-State 1  0.075  0.000  0.075  0.000  0.528  0.320  0.000  0.000  0.000  0.000 
-
-Feature: min_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.163  0.835  0.000  0.000  0.000  0.000  0.000 
-State 1  0.000  0.000  0.150  0.806  0.041  0.000  0.000  0.000  0.000  0.000 
-
-Feature: sea_level_pressure (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.150  0.030  0.030  0.000  0.030  0.609  0.150  0.000  0.000  0.000 
-State 1  0.000  0.000  0.001  0.038  0.038  0.324  0.598  0.000  0.000  0.000 
-
-Feature: wind_speed (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.030  0.597  0.371  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
-State 1  0.038  0.040  0.919  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
-
-Feature: precipitation (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.847  0.120  0.000  0.000  0.000  0.030  0.000  0.000  0.000  0.000 
-State 1  0.735  0.262  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
-
-
-================================================================================
-Site ID: 726815-24106
-Number of States (K): 2
-Log-Likelihood: -262.7318
-================================================================================
-
-Initial State Distribution (π):
-----------------------------------------
-  State 0: 0.990196
-  State 1: 0.009804
-
-Transition Matrix (A):
-----------------------------------------
-     State 0State 1
-State 0  0.6439  0.3561 
-State 1  0.1370  0.8630 
-
-Emission Probability Matrices (B):
-----------------------------------------
-
-Feature: mean_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.050  0.000  0.050  0.149  0.699  0.001  0.050  0.000  0.000  0.000 
-State 1  0.000  0.000  0.000  0.000  0.918  0.080  0.000  0.000  0.000  0.000 
-
-Feature: max_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.050  0.000  0.050  0.050  0.493  0.306  0.000  0.050  0.000  0.000 
-State 1  0.000  0.000  0.000  0.000  0.581  0.417  0.000  0.000  0.000  0.000 
-
-Feature: min_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.050  0.050  0.000  0.626  0.222  0.050  0.000  0.000  0.000  0.000 
-State 1  0.000  0.000  0.000  0.087  0.911  0.000  0.000  0.000  0.000  0.000 
-
-Feature: sea_level_pressure (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.099  0.000  0.214  0.683  0.000  0.000  0.000 
-State 1  0.000  0.000  0.000  0.000  0.000  0.795  0.204  0.000  0.000  0.000 
-
-Feature: wind_speed (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.117  0.287  0.593  0.000  0.000  0.000  0.000  0.000  0.000 
-State 1  0.000  0.293  0.685  0.000  0.020  0.000  0.000  0.000  0.000  0.000 
-
-Feature: precipitation (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.996  0.001  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
-State 1  0.958  0.040  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
-
-
-================================================================================
-Site ID: 843900-99999
-Number of States (K): 2
-Log-Likelihood: -236.5653
-================================================================================
-
-Initial State Distribution (π):
-----------------------------------------
-  State 0: 0.990196
-  State 1: 0.009804
-
-Transition Matrix (A):
-----------------------------------------
-     State 0State 1
-State 0  0.8529  0.1471 
-State 1  0.7289  0.2711 
-
-Emission Probability Matrices (B):
-----------------------------------------
-
-Feature: mean_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.618  0.380  0.000 
-State 1  0.001  0.001  0.001  0.001  0.001  0.001  0.001  0.001  0.519  0.471 
-
-Feature: max_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.000  0.000  0.046  0.952  0.000  0.000 
-State 1  0.001  0.001  0.001  0.001  0.001  0.001  0.001  0.284  0.706  0.001 
-
-Feature: min_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.229  0.700  0.069 
-State 1  0.001  0.001  0.001  0.001  0.001  0.001  0.001  0.001  0.519  0.471 
-
-Feature: sea_level_pressure (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.023  0.220  0.756  0.000  0.000  0.000  0.000  0.000 
-State 1  0.001  0.001  0.001  0.989  0.001  0.001  0.001  0.001  0.001  0.001 
-
-Feature: wind_speed (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.023  0.128  0.275  0.206  0.206  0.115  0.000  0.046 
-State 1  0.001  0.001  0.236  0.636  0.119  0.002  0.001  0.001  0.001  0.001 
-
-Feature: precipitation (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.952  0.046  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
-State 1  0.637  0.119  0.001  0.236  0.001  0.001  0.001  0.001  0.001  0.001 
-
-
-================================================================================
-Site ID: 847520-99999
-Number of States (K): 2
-Log-Likelihood: -126.2504
-================================================================================
-
-Initial State Distribution (π):
-----------------------------------------
-  State 0: 0.988522
-  State 1: 0.011478
-
-Transition Matrix (A):
-----------------------------------------
-     State 0State 1
-State 0  0.9780  0.0220 
-State 1  0.1273  0.8727 
-
-Emission Probability Matrices (B):
-----------------------------------------
-
-Feature: mean_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.000  0.873  0.125  0.000  0.000  0.000 
-State 1  0.001  0.001  0.001  0.001  0.001  0.989  0.001  0.001  0.001  0.001 
-
-Feature: max_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.000  0.771  0.227  0.000  0.000  0.000 
-State 1  0.001  0.001  0.001  0.001  0.001  0.001  0.989  0.001  0.001  0.001 
-
-Feature: min_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.188  0.811  0.000  0.000  0.000  0.000 
-State 1  0.001  0.001  0.001  0.001  0.123  0.867  0.001  0.001  0.001  0.001 
-
-Feature: sea_level_pressure (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.998  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
-State 1  0.001  0.001  0.989  0.001  0.001  0.001  0.001  0.001  0.001  0.001 
-
-Feature: wind_speed (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.089  0.826  0.084  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
-State 1  0.094  0.167  0.731  0.001  0.001  0.001  0.001  0.001  0.001  0.001 
-
-Feature: precipitation (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.956  0.022  0.000  0.021  0.000  0.000  0.000  0.000  0.000  0.000 
-State 1  0.628  0.362  0.001  0.001  0.001  0.001  0.001  0.001  0.001  0.001 
-
-
-================================================================================
-Site ID: 942030-99999
-Number of States (K): 2
-Log-Likelihood: -356.5682
-================================================================================
-
-Initial State Distribution (π):
-----------------------------------------
-  State 0: 0.990196
-  State 1: 0.009804
-
-Transition Matrix (A):
-----------------------------------------
-     State 0State 1
-State 0  0.0098  0.9902 
-State 1  0.0001  0.9999 
-
-Emission Probability Matrices (B):
-----------------------------------------
-
-Feature: mean_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.009  0.009  0.009  0.009  0.009  0.009  0.009  0.009  0.918  0.009 
-State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.594  0.405 
-
-Feature: max_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.009  0.009  0.009  0.009  0.009  0.009  0.009  0.009  0.918  0.009 
-State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.986  0.013 
-
-Feature: min_temp (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.009  0.009  0.009  0.009  0.009  0.009  0.009  0.918  0.009  0.009 
-State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.683  0.316 
-
-Feature: sea_level_pressure (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.009  0.918  0.009  0.009  0.009  0.009  0.009  0.009  0.009  0.009 
-State 1  0.000  0.405  0.000  0.468  0.089  0.038  0.000  0.000  0.000  0.000 
-
-Feature: wind_speed (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.009  0.009  0.918  0.009  0.009  0.009  0.009  0.009  0.009  0.009 
-State 1  0.038  0.379  0.556  0.025  0.000  0.000  0.000  0.000  0.000  0.000 
-
-Feature: precipitation (10 categories)
-     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.918  0.009  0.009  0.009  0.009  0.009  0.009  0.009  0.009  0.009 
-State 1  0.443  0.367  0.152  0.013  0.025  0.000  0.000  0.000  0.000  0.000 
-
-
-================================================================================
-Site ID: 943350-99999
-Number of States (K): 2
-Log-Likelihood: -237.4422
-================================================================================
-
-Initial State Distribution (π):
-----------------------------------------
-  State 0: 0.990186
-  State 1: 0.009814
-
-Transition Matrix (A):
-----------------------------------------
-     State 0State 1
-State 0  0.9514  0.0486 
+State 0  0.9541  0.0459 
 State 1  0.0266  0.9734 
 
 Emission Probability Matrices (B):
@@ -739,90 +535,90 @@ Emission Probability Matrices (B):
 
 Feature: mean_temp (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.677  0.319 
-State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.945  0.053 
+State 0  0.000  0.000  0.000  0.000  0.000  0.227  0.543  0.227  0.000  0.000 
+State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.870  0.128 
 
 Feature: max_temp (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.046  0.586  0.365 
-State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.998  0.000 
+State 0  0.000  0.000  0.000  0.000  0.000  0.227  0.543  0.227  0.000  0.000 
+State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.895  0.103 
 
 Feature: min_temp (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.539  0.412  0.046 
-State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.371  0.627  0.000 
+State 0  0.000  0.000  0.000  0.000  0.000  0.996  0.000  0.000  0.000  0.000 
+State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.256  0.691  0.051  0.000 
 
 Feature: sea_level_pressure (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.046  0.047  0.903  0.000  0.000  0.000  0.000  0.000 
-State 1  0.000  0.000  0.366  0.496  0.109  0.026  0.000  0.000  0.000  0.000 
+State 0  0.000  0.000  0.000  0.498  0.498  0.000  0.000  0.000  0.000  0.000 
+State 1  0.026  0.026  0.128  0.640  0.128  0.051  0.000  0.000  0.000  0.000 
 
 Feature: wind_speed (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.723  0.274  0.000  0.000  0.000  0.000  0.000  0.000 
-State 1  0.000  0.445  0.527  0.026  0.000  0.000  0.000  0.000  0.000  0.000 
+State 0  0.951  0.046  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+State 1  0.486  0.486  0.026  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
 
 Feature: precipitation (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.495  0.410  0.046  0.000  0.000  0.046  0.000  0.000  0.000  0.000 
-State 1  0.710  0.183  0.079  0.026  0.000  0.000  0.000  0.000  0.000  0.000 
+State 0  0.996  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+State 1  0.333  0.563  0.077  0.026  0.000  0.000  0.000  0.000  0.000  0.000 
 
 
 ================================================================================
-Site ID: 943740-99999
+Site ID: 763420-99999
 Number of States (K): 2
-Log-Likelihood: -318.0017
+Log-Likelihood: -313.0755
 ================================================================================
 
 Initial State Distribution (π):
 ----------------------------------------
-  State 0: 0.988715
-  State 1: 0.011285
+  State 0: 0.009804
+  State 1: 0.990196
 
 Transition Matrix (A):
 ----------------------------------------
      State 0State 1
-State 0  0.9437  0.0563 
-State 1  0.0915  0.9085 
+State 0  0.8944  0.1056 
+State 1  0.0490  0.9510 
 
 Emission Probability Matrices (B):
 ----------------------------------------
 
 Feature: mean_temp (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.981  0.017  0.000 
-State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.831  0.125  0.041 
+State 0  0.001  0.001  0.001  0.001  0.053  0.838  0.105  0.001  0.001  0.001 
+State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.452  0.547  0.000 
 
 Feature: max_temp (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.000  0.000  0.018  0.980  0.000  0.000 
-State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.792  0.205  0.000 
+State 0  0.001  0.001  0.001  0.001  0.053  0.419  0.472  0.053  0.001  0.001 
+State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.262  0.689  0.048 
 
 Feature: min_temp (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.000  0.000  0.054  0.927  0.018  0.000 
-State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.914  0.041  0.041 
+State 0  0.001  0.001  0.001  0.053  0.419  0.524  0.001  0.001  0.001  0.001 
+State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.499  0.499  0.000  0.000 
 
 Feature: sea_level_pressure (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.018  0.068  0.446  0.305  0.162  0.000  0.000 
-State 1  0.000  0.000  0.000  0.000  0.131  0.701  0.165  0.001  0.000  0.000 
+State 0  0.001  0.053  0.053  0.001  0.419  0.472  0.001  0.001  0.001  0.001 
+State 1  0.000  0.000  0.048  0.262  0.642  0.048  0.000  0.000  0.000  0.000 
 
 Feature: wind_speed (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.292  0.618  0.071  0.000  0.018  0.000  0.000  0.000  0.000  0.000 
-State 1  0.030  0.473  0.494  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+State 0  0.524  0.419  0.053  0.001  0.001  0.001  0.001  0.001  0.001  0.001 
+State 1  0.119  0.689  0.190  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
 
 Feature: precipitation (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.676  0.043  0.154  0.072  0.054  0.000  0.000  0.000  0.000  0.000 
-State 1  0.136  0.640  0.221  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+State 0  0.367  0.262  0.210  0.158  0.001  0.001  0.001  0.001  0.001  0.001 
+State 1  0.238  0.737  0.024  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
 
 
 ================================================================================
-Site ID: 944760-99999
+Site ID: 763820-99999
 Number of States (K): 2
-Log-Likelihood: -217.0193
+Log-Likelihood: -332.9468
 ================================================================================
 
 Initial State Distribution (π):
@@ -833,39 +629,447 @@ Initial State Distribution (π):
 Transition Matrix (A):
 ----------------------------------------
      State 0State 1
-State 0  0.9773  0.0227 
-State 1  0.0004  0.9996 
+State 0  0.7945  0.2055 
+State 1  0.1386  0.8614 
 
 Emission Probability Matrices (B):
 ----------------------------------------
 
 Feature: mean_temp (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.000  0.000  0.023  0.953  0.023  0.000 
-State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.834  0.122  0.041 
+State 0  0.000  0.000  0.000  0.000  0.000  0.040  0.277  0.561  0.120  0.000 
+State 1  0.000  0.084  0.000  0.000  0.000  0.000  0.000  0.274  0.584  0.056 
 
 Feature: max_temp (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.000  0.000  0.023  0.976  0.000  0.000 
-State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.510  0.447  0.041 
+State 0  0.000  0.000  0.000  0.000  0.000  0.000  0.040  0.910  0.047  0.000 
+State 1  0.000  0.000  0.028  0.056  0.000  0.000  0.000  0.000  0.886  0.028 
 
 Feature: min_temp (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.000  0.000  0.292  0.706  0.000  0.000 
-State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.852  0.063  0.082  0.000 
+State 0  0.000  0.000  0.000  0.040  0.119  0.399  0.202  0.238  0.000  0.000 
+State 1  0.084  0.000  0.000  0.000  0.000  0.110  0.610  0.195  0.000  0.000 
 
 Feature: sea_level_pressure (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.000  0.000  0.000  0.000  0.741  0.100  0.112  0.045  0.000  0.000 
-State 1  0.000  0.000  0.000  0.000  0.041  0.834  0.122  0.000  0.000  0.000 
+State 0  0.000  0.238  0.481  0.199  0.080  0.000  0.000  0.000  0.000  0.000 
+State 1  0.028  0.028  0.413  0.529  0.000  0.000  0.000  0.000  0.000  0.000 
 
 Feature: wind_speed (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.023  0.247  0.427  0.257  0.045  0.000  0.000  0.000  0.000  0.000 
-State 1  0.000  0.000  0.041  0.915  0.041  0.000  0.000  0.000  0.000  0.000 
+State 0  0.085  0.912  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+State 1  0.609  0.361  0.028  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
 
 Feature: precipitation (10 categories)
      Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
-State 0  0.976  0.023  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
-State 1  0.956  0.041  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+State 0  0.442  0.476  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.080 
+State 1  0.692  0.306  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+
+
+================================================================================
+Site ID: 764990-99999
+Number of States (K): 2
+Log-Likelihood: -274.7136
+================================================================================
+
+Initial State Distribution (π):
+----------------------------------------
+  State 0: 0.009804
+  State 1: 0.990196
+
+Transition Matrix (A):
+----------------------------------------
+     State 0State 1
+State 0  0.8944  0.1056 
+State 1  0.0490  0.9510 
+
+Emission Probability Matrices (B):
+----------------------------------------
+
+Feature: mean_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.001  0.001  0.001  0.001  0.001  0.001  0.367  0.629  0.001  0.001 
+State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.072  0.879  0.048 
+
+Feature: max_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.001  0.001  0.001  0.001  0.001  0.001  0.419  0.576  0.001  0.001 
+State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.974  0.024 
+
+Feature: min_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.001  0.001  0.001  0.001  0.001  0.367  0.472  0.158  0.001  0.001 
+State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.143  0.784  0.071  0.000 
+
+Feature: sea_level_pressure (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.001  0.001  0.001  0.001  0.524  0.472  0.001  0.001  0.001  0.001 
+State 1  0.000  0.000  0.000  0.024  0.784  0.167  0.024  0.000  0.000  0.000 
+
+Feature: wind_speed (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.262  0.734  0.001  0.001  0.001  0.001  0.001  0.001  0.001  0.001 
+State 1  0.285  0.689  0.024  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+
+Feature: precipitation (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.105  0.315  0.158  0.210  0.105  0.105  0.001  0.001  0.001  0.001 
+State 1  0.143  0.452  0.333  0.071  0.000  0.000  0.000  0.000  0.000  0.000 
+
+
+================================================================================
+Site ID: 843900-99999
+Number of States (K): 2
+Log-Likelihood: -188.4430
+================================================================================
+
+Initial State Distribution (π):
+----------------------------------------
+  State 0: 0.009804
+  State 1: 0.990196
+
+Transition Matrix (A):
+----------------------------------------
+     State 0State 1
+State 0  0.9788  0.0212 
+State 1  0.0643  0.9357 
+
+Emission Probability Matrices (B):
+----------------------------------------
+
+Feature: mean_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.447  0.493  0.058 
+State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.997  0.000  0.000 
+
+Feature: max_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.000  0.000  0.125  0.814  0.058  0.000 
+State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.963  0.034  0.000  0.000 
+
+Feature: min_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.418  0.522  0.058 
+State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.997  0.000  0.000 
+
+Feature: sea_level_pressure (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.795  0.203  0.000  0.000  0.000  0.000  0.000 
+State 1  0.000  0.000  0.000  0.997  0.000  0.000  0.000  0.000  0.000  0.000 
+
+Feature: wind_speed (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.232  0.174  0.232  0.261  0.041  0.000  0.058 
+State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.997  0.000  0.000 
+
+Feature: precipitation (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.824  0.116  0.029  0.029  0.000  0.000  0.000  0.000  0.000  0.000 
+State 1  0.997  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+
+
+================================================================================
+Site ID: 847520-99999
+Number of States (K): 2
+Log-Likelihood: -108.3248
+================================================================================
+
+Initial State Distribution (π):
+----------------------------------------
+  State 0: 0.009923
+  State 1: 0.990077
+
+Transition Matrix (A):
+----------------------------------------
+     State 0State 1
+State 0  0.9640  0.0360 
+State 1  0.0507  0.9493 
+
+Emission Probability Matrices (B):
+----------------------------------------
+
+Feature: mean_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.285  0.627  0.086  0.000  0.000  0.000 
+State 1  0.000  0.000  0.000  0.000  0.042  0.955  0.000  0.000  0.000  0.000 
+
+Feature: max_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.000  0.997  0.000  0.000  0.000  0.000 
+State 1  0.000  0.000  0.000  0.000  0.000  0.997  0.000  0.000  0.000  0.000 
+
+Feature: min_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.997  0.000  0.000  0.000  0.000  0.000 
+State 1  0.000  0.000  0.000  0.000  0.997  0.000  0.000  0.000  0.000  0.000 
+
+Feature: sea_level_pressure (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.884  0.113  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+State 1  0.000  0.994  0.003  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+
+Feature: wind_speed (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.407  0.534  0.058  0.000  0.000  0.000  0.000  0.000  0.000 
+State 1  0.000  0.033  0.964  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+
+Feature: precipitation (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.739  0.259  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+State 1  0.997  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+
+
+================================================================================
+Site ID: 911820-22521
+Number of States (K): 2
+Log-Likelihood: -109.1468
+================================================================================
+
+Initial State Distribution (π):
+----------------------------------------
+  State 0: 0.990125
+  State 1: 0.009875
+
+Transition Matrix (A):
+----------------------------------------
+     State 0State 1
+State 0  0.7142  0.2858 
+State 1  0.2169  0.7831 
+
+Emission Probability Matrices (B):
+----------------------------------------
+
+Feature: mean_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.997  0.000 
+State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.997  0.000 
+
+Feature: max_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.997  0.000  0.000 
+State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.997  0.000  0.000 
+
+Feature: min_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.997  0.000 
+State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.997  0.000 
+
+Feature: sea_level_pressure (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.077  0.920  0.000  0.000  0.000  0.000 
+State 1  0.000  0.000  0.000  0.000  0.026  0.941  0.030  0.000  0.000  0.000 
+
+Feature: wind_speed (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.806  0.191  0.000  0.000  0.000  0.000  0.000 
+State 1  0.000  0.000  0.000  0.045  0.892  0.060  0.000  0.000  0.000  0.000 
+
+Feature: precipitation (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.043  0.508  0.410  0.036  0.000  0.000  0.000  0.000  0.000  0.000 
+State 1  0.114  0.836  0.047  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+
+
+================================================================================
+Site ID: 942030-99999
+Number of States (K): 2
+Log-Likelihood: -198.3600
+================================================================================
+
+Initial State Distribution (π):
+----------------------------------------
+  State 0: 0.990175
+  State 1: 0.009825
+
+Transition Matrix (A):
+----------------------------------------
+     State 0State 1
+State 0  0.8830  0.1170 
+State 1  0.0323  0.9677 
+
+Emission Probability Matrices (B):
+----------------------------------------
+
+Feature: mean_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.001  0.001  0.001  0.001  0.001  0.001  0.001  0.001  0.491  0.505 
+State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.394  0.604 
+
+Feature: max_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.001  0.001  0.001  0.001  0.001  0.001  0.001  0.001  0.995  0.001 
+State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.998  0.000 
+
+Feature: min_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.001  0.001  0.001  0.001  0.001  0.001  0.001  0.001  0.945  0.051 
+State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.048  0.950  0.000 
+
+Feature: sea_level_pressure (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.001  0.043  0.952  0.001  0.001  0.001  0.001  0.001  0.001  0.001 
+State 1  0.000  0.100  0.632  0.266  0.000  0.000  0.000  0.000  0.000  0.000 
+
+Feature: wind_speed (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.001  0.001  0.217  0.779  0.001  0.001  0.001  0.001  0.001  0.001 
+State 1  0.000  0.121  0.766  0.112  0.000  0.000  0.000  0.000  0.000  0.000 
+
+Feature: precipitation (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.023  0.724  0.249  0.001  0.001  0.001  0.001  0.001  0.001  0.001 
+State 1  0.351  0.500  0.123  0.024  0.000  0.000  0.000  0.000  0.000  0.000 
+
+
+================================================================================
+Site ID: 943740-99999
+Number of States (K): 2
+Log-Likelihood: -229.0217
+================================================================================
+
+Initial State Distribution (π):
+----------------------------------------
+  State 0: 0.990196
+  State 1: 0.009804
+
+Transition Matrix (A):
+----------------------------------------
+     State 0State 1
+State 0  0.9636  0.0364 
+State 1  0.2530  0.7470 
+
+Emission Probability Matrices (B):
+----------------------------------------
+
+Feature: mean_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.998  0.000  0.000 
+State 1  0.002  0.002  0.002  0.002  0.002  0.002  0.002  0.789  0.002  0.195 
+
+Feature: max_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.998  0.000  0.000 
+State 1  0.002  0.002  0.002  0.002  0.002  0.002  0.582  0.210  0.195  0.002 
+
+Feature: min_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.000  0.000  0.393  0.606  0.000  0.000 
+State 1  0.002  0.002  0.002  0.002  0.002  0.002  0.585  0.206  0.195  0.002 
+
+Feature: sea_level_pressure (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.179  0.588  0.214  0.018  0.000  0.000 
+State 1  0.002  0.002  0.002  0.195  0.195  0.596  0.002  0.002  0.002  0.002 
+
+Feature: wind_speed (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.410  0.588  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+State 1  0.002  0.393  0.205  0.195  0.002  0.195  0.002  0.002  0.002  0.002 
+
+Feature: precipitation (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.143  0.661  0.124  0.072  0.000  0.000  0.000  0.000  0.000  0.000 
+State 1  0.391  0.002  0.400  0.002  0.195  0.002  0.002  0.002  0.002  0.002 
+
+
+================================================================================
+Site ID: 946370-99999
+Number of States (K): 2
+Log-Likelihood: -131.7016
+================================================================================
+
+Initial State Distribution (π):
+----------------------------------------
+  State 0: 0.009804
+  State 1: 0.990196
+
+Transition Matrix (A):
+----------------------------------------
+     State 0State 1
+State 0  0.9369  0.0631 
+State 1  0.0453  0.9547 
+
+Emission Probability Matrices (B):
+----------------------------------------
+
+Feature: mean_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.001  0.001  0.001  0.001  0.001  0.059  0.936  0.001  0.001  0.001 
+State 1  0.000  0.000  0.000  0.000  0.000  0.000  0.998  0.000  0.000  0.000 
+
+Feature: max_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.001  0.001  0.001  0.001  0.001  0.059  0.936  0.001  0.001  0.001 
+State 1  0.000  0.000  0.000  0.000  0.000  0.023  0.975  0.000  0.000  0.000 
+
+Feature: min_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.001  0.001  0.001  0.001  0.001  0.995  0.001  0.001  0.001  0.001 
+State 1  0.000  0.000  0.000  0.000  0.000  0.998  0.000  0.000  0.000  0.000 
+
+Feature: sea_level_pressure (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.001  0.001  0.235  0.760  0.001  0.001  0.001  0.001  0.001  0.001 
+State 1  0.000  0.000  0.000  0.001  0.725  0.272  0.000  0.000  0.000  0.000 
+
+Feature: wind_speed (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.001  0.001  0.292  0.703  0.001  0.001  0.001  0.001  0.001  0.001 
+State 1  0.000  0.000  0.590  0.408  0.000  0.000  0.000  0.000  0.000  0.000 
+
+Feature: precipitation (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.937  0.059  0.001  0.001  0.001  0.001  0.001  0.001  0.001  0.001 
+State 1  0.318  0.680  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+
+
+================================================================================
+Site ID: 946530-99999
+Number of States (K): 2
+Log-Likelihood: -191.0118
+================================================================================
+
+Initial State Distribution (π):
+----------------------------------------
+  State 0: 0.990100
+  State 1: 0.009900
+
+Transition Matrix (A):
+----------------------------------------
+     State 0State 1
+State 0  0.9240  0.0760 
+State 1  0.0498  0.9502 
+
+Emission Probability Matrices (B):
+----------------------------------------
+
+Feature: mean_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.000  0.784  0.213  0.000  0.000  0.000 
+State 1  0.000  0.000  0.000  0.000  0.000  0.847  0.151  0.000  0.000  0.000 
+
+Feature: max_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.000  0.918  0.079  0.000  0.000  0.000 
+State 1  0.000  0.000  0.000  0.000  0.000  0.727  0.271  0.000  0.000  0.000 
+
+Feature: min_temp (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.034  0.963  0.000  0.000  0.000  0.000 
+State 1  0.000  0.000  0.000  0.000  0.186  0.811  0.000  0.000  0.000  0.000 
+
+Feature: sea_level_pressure (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.000  0.000  0.000  0.707  0.290  0.000  0.000  0.000 
+State 1  0.000  0.000  0.000  0.000  0.000  0.730  0.267  0.000  0.000  0.000 
+
+Feature: wind_speed (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.000  0.000  0.070  0.842  0.086  0.000  0.000  0.000  0.000  0.000 
+State 1  0.000  0.000  0.000  0.115  0.883  0.000  0.000  0.000  0.000  0.000 
+
+Feature: precipitation (10 categories)
+     Cat 0Cat 1Cat 2Cat 3Cat 4Cat 5Cat 6Cat 7Cat 8Cat 9
+State 0  0.450  0.547  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
+State 1  0.465  0.533  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000 
 
