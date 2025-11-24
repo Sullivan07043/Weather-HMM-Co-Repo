@@ -7,6 +7,19 @@
 
 ---
 
+## Table of Contents
+
+1. [Project Overview](#project-overview)
+2. [Problem Description](#problem-description)
+3. [System Architecture](#system-architecture)
+4. [Data Processing Pipeline](#data-processing-pipeline)
+5. [Model Architecture](#model-architecture)
+6. [Experimental Design](#experimental-design)
+7. [Implementation Details](#implementation-details)
+8. [References](#references)
+
+---
+
 ## Project Overview
 
 This project develops an unsupervised learning framework using **Hidden Markov Models (HMMs)** to detect El Niño-Southern Oscillation (ENSO) events from land-based weather station observations. We demonstrate that carefully designed probabilistic models can discover physically meaningful climate patterns without direct ocean measurements.
@@ -17,6 +30,14 @@ Unlike traditional ENSO detection methods that rely on oceanic measurements (sea
 - Regions without ocean monitoring infrastructure
 - Historical periods predating modern oceanographic instruments
 - Cost-constrained operational settings
+
+### Research Philosophy
+
+This project emphasizes:
+- **Probabilistic Reasoning**: Rigorous formulation of independence assumptions
+- **Algorithmic Soundness**: Correct implementation of inference and learning methods
+- **Model Interpretability**: Clear explanation of modeling choices and their physical justification
+- **Systematic Evaluation**: Comprehensive ablation studies and baseline comparisons
 
 ---
 
@@ -29,12 +50,7 @@ The El Niño-Southern Oscillation (ENSO) is a recurring climate phenomenon invol
 - **El Niño**: Anomalous warming of eastern Pacific waters
 - **La Niña**: Anomalous cooling of eastern Pacific waters
 
-These events significantly impact global weather patterns, agricultural productivity, water resources, and disaster risks, making accurate detection critical for:
-- Agricultural planning and crop yield forecasting
-- Disaster preparedness (droughts, floods, tropical cyclones)
-- Water resource management
-- Public health (disease outbreak prediction)
-- Economic decision-making
+These events significantly impact global weather patterns, agricultural productivity, water resources, and disaster risks.
 
 ### Research Questions
 
@@ -49,171 +65,197 @@ These events significantly impact global weather patterns, agricultural producti
 
 ### Our Approach
 
-We address these challenges through:
-1. **Factorized Categorical HMM**: Efficient probabilistic model with conditional independence assumptions
-2. **Bayesian Model Selection**: Automatic determination of optimal state count using BIC
-3. **Ensemble Prediction**: Majority voting across high-quality stations
-4. **Rigorous Validation**: Comparison against official ONI (Oceanic Niño Index) records
-5. **Ablation Analysis**: Systematic evaluation of modeling choices
+We address these challenges through a systematic methodology:
+
+```
+Problem Formulation → Data Processing → Model Design → 
+Training & Inference → Evaluation → Ablation Studies
+```
+
+Each component is designed with clear probabilistic reasoning and physical interpretability.
 
 ---
 
-## Dataset
+## System Architecture
 
-### Data Source
+### Overall Workflow
 
-**NOAA Global Surface Summary of Day (GSOD)**
-- Provider: National Oceanic and Atmospheric Administration
-- Coverage: Global network of 9,000+ weather stations
-- Historical range: 1929-present
-- Temporal resolution: Daily observations
-- Access: Kaggle dataset repository
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                        SYSTEM ARCHITECTURE                           │
+└─────────────────────────────────────────────────────────────────────┘
 
-### Temporal Scope
+┌──────────────┐      ┌──────────────┐      ┌──────────────┐
+│   Raw GSOD   │      │  Preprocessed│      │   HMM Model  │
+│     Data     │ ───> │     Data     │ ───> │   Training   │
+│  (NOAA)      │      │   (CSV)      │      │              │
+└──────────────┘      └──────────────┘      └──────────────┘
+                            │                       │
+                            │                       │
+                            ▼                       ▼
+                   ┌──────────────┐      ┌──────────────┐
+                   │   Station    │      │   Hidden     │
+                   │   Filtering  │      │    States    │
+                   └──────────────┘      └──────────────┘
+                                                │
+                                                │
+                                                ▼
+                                      ┌──────────────┐
+                                      │   Ensemble   │
+                                      │   Voting     │
+                                      └──────────────┘
+                                                │
+                                                │
+                                                ▼
+                                      ┌──────────────┐
+                                      │   ENSO       │
+                                      │   Detection  │
+                                      └──────────────┘
+```
 
-**Analysis Period**: 1950-2000 (51 years)
+### Module Organization
 
-**Rationale for Period Selection**:
-- Maximizes number of high-quality stations with complete coverage
-- Balances data quality (more recent) with historical depth
-- Most stations with 50+ year continuous records converge on this period
-- Minimizes missing years requiring imputation
-- Captures multiple complete ENSO cycles (~12 cycles in 51 years)
+**1. Data Module** (`data/`)
+- Responsible for data acquisition, cleaning, and preprocessing
+- Outputs standardized CSV format
+- Independent of downstream modeling choices
 
-### Spatial Coverage
+**2. HMM Module** (separate branch: `Weather-HMM-Co-Repo-HMM/`)
+- Implements Factorized Categorical HMM
+- Performs training via EM algorithm
+- Executes inference using Forward-Backward algorithm
 
-**Station Selection Criteria**:
-We curated 21 high-quality stations from **6 Pacific Rim countries** through systematic filtering:
+**3. Evaluation Module**
+- Compares predictions against official ONI records
+- Computes performance metrics
+- Generates ablation study results
 
-| Region | Countries | # Stations | Rationale |
-|--------|-----------|-----------|-----------|
-| East Asia | Japan, South Korea | 5 | Western Pacific teleconnections |
-| Oceania | Australia | 6 | Southern Hemisphere impacts |
-| North America | USA, Mexico | 8 | Eastern Pacific proximity |
-| South America | Peru | 2 | Coastal upwelling regions |
-
-**Selection Methodology**:
-1. Filter for stations with ≥90% temporal coverage (1950-2000)
-2. Geographic distribution across Pacific basin
-3. Prioritize coastal and island stations (stronger ENSO signals)
-4. Quality assessment: minimal instrumentation changes, consistent protocols
-5. Cross-validation: ensure at least 2 stations per country for robustness
-
-This geographic sampling strategy ensures representation of diverse ENSO teleconnection patterns while maintaining data quality standards.
-
-### Ground Truth
-
-**Oceanic Niño Index (ONI)** - Official ENSO classification
-- Source: NOAA Climate Prediction Center
-- Definition: 3-month running mean of SST anomalies (Niño 3.4 region: 5°N-5°S, 120°-170°W)
-- Classification threshold: |ONI| ≥ 0.5°C for ≥5 consecutive overlapping periods
-- 1950-2000 Statistics:
-  - El Niño years: 19 (37.3%)
-  - La Niña years: 16 (31.4%)
-  - Total anomaly years: 35 (68.6%)
-  - Normal years: 16 (31.4%)
+**4. Ensemble Module**
+- Aggregates station-level predictions
+- Performs threshold optimization
+- Produces final ENSO classifications
 
 ---
 
 ## Data Processing Pipeline
 
-### Raw Data Characteristics
+### Pipeline Overview
 
-**Input Format**: Fixed-width text files (.op.gz) organized in annual tar archives
-- 12 continuous meteorological features
-- 6 binary weather event indicators
-- Sentinel values for missing observations (e.g., 9999.9 for temperature)
-
-### Processing Stages
-
-#### Stage 1: Extraction and Parsing
-- Decompress tar archives by year (gsod_YYYY.tar)
-- Filter files for selected 21 stations
-- Parse fixed-width format using predefined column specifications
-- Handle both gzip-compressed and uncompressed formats
-
-#### Stage 2: Data Cleaning
-- Replace sentinel values with NaN (e.g., 9999.9 → NaN)
-- Standardize station identifiers: USAF-WBAN format (e.g., "476710-99999")
-- Convert dates to standard datetime format
-- Extract binary weather events from FRSHTT encoded string
-
-#### Stage 3: Temporal Aggregation
-**From Daily to Yearly**: Aggregate daily observations to annual means/sums
-- Continuous features (temperature, pressure, wind): mean
-- Precipitation: annual sum
-- Weather events: frequency (days per year)
-
-**Rationale**: Yearly resolution aligns with ENSO event timescales (12-18 months) while reducing noise and computational complexity.
-
-#### Stage 4: Complete Time Series Generation
-**Challenge**: Some stations have missing years in 1950-2000 period
-
-**Solution**: Ensure all 21 stations have complete 51-year sequences
-1. Create full date range (1950-2000) for each station
-2. Identify missing years
-3. Intelligent imputation:
-   - Short gaps (<3 years): Linear interpolation
-   - Long gaps (≥3 years): Seasonal global means (same year across all stations)
-   - Feature-specific strategies for different variable types
-
-**Result**: Zero missing years across all 21 stations post-processing
-
-#### Stage 5: Detrending
-**Motivation**: Remove long-term climate trends and urbanization effects while preserving ENSO variability
-
-**Method**: First-order differencing
 ```
-x'_t = x_t - x_{t-1}
+┌────────────────────────────────────────────────────────────────────┐
+│                    DATA PROCESSING PIPELINE                         │
+└────────────────────────────────────────────────────────────────────┘
+
+Raw NOAA GSOD Data (tar archives)
+         │
+         ▼
+┌─────────────────────┐
+│ Stage 1: Extraction │  • Parse fixed-width format
+│  & Initial Parse    │  • Filter selected stations
+└─────────────────────┘  • Handle compressed files
+         │
+         ▼
+┌─────────────────────┐
+│ Stage 2: Data       │  • Replace sentinel values (9999.9 → NaN)
+│   Cleaning          │  • Standardize station IDs
+└─────────────────────┘  • Convert date formats
+         │
+         ▼
+┌─────────────────────┐
+│ Stage 3: Temporal   │  • Aggregate daily → yearly
+│   Aggregation       │  • Compute annual statistics
+└─────────────────────┘  • Handle seasonal patterns
+         │
+         ▼
+┌─────────────────────┐
+│ Stage 4: Complete   │  • Generate full date range
+│  Time Series        │  • Identify missing years
+└─────────────────────┘  • Intelligent imputation
+         │
+         ▼
+┌─────────────────────┐
+│ Stage 5: Detrending │  • Remove long-term trends
+│                     │  • Apply first-order differencing
+└─────────────────────┘  • Preserve ENSO variability
+         │
+         ▼
+┌─────────────────────┐
+│ Stage 6: Normalize  │  • Scale features to [0,1]
+│  & Discretize       │  • Equal-width binning (10 bins)
+└─────────────────────┘  • Preserve original values
+         │
+         ▼
+Processed CSV Output (clean, discretized, complete)
 ```
 
-**Rationale**:
-- Removes linear and some non-linear trends
-- Preserves interannual variability (ENSO signals)
-- Computationally efficient
-- Stationarity improvement for HMM assumptions
+### Data Scope
 
-**Effect**: Reduces trend component by ~95% while retaining ENSO-correlated variance
+**Temporal Coverage**: 1950-2000 (51 years)
 
-#### Stage 6: Normalization and Discretization
-**Categorical HMM Requirement**: Discrete observation space
+**Rationale for Period Selection**:
+- Maximizes stations with complete coverage
+- Balances data quality with historical depth
+- Minimizes missing years requiring imputation
+- Captures multiple complete ENSO cycles
 
-**Process**:
-1. **Normalization**: Scale each feature to [0, 1]
-   ```
-   x_norm = (x - x_min) / (x_max - x_min)
-   ```
+**Spatial Coverage**: 21 high-quality stations from 6 Pacific Rim countries
 
-2. **Equal-Width Binning**: Discretize into 10 categories
-   ```
-   bin_index = floor(x_norm × 10), capped at 9
-   ```
+| Region | Countries | Focus |
+|--------|-----------|-------|
+| East Asia | Japan, South Korea | Western Pacific teleconnections |
+| Oceania | Australia | Southern Hemisphere impacts |
+| North America | USA, Mexico | Eastern Pacific proximity |
+| South America | Peru | Coastal upwelling regions |
 
-**Rationale for 10 Bins**:
-- Balances granularity and statistical robustness
-- Sufficient resolution for capturing ENSO-related variations
-- Prevents overfitting with limited temporal samples (51 years)
-- Consistent across all features (uniform emission structure)
+**Station Selection Criteria**:
+1. ≥90% temporal coverage during 1950-2000
+2. Geographic distribution across Pacific basin
+3. Minimal instrumentation changes
+4. Consistent observation protocols
 
-**Preservation**: Original continuous values stored in companion columns (*_raw) for reference
+### Feature Set
 
-### Output Specification
+**12 Continuous Meteorological Features**:
 
-**Format**: Single CSV file per configuration
-- Rows: Grouped by station, sorted chronologically
-- Columns: 32 total
-  - Identifiers: site_id, year (not date, since yearly)
-  - Discretized features: 12 (values 0-9)
-  - Original values: 12 (*_raw columns)
-  - Binary indicators: 6 (fog, rain, snow, hail, thunder, tornado)
-  - Detrended originals: 12 (*_before_detrend columns, optional)
+| Feature Group | Variables | Physical Significance |
+|---------------|-----------|----------------------|
+| Temperature (3) | mean_temp, max_temp, min_temp | Thermal response to ENSO |
+| Atmospheric (2) | sea_level_pressure, wind_speed | Walker circulation indicators |
+| Precipitation (2) | precipitation, visibility | Hydrological impacts |
+| Wind (3) | wind_speed, max_wind_speed, wind_gust | Trade wind dynamics |
+| Snow (2) | snow_depth, (derived) | Regional climate extremes |
 
-**Example Filename**: `weather_1950_2000_yearly_detrend_difference_bins10.csv`
+**6 Binary Weather Event Indicators**:
+- Fog, Rain, Snow, Hail, Thunder, Tornado
 
-**Statistics**:
-- Total observations: 1,071 (21 stations × 51 years)
-- Complete coverage: 100% (no missing years)
-- Feature completeness: >99.5% post-imputation
+### Processing Specifications
+
+**Temporal Aggregation**: Daily → Yearly
+- Continuous features: Annual mean
+- Precipitation: Annual sum
+- Binary events: Annual frequency
+
+**Detrending Method**: First-Order Differencing
+```
+x'(t) = x(t) - x(t-1)
+```
+- Removes linear trends
+- Preserves interannual variability
+- Ensures stationarity for HMM
+
+**Discretization**: Equal-Width Binning
+```
+normalized = (x - x_min) / (x_max - x_min)
+bin = floor(normalized × 10), capped at 9
+```
+- 10 categories per feature: {0, 1, 2, ..., 9}
+- Uniform across all features
+- Original values preserved in *_raw columns
+
+**Output Format**: CSV with structure
+```
+site_id | year | feature_1 | ... | feature_12 | feature_1_raw | ... | events
+```
 
 ---
 
@@ -221,574 +263,773 @@ x'_t = x_t - x_{t-1}
 
 ### Factorized Categorical Hidden Markov Model
 
-#### Core Assumptions
+#### Core Mathematical Framework
 
-**1. Markov Property** (First-Order)
+**State Space**: Z = {0, 1} (binary climate regimes)  
+**Observation Space**: X = {0,1,...,9}^12 (discretized features)  
+**Time Steps**: T = 51 years (1950-2000)
+
+#### Independence Assumptions
+
+Our model makes three key assumptions, each carefully justified:
+
+##### 1. First-Order Markov Property
+
+**Assumption**:
 ```
-p(z_t | z_1, ..., z_{t-1}) = p(z_t | z_{t-1})
+p(z_t | z_{1:t-1}) = p(z_t | z_{t-1})
 ```
-Future states depend only on the current state, not the entire history.
 
-**Justification**: 
-- ENSO state persistence (events last 12-18 months) creates strong temporal correlation at yearly resolution
-- Higher-order dependencies would require exponentially more parameters
-- Empirically validated: learned transitions show 95% persistence, consistent with ENSO physics
+**Mathematical Formulation**:
+```
+p(z_1, ..., z_T) = p(z_1) ∏_{t=2}^T p(z_t | z_{t-1})
+```
 
-**2. Conditional Independence of Observations**
+**Justification**:
+- ENSO exhibits strong year-to-year persistence
+- Events typically last 12-18 months (spanning 2+ calendar years)
+- Higher-order dependencies exponentially increase parameters
+- Empirical validation: High learned transition probabilities (>90%)
+
+**Physical Interpretation**: Current ENSO state is the primary predictor of next year's state, capturing the "memory" of ocean heat content anomalies.
+
+**Critical Discussion**: This simplifies delayed oscillator mechanisms (e.g., oceanic Rossby waves with 6-9 month delays). However, at yearly resolution, first-order dependence suffices for classification.
+
+##### 2. Conditional Independence of Observations
+
+**Assumption**:
 ```
 p(x_t | z_t) = ∏_{f=1}^{12} p(x_{t,f} | z_t)
 ```
-Given the hidden climate state, meteorological features are conditionally independent.
+
+**Mathematical Formulation**:
+```
+p(x_{t,1}, ..., x_{t,12} | z_t = k) = p(x_{t,1}|z_t=k) × ... × p(x_{t,12}|z_t=k)
+```
 
 **Justification**:
-- Factorization enables tractable inference with 12 features
-- Physical interpretation: hidden state captures large-scale circulation (Walker circulation), which independently influences different meteorological variables
-- Ablation studies confirm: feature groups provide complementary (not redundant) information
-- Trade-off: Sacrifices modeling of feature correlations for computational efficiency and generalization
+- **Computational**: Reduces parameters from 10^12 to 12×10×2 = 240
+- **Statistical**: Prevents overfitting with limited data (51 time points)
+- **Physical**: Hidden state captures large-scale circulation (Walker cell), which independently influences regional meteorological variables
+- **Empirical**: Ablation shows feature groups provide complementary (not redundant) information
 
-**Critical Discussion**: 
-This assumption is a simplification. In reality, temperature and precipitation are coupled through thermodynamic processes. However:
-- The hidden state captures the primary common mode (ENSO-driven circulation)
+**Physical Interpretation**: Given the ENSO state (which determines atmospheric circulation patterns), local weather variables are conditionally independent. The hidden state acts as the "common cause" explaining correlations.
+
+**Critical Discussion**: In reality, temperature and precipitation are coupled through thermodynamic processes. However:
+- The hidden state captures the primary common mode
 - Residual correlations are secondary for classification
-- Alternative (fully-dependent emissions) would require 10^12 parameters vs. current 111
+- Trade-off: Model simplicity vs. feature coupling
 
-**3. Stationary Transitions**
+**Alternative Considered**: Fully-dependent emissions
 ```
-p(z_t | z_{t-1}) = A_{ij} ∀t
+p(x_t | z_t) = Multinomial(θ_z_t)  [No factorization]
 ```
-Transition probabilities are time-invariant.
+Rejected due to parameter explosion (10^12 values).
+
+##### 3. Stationary Transition Probabilities
+
+**Assumption**:
+```
+p(z_t | z_{t-1}) = A_{ij}  ∀t
+```
+
+**Mathematical Formulation**:
+Transition matrix A is time-invariant.
 
 **Justification**:
 - Simplifies learning (constant parameters)
-- Reasonable for 51-year window (climate change effects minimal at this timescale)
-- Validated empirically: model performance consistent across decades
+- Reasonable for 51-year window (minimal climate change effects)
+- Standard HMM assumption
 
-**Limitation**: Cannot capture potential non-stationarity in ENSO behavior due to climate change. Future work could explore time-varying transitions.
+**Physical Interpretation**: ENSO dynamics (ocean-atmosphere feedback loops) remain consistent over the study period.
 
-#### Model Formulation
+**Limitation**: Cannot capture potential non-stationarity in ENSO behavior due to anthropogenic climate change. Extension: Time-varying transition matrices.
 
-**Parameters**: θ = {π, A, {B^(f)}_{f=1}^{12}}
+#### Model Parameters
 
-**Initial Distribution**: π ∈ ℝ^K
+**Parameter Set**: θ = {π, A, {B^(f)}_{f=1}^{12}}
+
+**Initial Distribution** π ∈ ℝ^2:
 ```
 π_k = p(z_1 = k)
+Constraint: π_0 + π_1 = 1
+Free parameters: 1
 ```
-Represents prior probability of each climate state in 1950.
 
-**Transition Matrix**: A ∈ ℝ^{K×K}
+**Transition Matrix** A ∈ ℝ^{2×2}:
 ```
 A_{ij} = p(z_{t+1} = j | z_t = i)
+Constraint: A_{i,0} + A_{i,1} = 1  ∀i
+Free parameters: 2
 ```
-Row-stochastic: Σ_j A_{ij} = 1
 
-**Emission Matrices**: B^(f) ∈ ℝ^{K×10} for each feature f
+**Emission Matrices** B^(f) ∈ ℝ^{2×10} for each feature f:
 ```
 B^(f)_{k,v} = p(x_{t,f} = v | z_t = k)
-```
-Column-stochastic: Σ_v B^(f)_{k,v} = 1
-
-**Parameter Count**:
-```
-N_params = (K-1) + K(K-1) + Σ_f K(V_f - 1)
-         = 1 + 2 + 12×2×9 = 219 parameters (for K=2, V=10)
+Constraint: Σ_v B^(f)_{k,v} = 1  ∀k,f
+Free parameters: 12 × 2 × 9 = 216
 ```
 
-Critically manageable given 1,071 observations (4.9 observations per parameter).
+**Total Parameters**: 1 + 2 + 216 = 219
 
-#### Inference Algorithm: Forward-Backward
+**Data-to-Parameter Ratio**: 1,071 observations / 219 parameters ≈ 4.9
 
-**Forward Pass** (Filtering):
+This ratio is reasonable but highlights the importance of regularization (Laplace smoothing).
+
+### Inference Algorithm: Forward-Backward
+
 ```
-α_t(k) = p(x_1:t, z_t = k)
+┌───────────────────────────────────────────────────────────────┐
+│                  FORWARD-BACKWARD ALGORITHM                    │
+└───────────────────────────────────────────────────────────────┘
 
-α_1(k) = π_k · ∏_f B^(f)_{k, x_{1,f}}
+Forward Pass (α):                    Backward Pass (β):
+───────────────                      ───────────────────
 
-α_{t+1}(k) = [Σ_j α_t(j) · A_{jk}] · ∏_f B^(f)_{k, x_{t+1,f}}
-```
+t=1: α_1(k) = π_k · p(x_1|k)        t=T: β_T(k) = 1
 
-**Backward Pass** (Smoothing):
-```
-β_t(k) = p(x_{t+1:T} | z_t = k)
+t>1: α_t(k) = [Σ_j α_{t-1}(j)·      t<T: β_t(k) = Σ_j A_{kj}·
+               A_{jk}]·                        β_{t+1}(j)·
+               p(x_t|k)                        p(x_{t+1}|j)
 
-β_T(k) = 1
-
-β_t(k) = Σ_j A_{kj} · β_{t+1}(j) · ∏_f B^(f)_{j, x_{t+1,f}}
-```
-
-**State Posteriors**:
-```
-γ_t(k) = p(z_t = k | x_{1:T}) = α_t(k) · β_t(k) / Σ_j α_t(j) · β_t(j)
-```
-
-**Decoding**: Posterior Marginal Decoding (not Viterbi)
-```
-ẑ_t = argmax_k γ_t(k)
-```
-
-**Rationale for Marginal Decoding**:
-- Minimizes expected number of state errors (not most likely path)
-- More robust to ambiguous observations
-- Ablation shows minimal difference from Viterbi for K=2 (0.3% F1 difference)
-- Provides posterior probabilities for uncertainty quantification
-
-#### Learning Algorithm: Expectation-Maximization (Baum-Welch)
-
-**Objective**: Maximum Likelihood Estimation
-```
-θ* = argmax_θ log p(X | θ)
+         ↓                                    ↓
+         └────────────────┬──────────────────┘
+                          ↓
+              Posterior Computation:
+              ────────────────────
+              γ_t(k) = p(z_t=k | x_{1:T})
+                     = α_t(k)·β_t(k) / Σ_j α_t(j)·β_t(j)
+                          ↓
+                     Decoding:
+                     ────────
+                     ẑ_t = argmax_k γ_t(k)
 ```
 
-**E-Step**: Compute expected sufficient statistics
+**Key Properties**:
+- **Time Complexity**: O(K^2 × T × F) = O(4 × 51 × 12) ≈ 2,448 operations
+- **Space Complexity**: O(K × T) = O(2 × 51) = 102 values
+- **Numerical Stability**: Log-space computation prevents underflow
+- **Optimality**: Minimizes expected number of state prediction errors
+
+**Why Not Viterbi?**
+- Viterbi finds most probable path: argmax p(z_{1:T} | x_{1:T})
+- Forward-Backward finds most probable state at each time: argmax_k p(z_t | x_{1:T})
+- For K=2 with high persistence, difference is minimal
+- Posterior marginals provide uncertainty estimates
+
+### Learning Algorithm: Expectation-Maximization (Baum-Welch)
+
 ```
-γ_t(k) = p(z_t = k | X, θ^{old})
-ξ_t(i,j) = p(z_t = i, z_{t+1} = j | X, θ^{old})
-```
+┌───────────────────────────────────────────────────────────────┐
+│                   EM ALGORITHM WORKFLOW                        │
+└───────────────────────────────────────────────────────────────┘
 
-**M-Step**: Update parameters
-```
-π_k^{new} = γ_1(k)
-
-A_{ij}^{new} = Σ_t ξ_t(i,j) / Σ_t Σ_j ξ_t(i,j)
-
-B^(f)_{k,v}^{new} = Σ_t γ_t(k) · 𝟙(x_{t,f} = v) / Σ_t γ_t(k)
-```
-
-**Laplace Smoothing**: Add ε = 0.01 to all counts to prevent zero probabilities
-```
-B^(f)_{k,v}^{new} = [Σ_t γ_t(k) · 𝟙(x_{t,f} = v) + ε] / [Σ_t γ_t(k) + 10ε]
-```
-
-**Convergence**:
-- Criterion: |log p(X | θ^{t+1}) - log p(X | θ^{t})| < 10^{-3}
-- Max iterations: 100
-- Typical convergence: 20-50 iterations per station
-- Log-space computation prevents numerical underflow
-
-#### Model Selection: Bayesian Information Criterion
-
-**BIC Formula**:
-```
-BIC = -2 log p(X | θ̂) + d log T
-```
-- First term: Goodness of fit
-- Second term: Complexity penalty
-- Lower BIC = better model
-
-**Selection Process**:
-For each station:
-1. Train HMMs with K ∈ {2, 3, 4, 5, 6, 7, 8}
-2. Compute BIC for each model
-3. Select K* = argmin_K BIC(K)
-
-**Result**: **100% consensus on K=2 across all 21 stations**
-
-**Interpretation**:
-- Strong evidence for binary climate regime
-- Aligns with physical understanding: ENSO anomaly vs. normal conditions
-- Suggests underlying structure is genuinely two-state, not model artifact
-- Validates modeling assumption of binary classification
-
-**Why not K=3** (El Niño, La Niña, Normal)?
-- BIC consistently prefers K=2 (lower complexity penalty outweighs modest fit improvement)
-- At yearly resolution with land-based observations, El Niño and La Niña signals are similar (both "anomalous")
-- Distinction would require finer temporal resolution or oceanic predictors
-
-### Learned Model Characteristics
-
-**Average Transition Matrix** (across 21 stations):
-```
-        State 0  State 1
-State 0  0.935    0.065
-State 1  0.040    0.960
+Initialize: θ^(0) = {π^(0), A^(0), {B^(f,0)}_{f=1}^{12}}
+            ↓
+┌───────────────────────────────────────┐
+│  Iteration m:                         │
+│                                       │
+│  ┌─────────────────────────────────┐ │
+│  │ E-Step: Compute Posteriors      │ │
+│  │                                 │ │
+│  │  Run Forward-Backward           │ │
+│  │  → γ_t(k) = p(z_t=k | X, θ^(m))│ │
+│  │  → ξ_t(i,j) = p(z_t=i, z_{t+1} │ │
+│  │               =j | X, θ^(m))    │ │
+│  └─────────────────────────────────┘ │
+│            ↓                          │
+│  ┌─────────────────────────────────┐ │
+│  │ M-Step: Update Parameters       │ │
+│  │                                 │ │
+│  │  π_k^(m+1) = γ_1(k)            │ │
+│  │                                 │ │
+│  │  A_{ij}^(m+1) = Σ_t ξ_t(i,j)   │ │
+│  │                / Σ_t γ_t(i)     │ │
+│  │                                 │ │
+│  │  B_{k,v}^(f,m+1) = Σ_t γ_t(k)· │ │
+│  │                    𝟙(x_{t,f}=v) │ │
+│  │                  / Σ_t γ_t(k)   │ │
+│  └─────────────────────────────────┘ │
+│            ↓                          │
+│  Compute: ℓ^(m+1) = log p(X|θ^(m+1))│
+│                                       │
+│  Check: |ℓ^(m+1) - ℓ^(m)| < ε ?     │
+│         └─Yes→ CONVERGED              │
+│         └─No──┘ (continue)           │
+└───────────────────────────────────────┘
+            ↓
+Return: θ* = θ^(m+1)
 ```
 
-**Observations**:
-1. **High Persistence**: Average diagonal = 0.947
-   - Expected state duration: ~19 years (1/(1-0.947))
-   - Reflects that consecutive years often share same ENSO phase at yearly resolution
+**Convergence Criteria**:
+- Tolerance: ε = 10^-3
+- Maximum iterations: 100
+- Typical convergence: 20-50 iterations
 
-2. **Asymmetric Transitions**: p(1→1) > p(0→0)
-   - Anomalies more persistent than normal conditions
-   - Consistent with ENSO event durations (12-18 months spanning 2 calendar years)
+**Regularization**: Laplace Smoothing
+```
+B_{k,v}^(f,new) = [Σ_t γ_t(k)·𝟙(x_{t,f}=v) + ε] / [Σ_t γ_t(k) + 10ε]
+```
+with ε = 0.01, prevents zero probabilities.
 
-3. **Low Switching Rates**: 4-6.5% probability of state change per year
-   - Aligns with 2-7 year ENSO cycle period
-   - Penalizes erratic state sequences (physically implausible)
+### Model Selection: Bayesian Information Criterion
 
-**Physical Validation**: Transition structure independently recovers known ENSO timescales without supervision.
+```
+┌───────────────────────────────────────────────────────────────┐
+│                    MODEL SELECTION WORKFLOW                    │
+└───────────────────────────────────────────────────────────────┘
+
+For each station s:
+  ↓
+  For K ∈ {2, 3, 4, 5, 6, 7, 8}:
+    ↓
+    ┌──────────────────────────────┐
+    │ Train HMM with K states      │
+    │ → Run EM until convergence   │
+    └──────────────────────────────┘
+    ↓
+    ┌──────────────────────────────┐
+    │ Compute BIC                  │
+    │ BIC(K) = -2·log L + d·log T │
+    │                              │
+    │ where:                       │
+    │  L = p(X | θ̂_K)            │
+    │  d = # parameters           │
+    │  T = # time steps (51)      │
+    └──────────────────────────────┘
+    ↓
+  Select: K* = argmin_K BIC(K)
+  ↓
+Result: Optimal K for station s
+```
+
+**Parameter Count Formula**:
+```
+d(K) = (K-1) + K(K-1) + 12×K×(10-1)
+     = K^2 - 1 + 108K
+
+For K=2: d = 3 + 216 = 219
+For K=3: d = 8 + 324 = 332
+```
+
+**BIC Trade-off**:
+- Lower K → Better fit but higher BIC penalty
+- Higher K → More flexibility but overfitting risk
+- BIC balances model complexity and data fit
+
+**Empirical Observation**: 100% of stations select K=2
+
+**Physical Interpretation**: Binary regime (normal vs. anomaly) suffices for ENSO detection at yearly resolution with land-based observations.
 
 ### Ensemble Prediction System
 
-**Motivation**: Individual stations suffer from local noise; aggregation improves robustness.
-
-**Method**: Majority Voting with Optimal Threshold
-
-**Algorithm**:
 ```
-For each year t ∈ {1950, ..., 2000}:
-  1. Collect predictions: {ẑ_t^(s)}_{s=1}^{21}
-  2. Compute anomaly ratio: r_t = (# stations predicting anomaly) / 21
-  3. Classify: ŷ_t = 1 if r_t > τ, else 0
+┌───────────────────────────────────────────────────────────────┐
+│                    ENSEMBLE WORKFLOW                           │
+└───────────────────────────────────────────────────────────────┘
+
+Step 1: Individual Station Predictions
+───────────────────────────────────────
+For each station s ∈ {1,...,21}:
+  Train HMM → Decode states → {ẑ_t^(s)}_{t=1}^{51}
+
+Step 2: Ranking and Selection
+──────────────────────────────
+Evaluate each station on validation set
+→ Compute F1-scores → Rank stations
+→ Select Top K stations (K=14 optimal)
+
+Step 3: Majority Voting
+────────────────────────
+For each year t ∈ {1,...,51}:
+  Collect votes: V_t = {ẑ_t^(s)}_{s ∈ TopK}
+  Compute anomaly ratio: r_t = (# anomaly votes) / K
+  
+  Decision rule:
+  ŷ_t = { 1 (anomaly)  if r_t > τ
+        { 0 (normal)   if r_t ≤ τ
+  
+  where τ = 0.40 (40% threshold, optimized)
+
+Step 4: Validation
+──────────────────
+Compare {ŷ_t} with ground truth ONI
+→ Compute metrics (F1, precision, recall, accuracy)
 ```
 
-**Threshold Optimization**:
-- Evaluated τ ∈ {0.30, 0.35, 0.40, 0.45, 0.50, 0.60}
-- Selected τ* = 0.40 (40%) based on F1-score maximization
-- Rationale: Balances precision (avoiding false alarms) and recall (catching all events)
-
-**Station Selection**: Top 14 (by individual F1-scores)
-- Outperforms Top 10 (insufficient coverage) and All 21 (includes noisy stations)
-- Geographic diversity maintained: 3 Japan, 3 Australia, 4 Mexico, 2 USA, 2 Peru
+**Rationale for Ensemble**:
+- Reduces local noise and measurement errors
+- Averages out geographic biases
+- Improves robustness across different ENSO event types
+- Provides implicit confidence estimate (voting ratio)
 
 ---
 
-## Experimental Results
+## Experimental Design
+
+### Evaluation Framework
+
+```
+┌───────────────────────────────────────────────────────────────┐
+│                   EXPERIMENTAL WORKFLOW                        │
+└───────────────────────────────────────────────────────────────┘
+
+┌─────────────────┐
+│ Ground Truth    │  NOAA Oceanic Niño Index (ONI)
+│ (ONI Data)      │  • 1950-2000: 51 years
+└─────────────────┘  • 35 anomaly years (68.6%)
+        │            • 16 normal years (31.4%)
+        │
+        ├──────────────────────────────────────┐
+        │                                      │
+        ▼                                      ▼
+┌─────────────────┐                  ┌─────────────────┐
+│ Main Experiment │                  │ Baseline Models │
+│   (HMM)         │                  │                 │
+│                 │                  │ • Independent   │
+│ • Train on all  │                  │   Mixture       │
+│   21 stations   │                  │ • K-Means       │
+│ • Individual    │                  │ • GMM           │
+│   predictions   │                  │                 │
+│ • Ensemble      │                  │ Same evaluation │
+│   aggregation   │                  │ protocol        │
+└─────────────────┘                  └─────────────────┘
+        │                                      │
+        └──────────────┬───────────────────────┘
+                       ▼
+              ┌─────────────────┐
+              │ Performance     │
+              │ Metrics         │
+              │                 │
+              │ • F1-Score      │
+              │ • Precision     │
+              │ • Recall        │
+              │ • Accuracy      │
+              └─────────────────┘
+                       │
+                       ▼
+              ┌─────────────────┐
+              │ Ablation        │
+              │ Studies         │
+              │                 │
+              │ • Feature       │
+              │   Importance    │
+              │ • K Selection   │
+              │ • Temporal      │
+              │   Dependencies  │
+              │ • Threshold     │
+              │   Sensitivity   │
+              └─────────────────┘
+```
+
+### Baseline Comparisons
+
+**Purpose**: Validate HMM design choices through controlled comparisons
+
+**Baseline 1: Independent Mixture Model**
+- **Design**: Same emission structure as HMM, but A = Identity matrix
+- **Purpose**: Isolate contribution of temporal dependencies
+- **Expected**: HMM should outperform (temporal structure adds value)
+
+**Baseline 2: K-Means Clustering**
+- **Design**: Unsupervised clustering on 12-dimensional feature space
+- **Purpose**: Test benefit of probabilistic framework vs. hard clustering
+- **Expected**: HMM should outperform (soft assignments, temporal smoothing)
+
+**Baseline 3: Gaussian Mixture Model**
+- **Design**: GMM on continuous (non-discretized) features
+- **Purpose**: Validate discretization choice
+- **Expected**: HMM (discrete) may outperform if climate states are better captured by discrete regimes
+
+### Ablation Studies
+
+**Study 1: Feature Importance**
+
+```
+Experimental Design:
+─────────────────────
+Full Model (all 12 features) → Baseline F1
+
+Remove each group separately:
+  • Without Temperature (9 features)
+  • Without Atmospheric (10 features)
+  • Without Precipitation (10 features)
+  • Without Weather Events (6 features)
+
+Measure: ΔF1 = F1_baseline - F1_without_group
+
+Interpretation:
+  Larger ΔF1 → More important feature group
+```
+
+**Study 2: Number of Hidden States**
+
+```
+Experimental Design:
+─────────────────────
+Train models with K ∈ {2, 3, 4, 5, 6, 7, 8}
+
+For each K:
+  • Compute BIC(K)
+  • Measure F1 score on validation
+
+Compare:
+  • BIC preference (statistical criterion)
+  • F1 performance (task-specific criterion)
+
+Validate: Do BIC and F1 agree on optimal K?
+```
+
+**Study 3: Temporal Dependencies**
+
+```
+Experimental Design:
+─────────────────────
+Model A: Full HMM (temporal dependencies)
+  → Forward-Backward uses α_t and β_t
+
+Model B: Independent Model (no temporal)
+  → Classification: argmax_k p(x_t | z_t=k)
+
+Compare:
+  • Individual station F1
+  • Ensemble F1
+  • State sequence coherence
+
+Interpretation:
+  Performance gap quantifies value of temporal modeling
+```
+
+**Study 4: Decoding Algorithm**
+
+```
+Experimental Design:
+─────────────────────
+Same trained HMM, different decoding:
+
+Method A: Viterbi Decoding
+  ẑ_{1:T} = argmax p(z_{1:T} | x_{1:T})
+
+Method B: Posterior Marginal Decoding
+  ẑ_t = argmax_k p(z_t=k | x_{1:T})
+
+Compare F1 scores
+
+Expected: Minimal difference for K=2 with high persistence
+```
+
+**Study 5: Ensemble Threshold Sensitivity**
+
+```
+Experimental Design:
+─────────────────────
+Fixed: Top 14 stations
+
+Vary threshold: τ ∈ {0.30, 0.35, 0.40, 0.45, 0.50, 0.60}
+
+For each τ:
+  Classify year as anomaly if voting ratio > τ
+  Compute F1, precision, recall
+
+Analyze trade-off:
+  Lower τ → Higher recall, lower precision
+  Higher τ → Lower recall, higher precision
+
+Select τ* that maximizes F1
+```
 
 ### Evaluation Metrics
 
-**Primary Metric**: F1-Score (harmonic mean of precision and recall)
+**Primary Metric: F1-Score**
 ```
-F1 = 2 · (Precision · Recall) / (Precision + Recall)
+F1 = 2 × (Precision × Recall) / (Precision + Recall)
 ```
+Harmonic mean balances precision and recall, appropriate for imbalanced classes.
 
 **Supporting Metrics**:
-- Accuracy: Overall correctness
-- Precision: p(True Anomaly | Predicted Anomaly)
-- Recall: p(Predicted Anomaly | True Anomaly)
-
-**Evaluation Period**: 1950-2000 (51 years, 35 anomaly years)
-
-### Individual Station Performance
-
-**Top 5 Stations** (by F1-score):
-
-| Rank | Station | Country | F1 | Precision | Recall | Accuracy |
-|------|---------|---------|-----|-----------|--------|----------|
-| 1 | Tokyo Intl | Japan | 0.811 | 0.778 | 0.875 | 76.5% |
-| 2 | Osaka Intl | Japan | 0.791 | 0.759 | 0.846 | 74.5% |
-| 3 | Broome Intl | Australia | 0.778 | 0.800 | 0.800 | 74.5% |
-| 4 | Naha | Japan | 0.765 | 0.741 | 0.800 | 72.5% |
-| 5 | Ceduna | Australia | 0.753 | 0.714 | 0.800 | 70.6% |
-
-**Geographic Pattern**: Top performers cluster in Pacific Rim (Japan, Australia), consistent with ENSO teleconnections.
-
-### Ensemble Performance
-
-**Optimal Configuration**: Top 14 stations, 40% threshold
-
-| Metric | Value | Interpretation |
-|--------|-------|----------------|
-| **F1-Score** | **0.824** | Excellent balance |
-| Accuracy | 72.5% | 37/51 years correct |
-| Precision | 76.9% | 3 out of 4 predictions correct |
-| Recall | 88.6% | Catches 31/35 ENSO events |
+```
+Accuracy = (TP + TN) / (TP + TN + FP + FN)
+Precision = TP / (TP + FP)
+Recall = TP / (TP + FN)
+```
 
 **Confusion Matrix**:
 ```
                  Predicted Normal    Predicted Anomaly
-Actual Normal           9                   7
-Actual Anomaly          4                  31
+Actual Normal          TN                   FP
+Actual Anomaly         FN                   TP
 ```
 
-**Error Analysis**:
-- False Negatives (4): Missed 1964, 1968, 1976, 1979 (all weak El Niño years)
-- False Positives (7): 1959, 1961, 1962, 1966, 1967, 1980, 1989 (borderline ONI values)
-
-**Key Achievement**: 88.6% recall means ensemble rarely misses ENSO events (critical for early warning).
+**Interpretation**:
+- **High Recall**: Critical for early warning (avoid missing ENSO events)
+- **High Precision**: Reduces false alarms (operational credibility)
+- **F1-Score**: Overall balance for scientific evaluation
 
 ---
 
-## Comparison with Baseline Models
+## Implementation Details
 
-### Baseline Selection
+### Software Architecture
 
-**1. Independent Mixture Model** (No Temporal Dependencies)
-- Identical emission structure as HMM
-- Identity transition matrix: A = I
-- Each year classified independently
-
-**2. K-Means Clustering** (Unsupervised, No Temporal)
-- K=2 clusters on 12-dimensional feature space
-- Assign cluster labels to match ENSO majority
-
-**3. Gaussian Mixture Model** (Continuous Observations)
-- K=2 Gaussians on continuous features (no discretization)
-- Diagonal covariance (feature independence)
-
-### Comparative Results
-
-| Model | Avg Station F1 | Ensemble F1 | Key Advantage |
-|-------|----------------|-------------|---------------|
-| **HMM (Ours)** | **0.612** | **0.824** | Temporal smoothing, learned dynamics |
-| Independent Mixture | 0.597 | 0.789 | Same emissions, no temporal info |
-| K-Means | 0.523 | 0.712 | Fast, interpretable |
-| GMM (Continuous) | 0.541 | 0.698 | No discretization loss |
-
-**Analysis**:
-1. **Temporal Modeling Matters**: HMM outperforms Independent Mixture by 3.5% F1, validating Markov structure
-2. **Discretization Justified**: HMM (discrete) beats GMM (continuous) by 12.6%, suggesting categorical framework better captures climate regimes
-3. **Ensemble Amplifies Gains**: HMM advantage grows from 1.5% (individual) to 3.5% (ensemble), showing temporal consistency improves aggregation
-
-### Why HMM Succeeds
-
-**Temporal Smoothing**: Forward-backward algorithm leverages past and future context
 ```
-p(z_t | X) ∝ [past evidence] × [current observation] × [future confirmation]
+Weather-HMM-Co-Repo/
+│
+├── data/                          # Data Module
+│   ├── dataloader2.py            # Main preprocessing pipeline
+│   ├── download.py               # GSOD data acquisition
+│   ├── searcher.py               # Station filtering
+│   └── processed/                # Output directory
+│
+├── Weather-HMM-Co-Repo-HMM/      # HMM Module (separate branch)
+│   └── Categorical_HMM/
+│       ├── Categorical_HMM.py    # Core HMM implementation
+│       ├── evaluate_enso_f1.py   # Performance evaluation
+│       ├── ensemble/             # Ensemble system
+│       │   ├── ensemble_voting_enso.py
+│       │   └── README.md
+│       ├── ablation/             # Ablation studies
+│       │   ├── feature_ablation.py
+│       │   ├── temporal_ablation.py
+│       │   └── ABLATION_SUMMARY.md
+│       └── comparison/           # Baseline comparisons
+│           ├── generate_independent_ensemble.py
+│           └── visualize_model_comparison.py
+│
+└── PROJECT_README.md             # This document
 ```
 
-**State Persistence**: High transition probabilities (95%) provide strong priors, reducing sensitivity to noisy individual observations.
+### Key Implementation Classes
 
-**Physical Plausibility**: Penalizes rapid state alternations (0-1-0-1), which are inconsistent with multi-year ENSO cycles.
+**1. GSODDataLoader** (`data/dataloader2.py`)
+```python
+class GSODDataLoader:
+    """Main data preprocessing pipeline"""
+    
+    def __init__(self, n_bins=10, discretize=True, 
+                 time_aggregation='yearly', detrend=True):
+        # Initialize preprocessing parameters
+    
+    def load_station_metadata(self):
+        # Load and filter station list
+    
+    def process_year_data(self, year):
+        # Extract and parse data for given year
+    
+    def ensure_complete_time_series(self, df):
+        # Fill missing years with intelligent imputation
+    
+    def detrend_data(self, df):
+        # Remove long-term trends
+    
+    def normalize_and_discretize(self, df):
+        # Discretize continuous features
+    
+    def save_processed_data(self, df, filename):
+        # Export to CSV
+```
 
----
+**2. FactorizedCategoricalHMM** (`Categorical_HMM/Categorical_HMM.py`)
+```python
+class FactorizedCategoricalHMM:
+    """Factorized Categorical HMM implementation"""
+    
+    def __init__(self, n_states=2, n_features=12, n_categories=10):
+        # Initialize model structure
+    
+    def initialize_parameters(self):
+        # Random initialization for EM
+    
+    def forward_pass(self, X):
+        # Compute forward probabilities (α)
+    
+    def backward_pass(self, X):
+        # Compute backward probabilities (β)
+    
+    def compute_posteriors(self, X):
+        # Compute γ_t(k) and ξ_t(i,j)
+    
+    def m_step(self, X, gamma, xi):
+        # Update parameters (π, A, B)
+    
+    def fit(self, X, max_iter=100, tol=1e-3):
+        # EM algorithm main loop
+    
+    def decode(self, X, method='posterior'):
+        # Posterior marginal or Viterbi decoding
+    
+    def compute_bic(self, X):
+        # Calculate BIC for model selection
+```
 
-## Ablation Studies
+**3. EnsembleVoting** (`ensemble/ensemble_voting_enso.py`)
+```python
+class EnsembleVoting:
+    """Majority voting across stations"""
+    
+    def __init__(self, threshold=0.40):
+        # Set voting threshold
+    
+    def load_station_predictions(self, station_ids):
+        # Load individual HMM predictions
+    
+    def rank_stations_by_f1(self):
+        # Evaluate and rank stations
+    
+    def select_top_k(self, k=14):
+        # Select best performing stations
+    
+    def aggregate_votes(self, year):
+        # Compute voting ratio for given year
+    
+    def classify(self, voting_ratio):
+        # Apply threshold decision rule
+    
+    def evaluate_performance(self, predictions, ground_truth):
+        # Compute metrics
+```
 
-### Experiment 1: Feature Importance
+### Computational Specifications
 
-**Method**: Remove feature groups, measure F1 degradation
+**Training Complexity**:
+- Per station: O(K^2 × T × F × I) where I = EM iterations
+- For K=2, T=51, F=12, I≈30: ~36,720 operations
+- Total (21 stations): ~15 minutes on standard CPU
 
-**Results**:
+**Memory Requirements**:
+- Forward/Backward arrays: 2 × K × T × 8 bytes ≈ 1.6 KB per station
+- Parameter storage: (K^2 + K×F×V) × 8 bytes ≈ 17.5 KB
+- Data: 21 × 51 × 12 × 4 bytes ≈ 51 KB
+- Total: < 1 MB (very efficient)
 
-| Configuration | Features | F1 | ΔF1 (vs. All) | Importance Rank |
-|---------------|----------|-----|---------------|-----------------|
-| **All Features** | 12 | **0.612** | -- | -- |
-| Without Atmospheric | 10 | 0.389 | -0.223 | **1st (Critical)** |
-| Without Temperature | 9 | 0.467 | -0.145 | 2nd |
-| Without Precipitation | 10 | 0.522 | -0.090 | 3rd |
-| Without Weather Events | 6 | 0.541 | -0.071 | 4th |
-| **Only Atmospheric** | 2 | **0.556** | -0.056 | Best standalone |
+**Numerical Stability**:
+- All forward-backward computations in log-space
+- Log-sum-exp trick: log(Σ exp(a_i)) = a_max + log(Σ exp(a_i - a_max))
+- Prevents underflow for long sequences
 
-**Key Findings**:
+### Technology Stack
 
-1. **Atmospheric Features Dominate**: Sea level pressure + wind speed alone achieve 91% of full model performance
-   - Physical basis: ENSO fundamentally involves Walker circulation (atmospheric pressure gradient)
-   - Trade winds (wind speed) directly respond to ENSO state
+**Core Libraries**:
+- **NumPy** 1.21+: Numerical computations, matrix operations
+- **Pandas** 1.3+: Data manipulation, CSV I/O
+- **scikit-learn** 1.0+: Evaluation metrics, baseline models
+- **Matplotlib/Seaborn**: Visualization
 
-2. **Temperature Secondary**: 23.7% performance drop when removed
-   - Indirect ENSO signal (mediated by ocean-atmosphere heat exchange)
-   - High seasonal noise masks interannual variability
+**Development Tools**:
+- **Python** 3.8+
+- **Git**: Version control
+- **Jupyter**: Exploratory analysis
+- **pytest**: Unit testing (inference algorithms)
 
-3. **Feature Complementarity**: All groups together beat any single group (11% gain over atmospheric alone)
-   - Different features capture different aspects of ENSO teleconnections
-   - Redundancy provides robustness to measurement errors
-
-**Recommendation**: Minimal model (atmospheric only) for resource-constrained settings; full model for maximum accuracy.
-
-### Experiment 2: Number of Hidden States (K)
-
-**Method**: Train HMMs with K ∈ {2, 3, 4, 5}, compare BIC and F1
-
-**Results**:
-
-| K | BIC (avg) | F1 (ensemble) | Stations Selecting K |
-|---|-----------|---------------|----------------------|
-| **2** | **8,245** | **0.824** | **21 (100%)** |
-| 3 | 8,412 | 0.801 | 0 (0%) |
-| 4 | 8,589 | 0.779 | 0 (0%) |
-| 5 | 8,734 | 0.756 | 0 (0%) |
-
-**Analysis**:
-- BIC strongly favors K=2 (complexity penalty outweighs fit improvement for K>2)
-- F1 deteriorates with K>2 (overfitting, parameter dilution)
-- Universal consensus across geographic diversity validates binary regime hypothesis
-
-**Physical Interpretation**: At yearly resolution with binary ENSO classification, two states suffice to capture "normal" vs. "anomalous" climate.
-
-### Experiment 3: Decoding Algorithm
-
-**Method**: Compare Viterbi decoding vs. Posterior Marginal decoding
-
-**Results**:
-
-| Decoding Method | Ensemble F1 | Avg Stations Differing | Rationale |
-|-----------------|-------------|------------------------|-----------|
-| **Posterior Marginal** | **0.824** | -- | Minimizes expected errors |
-| Viterbi Path | 0.821 | 1.3 stations/year | Finds single most-likely path |
-
-**Difference**: Only 0.3% F1 difference (not statistically significant)
-
-**Explanation**: With K=2 and high persistence (95%), most probable path ≈ most probable states at each time
-- Viterbi advantage (global coherence) minimal when transitions rare
-- Posterior marginal preferred for interpretability (provides state probabilities)
-
-### Experiment 4: Ensemble Threshold Sensitivity
-
-**Method**: Vary voting threshold τ ∈ {0.30, 0.35, 0.40, 0.45, 0.50, 0.60}
-
-**Results**:
-
-| Threshold (τ) | F1 | Precision | Recall | Missed Events |
-|---------------|-----|-----------|--------|---------------|
-| 30% | 0.819 | 0.733 | 0.943 | 2 |
-| 35% | 0.819 | 0.759 | 0.914 | 3 |
-| **40%** | **0.824** | **0.769** | **0.886** | **4** |
-| 45% | 0.807 | 0.788 | 0.829 | 6 |
-| 50% | 0.782 | 0.821 | 0.743 | 9 |
-| 60% | 0.721 | 0.867 | 0.629 | 13 |
-
-**Trade-off**:
-- Lower τ: Higher recall (fewer missed events), lower precision (more false alarms)
-- Higher τ: Higher precision, lower recall
-
-**Optimal**: τ = 0.40 balances precision and recall (maximizes F1)
-
-**Operational Consideration**: For disaster preparedness (high cost of missing events), could use τ = 0.35 (91.4% recall).
-
----
-
-## Discussion
-
-### Quantitative Summary
-
-**Model Performance**:
-- Individual station F1: 0.612 (average), 0.811 (best)
-- Ensemble F1: 0.824 (+21.2% vs. average station, +1.3% vs. best station)
-- Recall: 88.6% (misses only 4 out of 35 ENSO events)
-- Precision: 76.9% (3 out of 4 predictions correct)
-
-**Comparison with Baselines**:
-- HMM vs. Independent Mixture: +3.5% F1 (temporal modeling value)
-- HMM vs. K-Means: +11.2% F1 (probabilistic framework value)
-- HMM vs. GMM: +12.6% F1 (discretization + temporal structure value)
-
-**Feature Importance**:
-- Atmospheric features: 91% of full model performance alone
-- Temperature: 23.7% performance drop when removed
-- Precipitation + Events: 14.5% combined contribution
-
-### Qualitative Insights
-
-**1. Unsupervised Learning Discovers Physical Structure**
-- HMM autonomously identifies two climate states highly correlated with ENSO (F1 = 0.824)
-- Learned transitions (95% persistence) match known ENSO timescales without supervision
-- Geographic patterns (Pacific Rim outperforms) align with teleconnection theory
-
-**2. Factorization Assumption is Reasonable**
-- Despite feature correlations (e.g., temperature-precipitation coupling), conditional independence given climate state is effective
-- Feature groups provide complementary information (not redundant)
-- Physical interpretation: Hidden state captures large-scale circulation; features are local manifestations
-
-**3. Temporal Modeling Provides Consistent Gains**
-- 3.5% F1 improvement over independent classification (across all metrics)
-- Larger gains (12.5% accuracy) when transitional years are considered
-- Value increases with ensemble aggregation (temporal consistency aids voting)
-
-**4. Ensemble Robustness Critical**
-- Single station F1: 0.612 → Ensemble F1: 0.824 (+21.2%)
-- Reduces local noise, geographic biases, measurement errors
-- Optimal configuration (Top 14, τ=0.40) balances quality and coverage
-
-### Limitations and Challenges
-
-**1. Binary Classification Constraint**
-- Cannot distinguish El Niño from La Niña (both classified as "anomaly")
-- Limits utility for applications requiring polarity (e.g., drought vs. flood risk)
-- Requires K=3 model or semi-supervised approach
-
-**2. Yearly Temporal Resolution**
-- Misses sub-annual dynamics (ENSO onset, termination, rapid transitions)
-- Cannot capture seasonal variations in ENSO impacts
-- Monthly resolution could improve performance but increases data sparsity
-
-**3. Conditional Independence Assumption**
-- Ignores feature correlations given state (e.g., temperature-precipitation coupling)
-- May miss synergistic effects of multiple variables
-- Trade-off: Computational tractability vs. modeling fidelity
-
-**4. Limited Spatial Coverage**
-- Only 21 stations (data quality constraints)
-- Underrepresents tropics, Africa, South America interior
-- May miss regional ENSO manifestations
-
-**5. Stationarity Assumption**
-- Fixed transition probabilities cannot adapt to climate change
-- May not capture potential shifts in ENSO behavior over time
-- 51-year window mitigates but doesn't eliminate non-stationarity
-
-### Open Questions
-
-1. **Why do some normal years get misclassified?**
-   - Borderline ONI values (near ±0.5°C threshold)
-   - Regional climate anomalies not reflected in equatorial Pacific SST
-   - Interactions with other climate modes (IOD, SAM, PDO)
-
-2. **Why does atmospheric pressure dominate?**
-   - Direct reflection of Walker circulation changes
-   - Immediate response (vs. delayed temperature/precipitation impacts)
-   - More spatially coherent signal across Pacific basin
-
-3. **Can we improve beyond 82.4% F1?**
-   - Monthly resolution: Expected +5-10% F1 (stronger temporal autocorrelation)
-   - Three-state model (El Niño/La Niña/Normal): Better phenotype matching
-   - Spatial coupling: Model dependencies between nearby stations
-   - Semi-supervised learning: Incorporate partial ONI labels
+**Reproducibility**:
+- Random seed setting for initialization
+- Parameter logging (all hyperparameters saved)
+- Version pinning (requirements.txt)
 
 ---
 
-## Conclusions
+## Results Summary
 
-### Key Findings
+### Main Findings
 
-1. **Feasibility Demonstrated**: Land-based meteorological observations can reliably detect ENSO events (F1 = 0.824) without direct ocean measurements
+Our systematic experimental methodology yielded several key insights:
 
-2. **Probabilistic Framework Validated**: HMMs with carefully chosen independence assumptions outperform simpler alternatives by 3.5-12.6% F1
+**1. Unsupervised Discovery of Climate States**
+- HMM autonomously identifies latent states highly correlated with ENSO
+- 100% of stations converge to K=2 (binary regime consensus)
+- Learned transition matrices exhibit high persistence (>90%), consistent with ENSO timescales
 
-3. **Physical Alignment**: Unsupervised learning discovers climate states and temporal dynamics consistent with known ENSO physics
-   - Two-state consensus across all stations
-   - 95% state persistence matches multi-year ENSO cycles
-   - Geographic performance patterns align with teleconnections
+**2. Feature Importance Hierarchy**
+- Atmospheric features (pressure, wind) dominate: ~91% of full performance alone
+- Temperature features are secondary: ~76% performance when removed
+- Precipitation and weather events are supplementary: ~15% combined contribution
+- Validates ENSO as primarily atmospheric circulation phenomenon
 
-4. **Feature Hierarchy Established**: Atmospheric pressure and wind speed provide 91% of predictive power, validating ENSO as atmosphere-ocean coupled phenomenon
+**3. Temporal Modeling Value**
+- HMM outperforms Independent Mixture by ~3-5% F1
+- Benefit primarily from temporal smoothing and state persistence priors
+- Larger gains for stations with moderate ENSO signal strength
 
-5. **Ensemble Robustness**: Majority voting across 14 stations improves F1 by 21.2% over average individual station (0.824 vs. 0.612)
+**4. Ensemble Robustness**
+- Aggregating Top 14 stations improves performance significantly over individuals
+- 40% voting threshold provides optimal precision-recall balance
+- Geographic diversity in top stations validates teleconnection patterns
 
-### Model Performance Summary
+**5. Model Validation**
+- HMM outperforms all baseline models (K-Means, GMM, Independent)
+- Ablation studies confirm all design choices are justified
+- High recall achieved: rarely misses ENSO events
 
-**Strengths**:
-- High recall (88.6%): Catches nearly all ENSO events
-- Acceptable precision (76.9%): Three out of four predictions correct
-- Computational efficiency: Trains in minutes, suitable for operational use
-- Interpretability: Clear physical mapping (states → climate regimes)
+### Performance Characteristics
 
-**Limitations**:
-- Binary classification only (no El Niño vs. La Niña distinction)
-- Yearly resolution misses sub-annual dynamics
-- Limited spatial coverage (21 stations)
-- 7 false positives among 16 normal years
+**Model Strengths**:
+- ✅ High detection rate (catches most ENSO events)
+- ✅ Computationally efficient (trains in minutes)
+- ✅ Interpretable (clear physical state mapping)
+- ✅ Robust (ensemble aggregation reduces noise)
+
+**Model Limitations**:
+- ❌ Binary classification only (cannot distinguish El Niño from La Niña)
+- ❌ Yearly resolution (misses sub-annual dynamics)
+- ❌ Some false positives (borderline normal years misclassified)
+- ❌ Limited spatial coverage (21 stations)
+
+---
+
+## Conclusions and Future Work
+
+### Key Contributions
+
+This project demonstrates that:
+
+1. **Land-based observations suffice** for ENSO detection through careful probabilistic modeling
+2. **Independence assumptions are reasonable** when properly justified and validated through ablations
+3. **Temporal structure matters** but requires careful formulation (first-order Markov is sufficient)
+4. **Ensemble methods** dramatically improve robustness over individual predictions
+5. **Unsupervised learning can discover** physically meaningful climate patterns
+
+### Modeling Insights
+
+**What We Learned About Independence Assumptions**:
+- Conditional independence (given hidden state) is a reasonable approximation for feature factorization
+- First-order Markov property captures essential temporal dynamics at yearly resolution
+- Stationarity assumption holds for 51-year window but may not extend to climate change scenarios
+
+**What We Learned About ENSO**:
+- Atmospheric variables (pressure, wind) provide strongest land-based ENSO signal
+- Pacific Rim stations show strongest correlation (validates teleconnection theory)
+- Binary regime (normal vs. anomaly) suffices for yearly detection
+- ENSO exhibits strong year-to-year persistence in land-based observations
 
 ### Proposed Extensions
 
 **Near-Term Improvements**:
-1. **Three-State Model**: Distinguish El Niño, La Niña, Normal using temperature anomaly signs or semi-supervised learning
-2. **Monthly Resolution**: Capture sub-annual dynamics, expected +5-10% F1 gain
-3. **Hierarchical Features**: Compute physically-motivated derived variables (pressure gradient, wind stress curl)
-4. **Expanded Station Network**: Increase spatial coverage with relaxed quality criteria
+1. **Three-State Model**: Extend to K=3 to distinguish El Niño from La Niña
+2. **Monthly Resolution**: Capture sub-annual dynamics and event transitions
+3. **Feature Engineering**: Compute physically-motivated derived variables (pressure gradients, wind stress)
+4. **Spatial Coupling**: Model dependencies between nearby stations (factorial HMMs)
 
 **Methodological Advances**:
-1. **Relaxed Independence**: Structured emissions (chained graphical models) for coupled features
+1. **Relaxed Independence**: Structured emissions (e.g., chained graphical models for temperature-precipitation coupling)
 2. **Semi-Markov Models**: Explicit duration distributions for non-geometric state lifetimes
-3. **Spatial Coupling**: Factorial HMMs modeling dependencies between nearby stations
-4. **Time-Varying Parameters**: Adapt to climate change with online learning or change-point detection
+3. **Time-Varying Parameters**: Adapt to climate change with online learning
+4. **Bayesian Inference**: Full posterior over parameters for uncertainty quantification
 
 **Application Extensions**:
-1. **Forecasting**: Multi-step-ahead prediction using learned transition dynamics
-2. **Impact Assessment**: Link hidden states to agricultural yields, disease outbreaks, extreme events
-3. **Other Climate Modes**: Apply framework to IOD, NAO, MJO, AO
-4. **Operational Deployment**: Real-time monitoring dashboard with automated alerts
+1. **Operational Forecasting**: Multi-step-ahead prediction using learned transitions
+2. **Other Climate Modes**: Apply to IOD, NAO, MJO, AO
+3. **Impact Assessment**: Link states to agricultural yields, extreme events
+4. **Real-Time Monitoring**: Deploy as operational dashboard with automated alerts
 
 ### Final Remarks
 
-This project demonstrates that **sophisticated probabilistic modeling can extract meaningful climate patterns from standard meteorological observations**, opening possibilities for ENSO monitoring in regions lacking oceanographic infrastructure. The high recall (88.6%) validates potential for operational early warning systems.
+This project successfully demonstrates that sophisticated probabilistic modeling with carefully justified independence assumptions can extract meaningful patterns from complex climate data. The key to success lies in:
 
-Key success factors:
-- Careful data preprocessing (complete time series, detrending, discretization)
-- Well-justified independence assumptions (conditional feature independence, first-order Markov)
-- Automatic model selection via BIC (universal K=2 consensus)
-- Ensemble aggregation (21.2% F1 improvement)
-- Rigorous ablation analysis (validates all design choices)
+- **Rigorous formulation** of modeling assumptions with physical justification
+- **Systematic validation** through ablation studies and baseline comparisons
+- **Clear interpretation** of learned parameters and their physical meaning
+- **Honest assessment** of limitations and appropriate scope
 
-The finding that atmospheric features alone achieve 91% of full performance validates ENSO as fundamentally an atmosphere-ocean coupled phenomenon, while the universal convergence to K=2 provides strong evidence for a binary climate regime at ENSO-sensitive land locations.
+By emphasizing principled probabilistic reasoning over raw predictive performance, we developed a framework that is not only effective but also interpretable and extensible.
 
 ---
 
@@ -797,71 +1038,23 @@ The finding that atmospheric features alone achieve 91% of full performance vali
 This project utilized artificial intelligence tools for specific development tasks:
 
 **Tools Used**:
-- **Claude Sonnet 4.5** (Anthropic): Primary assistant for code development, debugging, and documentation
-- **GPT-4o** (OpenAI): Secondary consultation for specific algorithm implementations
+- **Claude Sonnet 4.5** (Anthropic): Primary assistant
+- **GPT-4o** (OpenAI): Secondary consultation
 
 **Specific Applications**:
-1. **Code Development**:
-   - Initial HMM implementation structure and forward-backward algorithm
-   - Data preprocessing pipeline design
-   - Ensemble voting system logic
-
-2. **Debugging Assistance**:
-   - Numerical stability issues (log-space computation)
-   - EM convergence problems (Laplace smoothing)
-   - Edge case handling (missing data, zero probabilities)
-
-3. **Visualization**:
-   - Matplotlib plotting code for performance comparisons
-   - Confusion matrix visualization
-   - Time series plotting
-
-4. **Documentation**:
-   - LaTeX formatting assistance
-   - Mathematical notation verification
-   - README structure and organization
+1. **Code Development**: HMM implementation structure, forward-backward algorithm, EM optimization
+2. **Debugging**: Numerical stability issues (log-space), convergence problems
+3. **Visualization**: Matplotlib plotting code for workflows and results
+4. **Documentation**: LaTeX formatting, mathematical notation, README organization
 
 **Human Contributions**:
 - All modeling decisions and independence assumptions
-- Experimental design and ablation study protocols
-- Physical interpretation and validation
+- Physical interpretations and validations
+- Experimental design and ablation protocols
 - Critical analysis and conclusions
 - Final code review and correctness verification
 
-All AI-generated content was carefully reviewed, validated, and often substantially modified to ensure correctness and alignment with project requirements.
-
----
-
-## Repository Structure
-
-```
-Weather-HMM-Co-Repo/
-├── data/                           # Data processing module
-│   ├── dataloader2.py             # Main preprocessing pipeline
-│   ├── download.py                # GSOD dataset download script
-│   ├── searcher.py                # Station filtering utilities
-│   ├── README.md                  # Data module documentation
-│   ├── QUICK_START.md             # Quick usage guide
-│   └── processed/                 # Output directory for cleaned data
-│       └── normalization_info.txt # Discretization parameters
-│
-├── Weather-HMM-Co-Repo-HMM/       # HMM module (separate branch)
-│   └── Categorical_HMM/
-│       ├── Categorical_HMM.py     # Main HMM implementation
-│       ├── evaluate_enso_f1.py    # Performance evaluation
-│       ├── ensemble/              # Ensemble voting system
-│       │   ├── ensemble_voting_enso.py
-│       │   └── README.md
-│       ├── ablation/              # Ablation studies
-│       │   ├── feature_ablation.py
-│       │   ├── temporal_ablation.py
-│       │   └── ABLATION_SUMMARY.md
-│       └── README.md              # HMM module documentation
-│
-├── README.md                       # Main project overview
-├── PROJECT_README.md              # This file (comprehensive documentation)
-└── .gitignore                     # Git ignore patterns
-```
+All AI-generated content was carefully reviewed and validated.
 
 ---
 
@@ -877,7 +1070,7 @@ Weather-HMM-Co-Repo/
 
 5. Murphy, K. P. (2012). *Machine Learning: A Probabilistic Perspective*. MIT Press. (Chapters 17-18: Markov and Hidden Markov Models)
 
-6. Schwarz, G. (1978). Estimating the dimension of a model. *The Annals of Statistics*, 6(2), 461-464. (BIC criterion)
+6. Schwarz, G. (1978). Estimating the dimension of a model. *The Annals of Statistics*, 6(2), 461-464.
 
 7. NOAA Climate Prediction Center. Oceanic Niño Index (ONI). Retrieved from https://ggweather.com/enso/oni.htm
 
@@ -885,18 +1078,13 @@ Weather-HMM-Co-Repo/
 
 ## Acknowledgments
 
-- **Data Provider**: NOAA National Centers for Environmental Information (NCEI) for GSOD dataset
-- **Ground Truth**: NOAA Climate Prediction Center for ONI records
-- **Course Staff**: CSE 250A instructors for guidance on probabilistic modeling methods
-- **Computing Resources**: UC San Diego DSMLP cluster (data preprocessing)
+- **Data Provider**: NOAA National Centers for Environmental Information (NCEI)
+- **Ground Truth**: NOAA Climate Prediction Center (ONI records)
+- **Course Staff**: CSE 250A instructors for guidance on probabilistic modeling
+- **Computing**: UC San Diego resources
 
 ---
 
-## License
-
-This project is submitted as coursework for CSE 250A at UC San Diego. All rights reserved by the authors.
-
-For academic use: Citation and attribution required.
-For commercial use: Permission required from authors.
-
-
+**Last Updated**: November 2024  
+**Course**: CSE 250A - Probabilistic Reasoning and Learning  
+**Institution**: UC San Diego
