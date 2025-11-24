@@ -1,24 +1,25 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
-
+INPUT_CSV = "outputs/gmm_results.csv"
+OUTPUT_DIR = "outputs/plots/gmm_states_per_site"
 
 def plot_gmm_states_all_sites(
-    input_csv: str = "outputs/gmm_per_site_results.csv",
-    output_dir: str = "plots/gmm_states_per_site",
+    input_csv: str = INPUT_CSV,
+    output_dir: str = OUTPUT_DIR,
 ):
     # 1. 读数据
     df = pd.read_csv(input_csv)
 
     # 2. 处理日期
-    if "date" not in df.columns:
+    if "year" not in df.columns:
         raise ValueError("Input CSV must contain a 'date' column.")
     if "site_id" not in df.columns:
         raise ValueError("Input CSV must contain a 'site_id' column.")
-    if "pred_state" not in df.columns:
+    if "state" not in df.columns:
         raise ValueError("Input CSV must contain a 'pred_state' column.")
 
-    df["date"] = pd.to_datetime(df["date"])
+    df["year"] = pd.to_datetime(df["year"])
 
     # 3. 输出目录
     out_dir = Path(output_dir)
@@ -30,15 +31,15 @@ def plot_gmm_states_all_sites(
 
     for site in site_ids:
         g = df[df["site_id"] == site].copy()
-        g = g.sort_values("date")
+        g = g.sort_values("year")
 
         if g.empty:
             continue
 
         plt.figure(figsize=(10, 4))
-        plt.plot(g["date"], g["pred_state"], marker="o", linestyle="-")
-        plt.yticks(sorted(g["pred_state"].unique()))
-        plt.xlabel("Date")
+        plt.plot(g["year"], g["state"], marker="o", linestyle="-")
+        plt.yticks(sorted(g["state"].unique()))
+        plt.xlabel("year")
         plt.ylabel("GMM state")
         plt.title(f"GMM states over time, site {site}")
         plt.xticks(rotation=45)
@@ -57,6 +58,6 @@ def plot_gmm_states_all_sites(
 
 if __name__ == "__main__":
     plot_gmm_states_all_sites(
-        input_csv="outputs/gmm_per_site_results.csv",
-        output_dir="plots/gmm_states_per_site",
+        input_csv=INPUT_CSV,
+        output_dir=OUTPUT_DIR,
     )

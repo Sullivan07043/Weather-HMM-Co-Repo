@@ -4,11 +4,13 @@ from pathlib import Path
 from sklearn.preprocessing import StandardScaler
 from sklearn.mixture import GaussianMixture
 
+INPUT_CSV = "weather_1901_2019_yearly_detrend_adaptive_continuous.csv"
+OUTPUT_CSV = "gmm_results.csv"
 
 def run_gmm_per_site(
-    input_csv: str = "data/weather_1901_2019_yearly_detrend_adaptive_continuous.csv",
+    input_csv: str = INPUT_CSV,
     n_components: int = 2,
-    output_csv: str = "gmm_per_site_results.csv",
+    output_csv: str = OUTPUT_CSV,
 ):
     df = pd.read_csv(input_csv)
 
@@ -72,10 +74,10 @@ def run_gmm_per_site(
 
         g_res = g.copy()
 
-        # ---- 新增：生成 year 列 ----
+        # decode year
         g_res["year"] = pd.to_datetime(g_res["date"]).dt.year
 
-        # ---- 新增：重命名 pred_state → state ----
+
         g_res["state"] = labels
         g_res["model_name"] = f"gmm_{n_components_site}"
 
