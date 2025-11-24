@@ -3,7 +3,7 @@
 **Course**: CSE 250A - Probabilistic Reasoning and Learning  
 **Institution**: UC San Diego  
 **Project Type**: Final Course Project  
-**Academic Year**: 2024-2025
+**Academic Year**: 2025 FALL
 
 ---
 
@@ -1085,6 +1085,6 @@ All AI-generated content was carefully reviewed and validated.
 
 ---
 
-**Last Updated**: November 2024  
+**Last Updated**: November 2025 
 **Course**: CSE 250A - Probabilistic Reasoning and Learning  
 **Institution**: UC San Diego
