@@ -66,6 +66,28 @@ Categorical_HMM/
 │   ├── ensemble_voting_results.csv             # Year-by-year results
 │   ├── ensemble_voting_enso_analysis.png       # Analysis plots
 │   └── ensemble_voting_detailed_comparison.png # Detailed comparison
+├── comparison/                                  # Model comparison (HMM vs GMM vs PELT vs Independent)
+│   ├── README.md                               # Comparison documentation
+│   ├── ensemble_voting_results.csv             # HMM ensemble results
+│   ├── gmm_ensemble_voting_results.csv         # GMM ensemble results
+│   ├── PELT_enso_ensemble_results.csv          # PELT ensemble results
+│   ├── independent_ensemble_voting_results.csv # Independent classifier results
+│   ├── extract_independent_ensemble.py         # Generate independent predictions
+│   ├── visualize_model_comparison_v2.py        # Create comparison visualizations
+│   ├── figure1_performance_metrics.png         # Performance & confusion matrix
+│   ├── figure2_threshold_analysis.png          # F1-Score vs threshold
+│   ├── figure3_temporal_analysis.png           # Year-by-year detection timeline
+│   └── figure4_performance_summary.png         # Performance summary table
+├── ablation/                                    # Ablation studies
+│   ├── README.md                               # Ablation documentation
+│   ├── feature_ablation.py                     # Feature importance analysis
+│   ├── temporal_ablation.py                    # Temporal dependency analysis
+│   ├── run_all_ablations.py                    # Run all experiments
+│   ├── feature_ablation_results.csv            # Feature ablation results
+│   ├── temporal_ablation_results.csv           # Temporal ablation results
+│   ├── feature_ablation_analysis.png           # Feature importance visualization
+│   ├── temporal_ablation_analysis.png          # Temporal dependency visualization
+│   └── ABLATION_SUMMARY.md                     # Comprehensive ablation summary
 └── data/                                        # Data preprocessing
     ├── searcher.py                             # Station filtering
     ├── dataloader2.py                          # Data loading, cleaning & detrending
@@ -211,6 +233,46 @@ Actual: Anomaly          5                  16
 
 See `ensemble/README.md` for detailed ensemble voting analysis.
 
+## Model Comparison
+
+We compared four different approaches for ENSO detection using the same 21 stations and 1950-2000 time period:
+
+### Models Evaluated
+
+1. **HMM (Hidden Markov Model)** - Our factorized categorical HMM with temporal dependencies
+2. **GMM (Gaussian Mixture Model)** - Probabilistic clustering without temporal modeling
+3. **PELT (Pruned Exact Linear Time)** - Change point detection algorithm
+4. **Independent Classifier** - Mixture model without temporal dependencies (ablation baseline)
+
+### Comparison Results (50% Threshold, 1950-2000)
+
+| Model | F1-Score | Accuracy | Precision | Recall | Key Characteristic |
+|-------|----------|----------|-----------|--------|-------------------|
+| **HMM** | **0.6383** ⭐ | **0.6667** ⭐ | **0.5556** ⭐ | 0.7500 | Best overall performance |
+| **Independent** | 0.5231 | 0.3922 | 0.3778 | **0.8500** ⭐ | Highest recall, over-predicts |
+| **GMM** | 0.3404 | 0.3922 | 0.2963 | 0.4000 | Moderate performance |
+| **PELT** | 0.0000 | 0.6078 | 0.0000 | 0.0000 | Failed to detect anomalies |
+
+### Key Findings
+
+1. **HMM Outperforms All Baselines**
+   - Highest F1-Score (0.6383), Accuracy (66.67%), and Precision (55.56%)
+   - Best balance between detection and false positive control
+   - Temporal modeling provides clear advantage
+
+2. **Temporal Dependencies Matter**
+   - HMM (with temporal) vs Independent (without temporal): +22.0% F1 improvement
+   - Validates the importance of modeling state transitions
+   - Forward-backward algorithm effectively leverages sequence information
+
+3. **Model Characteristics**
+   - **HMM**: Balanced performance, suitable for most applications
+   - **Independent**: High recall (85%), use when missing events is costly
+   - **GMM**: Moderate performance, may need feature engineering
+   - **PELT**: Not suitable for gradual ENSO transitions
+
+See `comparison/README.md` for detailed model comparison analysis and visualizations.
+
 ## Usage
 
 ### Prerequisites
@@ -248,6 +310,19 @@ python plot_top10_f1.py
 cd ensemble
 python ensemble_voting_enso.py
 python plot_ensemble_voting.py
+```
+
+6. Run model comparison (HMM vs GMM vs PELT vs Independent):
+```bash
+cd comparison
+python extract_independent_ensemble.py  # Generate independent classifier results
+python visualize_model_comparison_v2.py  # Create comparison visualizations
+```
+
+7. Run ablation studies (feature importance & temporal dependencies):
+```bash
+cd ablation
+python run_all_ablations.py  # Run all ablation experiments
 ```
 
 ### Customizing the Model
@@ -372,6 +447,14 @@ This model can be used for:
 - NOAA Climate Prediction Center. Oceanic Niño Index (ONI). Retrieved from https://ggweather.com/enso/oni.htm
 
 ## Version History
+
+- **v3.3** (2025-11-24): Model comparison and ablation studies
+  - **Comparison**: Added comprehensive comparison with GMM, PELT, and Independent Classifier
+  - **Ablation**: Feature importance and temporal dependency analysis
+  - **Results**: HMM achieves best F1-Score (0.6383), outperforming all baselines
+  - **Findings**: Temporal dependencies provide +22% F1 improvement over independent model
+  - **Visualizations**: 4 high-quality comparison figures + 2 ablation analysis figures
+  - All experiments use 1950-2000 period with 21 stations
 
 - **v3.2** (2025-11-24): Viterbi decoding implementation
   - **Decoding**: Changed from posterior decoding to Viterbi algorithm
