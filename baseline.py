@@ -246,12 +246,9 @@ def load_enso_ground_truth(path):
     df = pd.read_csv(path)
 
     # Keep only relevant columns
-    df = df[["year", "enso_anomaly"]]
+    df = df[["year", "enso_type", "enso_anomaly"]]
 
-    # Ensure year is int
     df["year"] = df["year"].astype(int)
-
-    # Ensure anomaly is int: 0 or 1
     df["enso_anomaly"] = df["enso_anomaly"].astype(int)
 
     return df
@@ -335,7 +332,7 @@ def plot_site_predictions(site_id, df_site, gt_df, ax=None, title_prefix=""):
 #  PLOT MANY SITES (stacked vertically)
 # ============================================================
 
-def plot_all_sites(expanded_states, gt_df, max_sites=10):
+def plot_all_sites(expanded_states, gt_df, max_sites=21):
     site_list = expanded_states["site_id"].unique()[:max_sites]
 
     fig, axes = plt.subplots(
@@ -362,6 +359,69 @@ def plot_all_sites(expanded_states, gt_df, max_sites=10):
     fig.savefig("pelt_vs_gt.png", dpi=150, facecolor="white")
     plt.show()
 
+def compute_enso_ensemble(expanded_states, gt_df, total_sites=21):
+    """
+    Compute year-level ensemble ENSO predictions.
+    """
+
+    # 1. Aggregate per year
+    year_votes = (
+        expanded_states.groupby("year")["state"]
+        .agg(Anomaly_Votes="sum")
+        .reset_index()
+    )
+
+    year_votes["Total_Stations"] = total_sites
+    year_votes["Anomaly_Ratio"] = year_votes["Anomaly_Votes"] / total_sites
+
+    # 2. Merge with ground truth
+    merged = year_votes.merge(gt_df, on="year", how="left")
+
+    merged.rename(columns={
+        "year": "Year",
+        "enso_type": "ENSO_Type",
+        "enso_anomaly": "Ground_Truth"
+    }, inplace=True)
+
+    # 3. Ensemble thresholds
+    thresholds = [0.30, 0.35, 0.40, 0.45, 0.50, 0.55, 0.60]
+
+    for th in thresholds:
+        pct = int(th * 100)
+
+        pred_col = f"Ensemble_{pct}pct"
+        match_col = f"Match_{pct}pct"
+
+        merged[pred_col] = (merged["Anomaly_Ratio"] >= th).astype(int)
+        merged[match_col] = (merged[pred_col] == merged["Ground_Truth"]).astype(int)
+
+    # 4. Reorder columns
+    ordered_cols = [
+        "Year",
+        "ENSO_Type",
+        "Ground_Truth",
+        "Total_Stations",
+        "Anomaly_Votes",
+        "Anomaly_Ratio",
+        "Ensemble_30pct",
+        "Ensemble_35pct",
+        "Ensemble_40pct",
+        "Ensemble_45pct",
+        "Ensemble_50pct",
+        "Ensemble_55pct",
+        "Ensemble_60pct",
+        "Match_30pct",
+        "Match_35pct",
+        "Match_40pct",
+        "Match_45pct",
+        "Match_50pct",
+        "Match_55pct",
+        "Match_60pct"
+    ]
+
+    merged = merged[ordered_cols]
+    return merged
+
 
 
 
@@ -374,7 +434,22 @@ if __name__ == "__main__":
         # segments_with_states.to_csv("pelt_segments_with_states.csv", index = False)
 
         expanded_states = expand_segments_to_years(segments_with_states)
-        expanded_states.to_csv("pelt_top10_states_expanded.csv", index = False)
+        expanded_states.to_csv("pelt_states_expanded.csv", index = False)
 
-        ground_truth = load_enso_ground_truth("enso_oni_data_1950_1990.csv")
-        plot_all_sites(expanded_states, ground_truth, max_sites=21)
+        ground_truth = load_enso_ground_truth("enso_oni_data_1950_2010.csv")
+
+        # only do from 1950 to 2000
+        expanded_states = expanded_states[
+            (expanded_states["year"] >= 1950) &
+            (expanded_states["year"] <= 2000)
+            ]
+
+        ground_truth = ground_truth[
+            (ground_truth["year"] >= 1950) &
+            (ground_truth["year"] <= 2000)
+            ]
+
+        # plot_all_sites(expanded_states, ground_truth, max_sites=21)
+
+        ensemble_df = compute_enso_ensemble(expanded_states, ground_truth)
+        ensemble_df.to_csv("PELT_enso_ensemble_results.csv", index=False)
