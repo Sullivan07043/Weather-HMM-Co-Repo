@@ -899,9 +899,4 @@ This project is submitted as coursework for CSE 250A at UC San Diego. All rights
 For academic use: Citation and attribution required.
 For commercial use: Permission required from authors.
 
----
-
-**Project Team**: [Your Team Name]  
-**Contact**: [Your Email]  
-**Last Updated**: November 2024
 
