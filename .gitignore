@@ -1,0 +1,31 @@
+# IDE
+.idea/
+.vscode/
+
+# Data files
+data/
+*/data/
+kaggle_data/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+env/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Other
+*.log
+

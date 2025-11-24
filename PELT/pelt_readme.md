@@ -12,6 +12,11 @@ For weather data, PELT can detect:
 
 The algorithm works by minimizing a cost function that balances segment fit quality against the number of segments, controlled by a penalty parameter.
 
+## How does it assign state (enso_anomaly) ?
+1. it applies PELT on each site's multivariate time series to find the changing point, and find the time segments spliting by these changing points.
+2. For each site, it calculates the segment average time series data, and compare the L2 distance between this segment avg data with the overall avg data of this site.
+    Large distance → unusual climate period.  Small distance → normal climate period
+
 ## What This Script Does
 
 This script processes historical weather data (1901-2019) and uses PELT to automatically segment the time series into periods with statistically similar characteristics. It:
@@ -25,63 +30,13 @@ This script processes historical weather data (1901-2019) and uses PELT to autom
    - Wind speed
    - Precipitation
 3. **Identifies temporal segments** where weather patterns are statistically consistent
-4. **Exports results** with segment boundaries, dates, and indices for further analysis
+4. **Exports results**
+
 
 ## Usage
 
-
-### Input Data Format
-
-The script expects a CSV file with the following columns:
-- `site_id`: Unique identifier for weather station
-- `date`: Timestamp (convertible to datetime)
-- `mean_temp`: Mean temperature
-- `max_temp`: Maximum temperature
-- `min_temp`: Minimum temperature
-- `sea_level_pressure`: Sea level pressure
-- `wind_speed`: Wind speed
-- `precipitation`: Precipitation amount
-
-### Running the Script
-
-**Basic usage:**
-```python
-python script_name.py
-```
-
-This will:
-1. Load `weather_1901_2019_monthly_continuous.csv`
-2. Run PELT with default parameters (`model="rbf"`, `penalty=10`)
-3. Save results to `pelt_segments_enso24.csv`
-
-**Custom usage in your own code:**
-```python
-from script_name import load_data, run_pelt_all_sites
-
-# Load data
-site_dict = load_data("your_weather_data.csv")
-
-# Run PELT with custom parameters
-segments = run_pelt_all_sites(
-    site_dict, 
-    model="rbf",  # 'rbf' for mean+variance, 'l2' for mean only
-    penalty=15    # Higher = fewer segments, Lower = more segments
-)
-
-# Save results
-segments.to_csv("my_segments.csv", index=False)
-```
-
 ### Output Format
-
-The output CSV (`pelt_segments_enso24.csv`) contains:
-- `site_id`: Weather station identifier
-- `segment_id`: Sequential segment number for EACH site.
-- `start_idx`: Starting index in the time series (months)
-- `end_idx`: Ending index (inclusive)
-- `start_date`: First date of this segment
-- `end_date`: Last date of this segment
-- `length`: Number of time points in segment
+csv file "PELT_enso_ensemble_results.csv". The final prediciton produced by voting on 21 local sites prediction results.
 
 ## Parameters
 
@@ -99,43 +54,4 @@ Controls the trade-off between segment fit and number of segments:
 
 Tune this parameter based on your desired segmentation granularity.
 
-## Helper Functions
-
-### `gen_site_csv()`
-Generates a `sites_to_process.csv` file with 24 predefined weather station IDs (USAF-WBAN format).
-
-### `load_data(path)`
-Loads weather data and returns a dictionary:
-```python
-{
-    "site_id": {
-        "X": numpy.ndarray,  # (T, 6) feature matrix
-        "dates": list        # List of timestamps
-    }
-}
-```
-
-### `run_pelt_one_site(X, model, penalty)`
-Runs PELT on a single site's feature matrix, returns breakpoint indices.
-
-### `breakpoints_to_segments(dates, breakpoints)`
-Converts breakpoint indices to segment metadata with dates.
-
-## Example Workflow
-
-```python
-# 1. Load your data
-site_dict = load_data("weather_data.csv")
-
-# 2. Run segmentation
-segments = run_pelt_all_sites(site_dict, model="rbf", penalty=12)
-
-# 3. Analyze results
-print(f"Total segments detected: {len(segments)}")
-print(f"Average segment length: {segments['length'].mean():.1f} months")
-
-# 4. Filter long-term stable periods
-stable_periods = segments[segments['length'] > 120]  # >10 years
-print(f"Stable periods (>10 years): {len(stable_periods)}")
-```
 
