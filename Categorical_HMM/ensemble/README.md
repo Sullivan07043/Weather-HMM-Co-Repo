@@ -436,6 +436,13 @@ For questions or suggestions about the ensemble voting system, please open an is
 
 ## Version History
 
+- **v3.2** (2025-11-24): Viterbi decoding implementation
+  - **Decoding Algorithm**: Changed from posterior decoding to Viterbi algorithm
+  - **Method**: Finds globally optimal state sequence for each station
+  - **Performance**: Maintained F1=0.5517 with 50% threshold
+  - **Benefit**: Ensures valid state transitions and global optimality
+  - All other configurations unchanged
+
 - **v3.1** (2025-11-24): Moderate+ ENSO definition with enhanced features
   - **ENSO Definition**: Changed to Moderate, Strong, Very Strong only (21 anomaly years)
   - **Features**: Expanded from 6 to 13 features (added visibility + 6 binary weather events)

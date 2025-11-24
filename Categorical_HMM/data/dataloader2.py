@@ -658,7 +658,7 @@ class GSODDataLoader:
                             limit_direction='both',
                             limit=365
                         )
-                    
+                
                     # 2. 对于仍然缺失的值（超过365天的间隔），使用时间加权的全局均值
                     if interpolated.isna().any():
                         # 使用相同日期的全局平均值（考虑季节性）
@@ -1218,10 +1218,10 @@ class GSODDataLoader:
             f.write("-" * 40 + "\n")
             for feature, info in normalization_info.items():
                 if info['type'] == 'binary':
-                    f.write(f"\n{feature}:\n")
-                    f.write(f"  原始范围: [{info['min']:.2f}, {info['max']:.2f}]\n")
-                    f.write(f"  唯一值数: {info['unique_values']}\n")
-                    f.write(f"  离散化后: {info['bins']} 组 (0-{info['bins']-1})\n")
+                f.write(f"\n{feature}:\n")
+                f.write(f"  原始范围: [{info['min']:.2f}, {info['max']:.2f}]\n")
+                f.write(f"  唯一值数: {info['unique_values']}\n")
+                f.write(f"  离散化后: {info['bins']} 组 (0-{info['bins']-1})\n")
 
         print(f"\n   归一化信息已保存到: {info_path}")
         continuous_count = sum(1 for info in normalization_info.values() if info['type'] == 'continuous')

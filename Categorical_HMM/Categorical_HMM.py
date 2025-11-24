@@ -269,10 +269,71 @@ class FactorizedCategoricalHMM:
     # -----------------------
     # Decode hidden states using posterior argmax
     # -----------------------
-    def predict(self, X):
+    def viterbi(self, X):
+        """
+        Viterbi algorithm to find the most likely state sequence.
+        
+        Parameters:
+        -----------
+        X : array-like, shape (T, F)
+            Observation sequence
+            
+        Returns:
+        --------
+        path : array, shape (T,)
+            Most likely state sequence
+        """
         X = np.asarray(X, dtype=int)
-        _, gamma, _ = self._forward_backward(X)
-        return np.argmax(gamma, axis=1)
+        T = len(X)
+        K = self.n_components
+        
+        # Compute log emission probabilities for all time steps
+        log_B_all = self._compute_log_emission(X)  # (T, K)
+        
+        # Initialize
+        log_pi = np.log(self.pi_ + 1e-10)
+        log_A = np.log(self.A_ + 1e-10)
+        
+        # Viterbi variables
+        log_delta = np.zeros((T, K))  # log of max probability
+        psi = np.zeros((T, K), dtype=int)  # backpointer
+        
+        # Initialization (t=0)
+        log_delta[0] = log_pi + log_B_all[0]
+        
+        # Recursion (t=1 to T-1)
+        for t in range(1, T):
+            for j in range(K):
+                # For each state j at time t, find the best previous state
+                temp = log_delta[t-1] + log_A[:, j]
+                psi[t, j] = np.argmax(temp)
+                log_delta[t, j] = temp[psi[t, j]] + log_B_all[t, j]
+        
+        # Termination: find best final state
+        path = np.zeros(T, dtype=int)
+        path[T-1] = np.argmax(log_delta[T-1])
+        
+        # Backtracking
+        for t in range(T-2, -1, -1):
+            path[t] = psi[t+1, path[t+1]]
+        
+        return path
+    
+    def predict(self, X):
+        """
+        Predict the most likely state sequence using Viterbi algorithm.
+        
+        Parameters:
+        -----------
+        X : array-like, shape (T, F)
+            Observation sequence
+            
+        Returns:
+        --------
+        states : array, shape (T,)
+            Most likely state sequence
+        """
+        return self.viterbi(X)
 
 
 # ========================
@@ -646,7 +707,7 @@ if __name__ == "__main__":
     
     # Path to preprocessed yearly data with discretized features (detrended version)
     csv_path = "data/processed/weather_1901_2019_yearly_detrend_adaptive_bins10.csv"
-    
+
     data_dict, lengths_dict, feature_cols, n_categories = load_data(
         csv_path,
         site_ids=site_ids,

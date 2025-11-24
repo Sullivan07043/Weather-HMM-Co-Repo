@@ -33,6 +33,8 @@ where each feature `f` is a categorical variable. This approach allows modeling 
 
 - **EM algorithm**: Implements Baum-Welch (forward-backward) algorithm for parameter estimation
 
+- **Viterbi decoding**: Uses Viterbi algorithm to find the most likely state sequence (global optimum)
+
 - **Numerical stability**: Uses log-sum-exp trick to prevent numerical underflow
 
 - **Trend removal**: Detrends continuous features using adaptive methods (polynomial, differencing, high-pass filtering)
@@ -279,6 +281,33 @@ tol = 1e-3
 - Transition matrix: `A_{ij} ∝ Σ_t ξ_t(i,j)`
 - Emission matrices: `B_f(k,v) ∝ Σ_t γ_t(k) · 1{x_{t,f}=v}`
 
+### Viterbi Decoding
+
+The Viterbi algorithm finds the most likely state sequence globally:
+
+**Initialization** (t=0):
+```
+δ_0(k) = π_k · p(x_0 | z_0=k)
+```
+
+**Recursion** (t=1 to T-1):
+```
+δ_t(j) = max_i [δ_{t-1}(i) · A_{ij}] · p(x_t | z_t=j)
+ψ_t(j) = argmax_i [δ_{t-1}(i) · A_{ij}]
+```
+
+**Termination**:
+```
+z_T* = argmax_k δ_T(k)
+```
+
+**Backtracking** (t=T-1 to 0):
+```
+z_t* = ψ_{t+1}(z_{t+1}*)
+```
+
+This ensures the decoded state sequence respects transition probabilities and finds the globally optimal path, unlike posterior decoding which maximizes each state independently.
+
 ### Model Complexity
 
 Number of free parameters:
@@ -343,6 +372,13 @@ This model can be used for:
 - NOAA Climate Prediction Center. Oceanic Niño Index (ONI). Retrieved from https://ggweather.com/enso/oni.htm
 
 ## Version History
+
+- **v3.2** (2025-11-24): Viterbi decoding implementation
+  - **Decoding**: Changed from posterior decoding to Viterbi algorithm
+  - **Algorithm**: Finds globally optimal state sequence using dynamic programming
+  - **Performance**: Maintained F1=0.5517 with 50% threshold
+  - **Benefit**: Ensures valid state transitions and global optimality
+  - All other configurations unchanged (13 features, Moderate+ ENSO, 21 stations)
 
 - **v3.1** (2025-11-24): Moderate+ ENSO definition with enhanced features
   - **ENSO Definition**: Moderate, Strong, and Very Strong events only (21 anomaly years)
