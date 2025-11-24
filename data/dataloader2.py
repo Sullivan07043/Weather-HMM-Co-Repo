@@ -28,6 +28,7 @@ class GSODDataLoader:
         time_aggregation='daily',   # 新增：时间聚合方式 ('daily', 'monthly', 'quarterly', 'yearly')
         detrend=False,   # 新增：是否去趋势
         detrend_method='difference',   # 新增：去趋势方法
+        complete_time_series=True,   # 新增：是否确保完整时间序列
     ):
         """
         初始化数据加载器
@@ -50,6 +51,9 @@ class GSODDataLoader:
                 - 'linear': 线性去趋势
                 - 'moving_average': 移动平均去趋势
                 - 'seasonal': 季节性差分（适合有明显季节性的数据）
+            complete_time_series: 是否确保每个站点都有完整的时间序列（默认True）
+                - True: 为每个站点创建完整日期范围，缺失日期用插值填充
+                - False: 只填充已有记录中的缺失值，不补全缺失的日期
         """
         if data_root is None:
             # 自动检测数据路径
@@ -87,6 +91,9 @@ class GSODDataLoader:
         if detrend_method not in ['difference', 'linear', 'moving_average', 'seasonal']:
             raise ValueError("detrend_method 必须是 'difference', 'linear', 'moving_average' 或 'seasonal'")
         self.detrend_method = detrend_method
+        
+        # 完整时间序列参数
+        self.complete_time_series = complete_time_series
 
         # 数据格式定义（基于 GSOD 文档）
         self.missing_values = {
@@ -419,10 +426,14 @@ class GSODDataLoader:
 
         print(f"   清洗完成，保留 {len(df_cleaned)} 行，{len(df_cleaned.columns)} 列特征")
 
-        # 1. 先填充缺失值（在时间聚合之前，保证插值效果）
+        # 1. 确保每个站点都有完整的时间序列（填补缺失的日期记录）
+        if self.complete_time_series:
+            df_cleaned = self.ensure_complete_time_series(df_cleaned)
+        
+        # 2. 填充缺失值（在时间聚合之前，保证插值效果）
         df_cleaned = self.fill_missing_values(df_cleaned)
         
-        # 2. 进行时间聚合（如果需要）
+        # 3. 进行时间聚合（如果需要）
         if self.time_aggregation == 'monthly':
             df_cleaned = self.aggregate_to_monthly(df_cleaned)
         elif self.time_aggregation == 'quarterly':
@@ -431,15 +442,87 @@ class GSODDataLoader:
             df_cleaned = self.aggregate_to_yearly(df_cleaned)
         # 如果是 'daily'，则不做聚合
         
-        # 3. 进行去趋势处理（如果启用）
+        # 4. 进行去趋势处理（如果启用）
         if self.detrend:
             df_cleaned = self.detrend_data(df_cleaned)
         
-        # 4. 进行归一化和离散化（如果启用）
+        # 5. 进行归一化和离散化（如果启用）
         if self.discretize:
             df_cleaned = self.normalize_and_discretize(df_cleaned)
 
         return df_cleaned
+
+    def ensure_complete_time_series(self, df):
+        """
+        确保每个站点都有完整的时间序列记录
+        
+        问题：有些站点可能连续几年都没有记录（整行缺失）
+        解决：为每个站点创建完整的日期范围，缺失的日期用NaN填充
+        
+        Args:
+            df: 输入数据框
+            
+        Returns:
+            DataFrame: 包含完整时间序列的数据框
+        """
+        print("\n确保每个站点都有完整的时间序列...")
+        
+        # 获取全局日期范围
+        min_date = df['date'].min()
+        max_date = df['date'].max()
+        print(f"   数据日期范围: {min_date} 到 {max_date}")
+        
+        # 创建完整的日期序列
+        full_date_range = pd.date_range(start=min_date, end=max_date, freq='D')
+        print(f"   完整日期序列长度: {len(full_date_range)} 天")
+        
+        # 获取所有站点列表
+        all_sites = df['site_id'].unique()
+        print(f"   站点数量: {len(all_sites)}")
+        
+        # 统计原始数据行数
+        original_rows = len(df)
+        
+        # 为每个站点创建完整的时间序列
+        complete_data_list = []
+        
+        for site_id in tqdm(all_sites, desc="   创建完整时间序列"):
+            # 获取该站点的实际数据
+            site_data = df[df['site_id'] == site_id].copy()
+            
+            # 创建该站点的完整日期框架
+            site_complete = pd.DataFrame({
+                'site_id': site_id,
+                'date': full_date_range
+            })
+            
+            # 将实际数据合并到完整框架中
+            # 使用左连接，保留所有日期，缺失的特征值会是NaN
+            site_complete = site_complete.merge(
+                site_data,
+                on=['site_id', 'date'],
+                how='left'
+            )
+            
+            complete_data_list.append(site_complete)
+        
+        # 合并所有站点的数据
+        df_complete = pd.concat(complete_data_list, ignore_index=True)
+        
+        # 按站点和日期排序
+        df_complete = df_complete.sort_values(['site_id', 'date']).reset_index(drop=True)
+        
+        # 统计结果
+        new_rows = len(df_complete)
+        added_rows = new_rows - original_rows
+        
+        print(f"   ✅ 完整时间序列创建完成")
+        print(f"      原始数据行数: {original_rows:,}")
+        print(f"      补全后行数: {new_rows:,}")
+        print(f"      新增行数: {added_rows:,} ({added_rows/original_rows*100:.1f}%)")
+        print(f"      平均每站点: {new_rows/len(all_sites):.1f} 条记录")
+        
+        return df_complete
 
     def fill_missing_values(self, df):
         """
@@ -450,6 +533,8 @@ class GSODDataLoader:
         2. 如果开头/结尾仍有NaN，使用前向/后向填充
         3. 如果整列都是NaN，使用全局均值
         4. 二进制特征用0填充（表示事件未发生）
+        
+        注意：此方法应在 ensure_complete_time_series 之后调用
         """
         print("\n填充缺失值...")
         
@@ -463,6 +548,17 @@ class GSODDataLoader:
         
         # 按站点分组处理连续特征
         print("   对连续特征进行时间序列插值...")
+        
+        # 首先计算每个特征的全局统计量（用于长期缺失的站点）
+        global_stats = {}
+        for feature in self.continuous_features:
+            if feature in df_filled.columns:
+                global_stats[feature] = {
+                    'mean': df_filled[feature].mean(),
+                    'median': df_filled[feature].median(),
+                    'std': df_filled[feature].std()
+                }
+        
         for site_id in tqdm(df_filled['site_id'].unique(), desc="   处理站点", leave=False):
             site_mask = df_filled['site_id'] == site_id
             
@@ -471,20 +567,68 @@ class GSODDataLoader:
                     continue
                 
                 # 获取该站点该特征的数据
-                site_feature_data = df_filled.loc[site_mask, feature]
+                site_feature_data = df_filled.loc[site_mask, feature].copy()
                 
                 if site_feature_data.isna().all():
-                    # 如果该站点该特征全是NaN，跳过（后面用全局均值填充）
+                    # 如果该站点该特征全是NaN，用全局均值填充
+                    if pd.notna(global_stats[feature]['mean']):
+                        df_filled.loc[site_mask, feature] = global_stats[feature]['mean']
                     continue
                 
-                # 1. 线性插值（基于时间顺序）
-                interpolated = site_feature_data.interpolate(method='linear', limit_direction='both')
+                # 检查缺失比例
+                missing_ratio = site_feature_data.isna().sum() / len(site_feature_data)
                 
-                # 2. 前向填充（处理开头的NaN）
-                interpolated = interpolated.fillna(method='ffill')
-                
-                # 3. 后向填充（处理结尾的NaN）
-                interpolated = interpolated.fillna(method='bfill')
+                if missing_ratio > 0.8:
+                    # 如果缺失超过80%，使用全局中位数作为基准，再加上站点偏移
+                    valid_data = site_feature_data.dropna()
+                    if len(valid_data) > 0:
+                        site_offset = valid_data.mean() - global_stats[feature]['mean']
+                        interpolated = site_feature_data.fillna(
+                            global_stats[feature]['mean'] + site_offset
+                        )
+                    else:
+                        interpolated = site_feature_data.fillna(global_stats[feature]['mean'])
+                else:
+                    # 缺失比例较小，使用多种插值方法
+                    
+                    # 1. 首先使用三次样条插值（对于平滑的数据效果更好）
+                    try:
+                        interpolated = site_feature_data.interpolate(
+                            method='cubic',
+                            limit_direction='both',
+                            limit=365  # 最多插值365天
+                        )
+                    except:
+                        # 如果三次样条失败，降级为线性插值
+                        interpolated = site_feature_data.interpolate(
+                            method='linear',
+                            limit_direction='both',
+                            limit=365
+                        )
+                    
+                    # 2. 对于仍然缺失的值（超过365天的间隔），使用时间加权的全局均值
+                    if interpolated.isna().any():
+                        # 使用相同日期的全局平均值（考虑季节性）
+                        for idx in interpolated[interpolated.isna()].index:
+                            date = df_filled.loc[idx, 'date']
+                            # 获取相同月份和日期的所有站点数据
+                            same_period_mask = (
+                                (df_filled['date'].dt.month == date.month) &
+                                (df_filled['date'].dt.day == date.day)
+                            )
+                            same_period_mean = df_filled.loc[same_period_mask, feature].mean()
+                            
+                            if pd.notna(same_period_mean):
+                                interpolated.loc[idx] = same_period_mean
+                            else:
+                                # 如果同期数据也缺失，使用全局均值
+                                interpolated.loc[idx] = global_stats[feature]['mean']
+                    
+                    # 3. 前向填充（处理开头的NaN）
+                    interpolated = interpolated.fillna(method='ffill')
+                    
+                    # 4. 后向填充（处理结尾的NaN）
+                    interpolated = interpolated.fillna(method='bfill')
                 
                 # 更新数据
                 df_filled.loc[site_mask, feature] = interpolated
@@ -893,6 +1037,7 @@ class GSODDataLoader:
         print(f"   站点数: {df['site_id'].nunique()}")
         print(f"   日期范围: {df['date'].min()} 到 {df['date'].max()}")
         print(f"   时间粒度: {time_granularity_map[self.time_aggregation]}")
+        print(f"   完整时间序列: {'是' if self.complete_time_series else '否'}")
         
         if self.detrend:
             detrend_method_map = {
@@ -1019,8 +1164,22 @@ def main():
     else:
         print("   ✓ 保留原始趋势")
 
-    # 3. 离散化选择
-    print("\n【3/5】是否对连续特征进行归一化和离散化？")
+    # 3. 缺失值处理策略
+    print("\n【3/5】缺失值处理策略：")
+    print("说明：部分站点可能连续几年都没有数据记录")
+    print("1. 完整填充（推荐）- 为每个站点创建完整时间序列，使用智能插值填补所有缺失")
+    print("2. 仅填充已有记录 - 只对已有记录中的缺失值进行填充，不补全缺失的日期")
+    
+    complete_choice = input("\n请选择 (1/2) [默认: 1]: ").strip() or "1"
+    complete_time_series = (complete_choice == "1")
+    
+    if complete_time_series:
+        print("   ✓ 将创建完整时间序列并智能填充所有缺失值")
+    else:
+        print("   ✓ 仅填充已有记录中的缺失值")
+
+    # 4. 离散化选择
+    print("\n【4/5】是否对连续特征进行归一化和离散化？")
     print("1. 是 - 归一化到 [0,1] 并离散化为 N 组（推荐用于 HMM）")
     print("2. 否 - 保持原始连续值")
 
@@ -1037,8 +1196,8 @@ def main():
     else:
         print("   ✓ 保持连续值")
 
-    # 4. 站点选择
-    print("\n【4/5】选择要处理的站点：")
+    # 5. 站点选择
+    print("\n【5/5】选择要处理的站点：")
     station_csv_input = input(
         "   站点列表 CSV 路径（包含 USAF, WBAN；留空使用默认站点列表）: "
     ).strip() or None
@@ -1054,7 +1213,8 @@ def main():
         station_list_csv=station_csv_input,
         time_aggregation=time_aggregation,
         detrend=detrend,
-        detrend_method=detrend_method
+        detrend_method=detrend_method,
+        complete_time_series=complete_time_series
     )
 
     # 加载站点元数据（这里会生成 target_site_ids）
@@ -1069,8 +1229,8 @@ def main():
 
     print(f"   找到 {len(available_years)} 个年份: {available_years[0]} - {available_years[-1]}")
 
-    # 5. 年份范围选择
-    print("\n【5/5】选择处理哪些年份的数据：")
+    # 6. 年份范围选择
+    print("\n【6/6】选择处理哪些年份的数据：")
     print("1. 快速测试（2015年，前50个目标站点文件）")
     print("2. 单年完整（2015年，所有目标站点文件）")
     print("3. 近期数据（1973-2019 年，所有目标站点）")
